@@ -1,18 +1,16 @@
-"""Etapas 3 e 4 do enunciado: três métodos de seleção de features e votação.
+"""Feature F3 (critério 3): três métodos de seleção de features.
 
-STATUS: a implementar (ver docs/divisao_de_tarefas.md, critérios 3 e 4).
+Dono: ver ``config/equipe.yaml``. STATUS: a implementar. Pronto quando: ver ``docs/divisao_de_tarefas.md``.
 
-Contrato de entrada (notebook 02):
+Contrato de entrada (notebook 02, seção dos métodos):
   * ``ctx = carregar_contexto(cfg)``; ``dev = carregar_particao("dev", cfg)``
   * X = ``construir_preprocessador(cfg)`` ajustado SOMENTE no dev (ou dentro de cada fold do CV)
   * y = ``dev[cfg["avaliacao"]["alvo"]]``
-  * Parâmetros em ``cfg["selecao"]`` (k_top, métodos, regra de votação), já definidos antes de rodar.
+  * Parâmetros em ``cfg["selecao"]`` (métodos, k_top), já definidos antes de rodar.
 
-Contrato de saída (para o notebook 03):
-  * ``data/processed/features_eleitas.json`` com: cycle_id, data_version, lista de features eleitas
-    (nomes após o pré-processador), regra de votação usada e k_top.
-  * ``evidencias/votacao/votos_<cycle_id>.csv`` com a tabela de votos e os rankings dos 3 métodos.
-  * Registro no MLflow dos votos, do conjunto final, dos parâmetros e do cycle_id (critério 6).
+Contrato de saída (consumido por ``src/votacao.py``, feature F4):
+  * ``calcular_rankings`` devolve ``{método: Series(score por feature)}`` com os nomes das features
+    DEPOIS do pré-processador (mesmo índice nos três métodos).
 
 Lembrete do enunciado: a seleção é ajustada apenas no treino e, com validação cruzada, dentro de cada fold.
 """
@@ -26,14 +24,4 @@ def calcular_rankings(X: pd.DataFrame, y: pd.Series, cfg: dict) -> dict[str, pd.
 
     Retorna um dicionário ``{nome_do_metodo: Series(importância/score por feature)}``.
     """
-    raise NotImplementedError("TODO(critério 3): implementar os três métodos de seleção")
-
-
-def votar(rankings: dict[str, pd.Series], cfg: dict) -> pd.DataFrame:
-    """Monta a tabela de votos: uma linha por feature, uma coluna de voto por método, total e ranking médio."""
-    raise NotImplementedError("TODO(critério 4): aplicar o top-k de cada método e contar os votos")
-
-
-def eleger_features(tabela_votos: pd.DataFrame, cfg: dict) -> list[str]:
-    """Aplica a regra de ``cfg['selecao']['votacao']`` (mín. de votos, desempate, mín. de features)."""
-    raise NotImplementedError("TODO(critério 4): eleger o conjunto final de features")
+    raise NotImplementedError("TODO(F3): implementar os três métodos de seleção")

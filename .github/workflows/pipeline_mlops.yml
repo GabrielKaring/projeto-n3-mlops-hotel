@@ -1,9 +1,9 @@
 # Workflow ÚNICO do pipeline (enunciado, seção 2 e Etapa 7).
 #
 # STATUS: esqueleto mínimo. Roda testes e o notebook 01. Ainda NÃO foi executado no GitHub Actions.
-# Responsável pelo critério 7: completar (ver docs/divisao_de_tarefas.md).
+# Feature F7 (critério 7): dono em config/equipe.yaml; completar conforme docs/divisao_de_tarefas.md.
 #
-# Pendências do critério 7:
+# Pendências da F7:
 #   1. Ativar `schedule` (o enunciado exige evidência de execução pelo gatilho agendado;
 #      workflow_dispatch serve só para depuração).
 #   2. Encadear os notebooks 02 -> 03 -> 04 (-> 05) quando estiverem prontos. Falha em qualquer um
@@ -45,7 +45,7 @@ jobs:
           jupyter nbconvert --to notebook --execute notebooks/01_etl.ipynb
           --output 01_executado.ipynb --output-dir evidencias/execucao
 
-      # TODO(critério 7): 02_votacao_features -> 03_treino_competicao -> 04_selecao_promocao -> 05_previsoes
+      # TODO(F7): 02_votacao_features -> 03_treino_competicao -> 04_selecao_promocao -> 05_previsoes
 
       - name: Publicar evidências
         if: always()

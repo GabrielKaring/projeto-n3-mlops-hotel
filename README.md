@@ -6,22 +6,24 @@ Pipeline preditivo versionado e agendado que, a cada ciclo, incorpora dados novo
 
 **Problema:** prever se uma reserva de hotel será cancelada (classificação binária), usando o dataset público [Hotel Booking Demand](https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand). Detalhes e decisões em [`docs/etapa1_problema_dados_avaliacao.md`](docs/etapa1_problema_dados_avaliacao.md).
 
-## Status
+## Status por feature
 
-| Etapa | Critério | Responsável | Status |
+Cada feature é um critério do enunciado e tem um dono (1 a 2 features por pessoa), definido em [`config/equipe.yaml`](config/equipe.yaml).
+
+| Feature | Critério | Dono (proposta) | Status |
 |---|---|---|---|
-| 1. Problema, dados e avaliação | 1 | Gabriel | ✅ pronto |
-| 2. ETL e engenharia de atributos | 2 | Gabriel | ✅ pronto (testes + 2 ciclos de evidência) |
-| 3. Três métodos de seleção | 3 | a definir | ⬜ esqueleto (`src/features.py`, notebook 02) |
-| 4. Votação e eleição das features | 4 | a definir | ⬜ esqueleto |
-| 5. Dois algoritmos disputam | 5 | a definir | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
-| 6. MLflow e rastreabilidade | 6 | a definir | ⬜ config proposta, sem código |
-| 7. Workflow único e agendamento | 7 | a definir | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
-| 8. Eleição, promoção e previsões | 8 | a definir | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
-| 9. Repositório, relatório e evidências | 9 | Gabriel (coord.) | 🟨 README e histórico prontos; falta o relatório PDF |
-| 10. Recurso adicional | 10 | a definir | ⬜ ideia sugerida em `docs/divisao_de_tarefas.md` |
+| F1 | 1 · Problema, dados e avaliação | Gabriel | ✅ pronto |
+| F2 | 2 · ETL e engenharia de atributos | Gabriel | ✅ pronto (testes + 2 ciclos de evidência) |
+| F3 | 3 · Três métodos de seleção | Integrante 2 | ⬜ esqueleto (`src/features.py`, notebook 02) |
+| F4 | 4 · Votação e eleição das features | Integrante 3 | ⬜ esqueleto (`src/votacao.py`, notebook 02) |
+| F5 | 5 · Dois algoritmos disputam | Integrante 4 | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
+| F6 | 6 · MLflow e rastreabilidade | Integrante 5 | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
+| F7 | 7 · Workflow único e agendamento | Integrante 5 | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
+| F8 | 8 · Eleição, promoção e previsões | Integrante 6 | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
+| F9 | 9 · Repositório, relatório e evidências | Integrante 7 | 🟨 README e histórico prontos; falta o relatório PDF |
+| F10 | 10 · Recurso adicional | Integrante 7 | ⬜ ideia sugerida em `docs/divisao_de_tarefas.md` |
 
-Quem faz o quê e como contribuir: [`docs/divisao_de_tarefas.md`](docs/divisao_de_tarefas.md). Histórico de commits por integrante: [`HISTORICO_DESENVOLVIMENTO.md`](HISTORICO_DESENVOLVIMENTO.md).
+Definição de pronto, evidência e teste de cada feature: [`docs/divisao_de_tarefas.md`](docs/divisao_de_tarefas.md). Commits seguem `[Fn] descrição`; o [`HISTORICO_DESENVOLVIMENTO.md`](HISTORICO_DESENVOLVIMENTO.md) mostra, por feature, quem fez o quê.
 
 ## Instalação
 
@@ -35,7 +37,7 @@ Testado com Python 3.13, pandas 2.3, scikit-learn 1.9 e mlflow 3.18 (o que o `re
 ## Execução local
 
 ```bash
-python -m pytest -q                      # testes (ingestão, ETL, ausência de vazamento, avaliação)
+python -m pytest -q                      # testes (ingestão, ETL, ausência de vazamento, avaliação, divisão da equipe, histórico)
 python -m src.ingestao                   # registra lotes novos em data/raw e mostra data_version
 python -m src.ingestao --liberar 1       # simula a chegada do próximo lote mensal (data/incoming -> data/raw)
 cd notebooks && jupyter nbconvert --to notebook --execute 01_etl.ipynb --output 01_executado.ipynb --output-dir ../evidencias/execucao
@@ -50,12 +52,13 @@ Os dados já estão no repositório, divididos em lotes mensais. Para regerá-lo
 ```
 .github/workflows/pipeline_mlops.yml   workflow único (esqueleto)
 config/config.yaml                     métrica, partição, ETL, votação, modelos, promoção, MLflow
+config/equipe.yaml                     dono de cada feature (F1..F10), validado por tests/test_equipe.py
 data/raw/                              lotes incorporados (*.csv.gz) + manifest.json
 data/incoming/                         lotes futuros, liberados um a um para simular dados novos
 data/processed/                        saídas intermediárias do ciclo (não versionadas)
 docs/                                  decisões da Etapa 1 e divisão de tarefas
 notebooks/01_etl.ipynb ... 05_previsoes.ipynb
-src/                                   ingestao, preprocessamento, avaliacao (prontos); features, modelagem, promocao (esqueletos)
+src/                                   ingestao, preprocessamento, avaliacao (prontos); features, votacao, modelagem, rastreio, promocao (esqueletos)
 tests/                                 pytest
 models/modelo_vigente.json             gerado pela promoção (ainda não existe)
 evidencias/                            diagnósticos e notebooks executados
@@ -68,7 +71,7 @@ O notebook 01 grava `data/processed/ciclo_atual.json` (com `cycle_id`, `data_ver
 
 ## Execução agendada e MLflow
 
-Ainda não implementados (critérios 7 e 6). O esqueleto do workflow lista as pendências. Lembrete: o runner do GitHub Actions é efêmero, então o histórico do MLflow, o manifesto dos lotes e o modelo vigente precisam de armazenamento persistente entre ciclos.
+Ainda não implementados (features F7 e F6). O esqueleto do workflow lista as pendências. Lembrete: o runner do GitHub Actions é efêmero, então o histórico do MLflow, o manifesto dos lotes e o modelo vigente precisam de armazenamento persistente entre ciclos.
 
 ## Dados e licença
 

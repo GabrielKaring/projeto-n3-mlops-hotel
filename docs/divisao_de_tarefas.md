@@ -1,37 +1,65 @@
-# Divisão de tarefas
+# Divisão de tarefas por feature
 
-Proposta inicial para 7 integrantes. Preencha os nomes e ajuste à vontade, mas registre a mudança em um commit.
+Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ..., F10 = critério 10) e tem **um dono**, que responde por ela na avaliação individual. Cada integrante tem de **1 a 2 features**.
 
-> **Atenção:** o enunciado (`Trabalho_N3_Analise_Preditiva_MLOps.pdf`, capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega.
+A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 2 (ou ficar com 0).
 
-## Quem faz o quê
+> **Atenção:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega. Com 5 pessoas a divisão cabe exatamente (2 features cada); basta remover dois integrantes de `equipe.yaml` e redistribuir.
 
-| # | Integrante | GitHub | Critérios | Notebook / módulo | Status |
-|---|---|---|---|---|---|
-| 1 | Gabriel Henrique Karing | | **1, 2** e **9** (coordenação, README e relatório) | `01_etl`, `src/ingestao.py`, `src/preprocessamento.py`, `src/avaliacao.py` | 1 e 2 feitos; 9 em andamento |
-| 2 | _nome_ | | **3, 4**: três métodos de seleção e votação | `02_votacao_features`, `src/features.py` | a fazer |
-| 3 | _nome_ | | **5**: treino dos dois algoritmos | `03_treino_competicao`, `src/modelagem.py` | a fazer |
-| 4 | _nome_ | | **6**: MLflow, persistência e rastreabilidade | `src/` (novo módulo de rastreio), `config.mlflow` | a fazer |
-| 5 | _nome_ | | **7**: workflow único e agendamento | `.github/workflows/pipeline_mlops.yml` | esqueleto pronto |
-| 6 | _nome_ | | **8**: eleição, promoção e previsões | `04_selecao_promocao`, `05_previsoes`, `src/promocao.py` | a fazer |
-| 7 | _nome_ | | **10**: recurso adicional justificado | a definir | a fazer |
+## Quem entrega o quê
 
-**Sugestão para o critério 10:** monitoramento de drift com alerta. O dataset tem mudança real de distribuição (a taxa de cancelamento sobe para ~43% em abr-jun/2017), então há um problema concreto para motivar o recurso. Ele deve **não** repetir os critérios 1 a 9: a validação de esquema que já existe em `validar_dados_brutos` faz parte do critério 2 e não conta.
+| Feature | Critério | Dono (proposta) | Entrega | Status |
+|---|---|---|---|---|
+| **F1** | 1 · Problema, dados e avaliação | Gabriel | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
+| **F2** | 2 · ETL e engenharia de atributos | Gabriel | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
+| **F3** | 3 · Três métodos de seleção | Integrante 2 | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
+| **F4** | 4 · Votação e eleição | Integrante 3 | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
+| **F5** | 5 · Dois algoritmos disputam | Integrante 4 | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
+| **F6** | 6 · MLflow e rastreabilidade | Integrante 5 | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
+| **F7** | 7 · Workflow único e agendamento | Integrante 5 | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
+| **F8** | 8 · Eleição, promoção e previsões | Integrante 6 | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
+| **F9** | 9 · Repositório, relatório e evidências | Integrante 7 | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
+| **F10** | 10 · Recurso adicional | Integrante 7 | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
 
-## Dependências entre as partes
+Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python -m pytest tests/test_equipe.py` e faça um commit `[equipe] ...`. O nome em `integrantes` deve ser **igual ao nome dos seus commits no git** (ver `.mailmap`); é assim que o histórico por feature reconhece o seu trabalho.
+
+## Definição de pronto e evidência de cada feature
+
+O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o dono adiciona em `tests/`.
+
+| Feature | Pronto quando | Evidência | Teste mínimo |
+|---|---|---|---|
+| F1 | Problema, variável-alvo, métrica, partição e protocolo definidos antes de rodar modelos | `docs/etapa1_...md` | `tests/test_avaliacao.py` (existente) |
+| F2 | Lotes versionados, validação, limpeza sem vazamento, `cycle_id` e `data_version` | `evidencias/etl/` (2 ciclos) | `tests/test_ingestao.py`, `test_preprocessamento.py` (existentes) |
+| F3 | SelectKBest, importância do RF e RFE rodam sobre o mesmo X/y, ajustados só no treino/folds, rankings de cada método salvos | Tabela de scores por método no notebook 02 | `tests/test_features.py`: três rankings com o mesmo índice; sem uso do teste |
+| F4 | Regra de votação definida **antes** em `config.yaml`; tabela de votos, desempate e mínimo de features; `features_eleitas.json` gerado | `evidencias/votacao/votos_<cycle_id>.csv` | `tests/test_votacao.py`: voto, desempate e piso de features em casos pequenos |
+| F5 | Modelos A e B sobre as mesmas features, partição e métrica; cada um é um `Pipeline` completo serializado | `models/candidatos/<cycle_id>/`, `resultados_competicao.json` | `tests/test_modelagem.py`: A e B treinam e prevêem em dados sintéticos; mesmo protocolo |
+| F6 | Todo run com `cycle_id`, `data_version`, parâmetros, métricas, features e artefatos; dois ciclos recuperáveis; armazenamento persiste entre execuções do runner | Captura do MLflow com 2 ciclos + `run_id`s no relatório | `tests/test_rastreio.py`: run local com as tags do ciclo |
+| F7 | Um único YAML com `schedule`, notebooks 01→05 encadeados, falha interrompe, estado persistido entre execuções | Log de execução **agendada** (não só `workflow_dispatch`) | Execuções reais no Actions (anexar link/log) |
+| F8 | Comparação automática A×B, regra de promoção/manutenção, vigente preservado, modelos antigos mantidos, previsões com o vigente e seu pré-processamento | `models/modelo_vigente.json`, previsões, decisão em 2 ciclos | `tests/test_promocao.py`: primeiro ciclo, melhora suficiente, melhora insuficiente, abaixo do piso |
+| F9 | README reproduzível, relatório PDF com a tabela de votação, a decisão de promoção e as limitações, histórico de commits por integrante | `reports/relatorio_n3.pdf`, `HISTORICO_DESENVOLVIMENTO.md` | Seguir o README em ambiente limpo |
+| F10 | Necessidade real, integrado ao fluxo, resultado demonstrado e **não repete** os critérios 1 a 9 | `evidencias/drift/` + seção do relatório | `tests/test_drift.py` |
+
+**Sugestão para F10:** monitoramento de drift com alerta. O dataset tem mudança real de distribuição (a taxa de cancelamento sobe para ~43% em abr-jun/2017), então há um problema concreto para motivar o recurso. A validação de esquema que já existe em `validar_dados_brutos` faz parte da F2 e não conta.
+
+## Dependências entre as features
 
 ```
-01_etl (pronto) ──> 02 (3, 4) ──> 03 (5) ──> 04 (8) ──> 05 (8)
-        │                                       ▲
-        └──────── 6 (MLflow) registra 02, 03, 04┘
-7 (workflow) executa 01 → 04 (→ 05) e persiste o estado entre execuções
+F1,F2 (prontos) ──> F3 ──> F4 ──> F5 ──> F8
+                                           ▲
+F6 (MLflow) registra F4, F5 e F8 ──────────┘
+F7 (workflow) executa 01 → 05 e persiste o estado entre execuções
+F10 (drift) lê os dados de F2 e alerta no fluxo de F7
 ```
 
-Quem faz a parte 5 e a parte 6 precisa conversar cedo: o runner do GitHub Actions é efêmero, então o histórico do MLflow e o `modelo_vigente.json` precisam de um lugar persistente.
+Pares que precisam conversar cedo (as interfaces são os contratos nas docstrings de `src/`):
+- **F3 → F4:** F3 devolve `{método: Series}` com o mesmo índice; F4 consome.
+- **F6 ↔ F7:** o runner do GitHub Actions é efêmero, então o MLflow, o manifesto dos lotes e o `modelo_vigente.json` precisam de armazenamento persistente. Como o **mesmo dono** cuida das duas na proposta, esta decisão fica com uma pessoa só.
+- **F5 → F8:** F8 lê os modelos e métricas em `models/candidatos/` e `resultados_competicao.json`.
+
+O notebook 02 é compartilhado por F3 e F4: cada um edita **só a sua seção** para não gerar conflito de merge em `.ipynb`.
 
 ## O que já está pronto e como usar
-
-Contrato entre notebooks: o 01 grava `data/processed/ciclo_atual.json`, e os demais apenas leem.
 
 ```python
 from src.config import carregar_config, carregar_contexto
@@ -45,20 +73,27 @@ pre = construir_preprocessador(cfg)     # NÃO ajustado: ajuste só no treino / 
 ```
 
 Regras que valem para todos (vêm do enunciado):
-- A métrica (`f1_macro`) e o protocolo (`criar_cv`) estão definidos em `config/config.yaml`. Não troquem depois de ver resultados.
+- A métrica (`f1_macro`) e o protocolo (`criar_cv`) estão em `config/config.yaml`. Não troquem depois de ver resultados.
 - O conjunto de **teste** só aparece na avaliação final (notebooks 04/05).
 - Seleção de features e pré-processamento são ajustados só com dados de treino, dentro de cada fold.
 - Cada execução carrega o mesmo `cycle_id` e `data_version`, do início ao fim.
-- Os valores de `selecao`, `modelos`, `promocao` e `mlflow` em `config.yaml` são **propostas iniciais**. O dono de cada etapa pode ajustá-los antes do primeiro ciclo oficial.
+- Os valores de `selecao`, `modelos`, `promocao` e `mlflow` em `config.yaml` são **propostas iniciais**. O dono da feature pode ajustá-los antes do primeiro ciclo oficial, registrando a mudança num commit com a tag da feature.
 
-## Como o histórico de todos fica junto
+## Como o histórico e a avaliação individual ficam no git
 
-O histórico de desenvolvimento é o próprio **git**. Cada pessoa faz commits com a própria identidade neste mesmo repositório, e `scripts/gerar_historico.py` monta `HISTORICO_DESENVOLVIMENTO.md` a partir do `git log`, agrupando por integrante.
+O histórico de desenvolvimento é o próprio **git**. Cada pessoa faz commits com a própria identidade neste mesmo repositório.
+
+**Convenção de commit:** a mensagem começa com a tag da feature, `[F3] descrição curta`. Para mais de uma, `[F3][F4]` ou `[F3,F4]`. Commits de documentação geral usam `[docs]`, de ajuste de equipe `[equipe]`, de correção `[fix]`.
+
+`scripts/gerar_historico.py` lê as tags e `config/equipe.yaml` e monta o `HISTORICO_DESENVOLVIMENTO.md`, com:
+- resumo por integrante;
+- **visão por feature**: dono, commits do dono, commits de apoio e se a feature já tem commits do dono;
+- linha do tempo completa.
 
 **Fluxo recomendado**
-1. `git clone` do repositório e uma branch por tarefa: `git switch -c etapa-3-selecao`.
-2. Mensagens de commit no formato `[etapa-3] descrição curta`.
-3. Pull Request para a `main`, integrando com **"Create a merge commit"** ou **"Rebase and merge"**. Evitem *squash*, que apaga os commits individuais.
+1. `git clone` e uma branch por feature: `git switch -c f3-selecao`.
+2. Commits `[F3] ...` com a **sua** identidade (`git config user.name` igual ao nome em `equipe.yaml`).
+3. Pull Request para a `main` (há um template em `.github/pull_request_template.md`), integrando com **"Create a merge commit"** ou **"Rebase and merge"**. Evitem *squash*, que apaga os commits individuais.
 4. Antes da entrega: `python scripts/gerar_historico.py` e commitar o arquivo gerado.
 
 **Quem já desenvolveu em outro repositório** pode trazer o histórico preservando os commits originais:
@@ -71,17 +106,4 @@ git merge --allow-unrelated-histories colega/main -m "[historico] incorpora trab
 
 **Identidades duplicadas** (mesma pessoa com dois e-mails) são unificadas no arquivo `.mailmap`.
 
-**O que não fazer:** escrever commits em nome de outra pessoa ou editar datas e autores para simular participação. O histórico serve de evidência de autoria e o professor pode conferi-lo.
-
-## Checklist por critério (definição de pronto)
-
-| Critério | Pronto quando |
-|---|---|
-| 3 | Os 3 métodos rodam no `02`, com ranking/importância de cada um registrados |
-| 4 | Regra de votação definida antes (em `config.yaml`), tabela de votos e conjunto final salvos |
-| 5 | Modelos A e B treinados sobre as mesmas features, mesma partição e mesma métrica, dois runs comparáveis |
-| 6 | Dois ciclos diferentes recuperáveis no MLflow, com `run_id`, `cycle_id`, `data_version`, parâmetros, métricas e artefatos |
-| 7 | Um único YAML, com `schedule` e execução agendada comprovada por log |
-| 8 | Comparação automática, regra de promoção/manutenção registrada e previsões com o vigente e seu pré-processamento |
-| 9 | README reproduzível, relatório PDF com a tabela de votação, a decisão de promoção e as limitações |
-| 10 | Necessidade real, solução integrada ao fluxo e resultado demonstrado no relatório |
+**O que não fazer:** escrever commits em nome de outra pessoa, ou editar datas e autores para simular participação. O histórico serve de evidência de autoria e o professor pode conferi-lo. A tag `[Fn]` indica onde o trabalho foi feito, mas quem avalia é o conteúdo da feature, não a contagem de commits.

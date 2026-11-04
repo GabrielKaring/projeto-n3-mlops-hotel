@@ -1,9 +1,9 @@
-"""Etapa 4 do enunciado: dois algoritmos disputam o modelo preditivo.
+"""Feature F5 (critério 5): dois algoritmos disputam o modelo preditivo.
 
-STATUS: a implementar (ver docs/divisao_de_tarefas.md, critério 5).
+Dono: ver ``config/equipe.yaml``. STATUS: a implementar. Pronto quando: ver ``docs/divisao_de_tarefas.md``.
 
 Contrato de entrada (notebook 03):
-  * ``features_eleitas.json`` gerado pelo notebook 02 (mesmo cycle_id e data_version).
+  * ``features_eleitas.json`` gerado pela feature F4 (notebook 02) (mesmo cycle_id e data_version).
   * ``dev`` de ``carregar_particao("dev", cfg)``; modelos A e B em ``cfg["modelos"]``.
 
 Regras do enunciado:
@@ -25,9 +25,9 @@ from sklearn.pipeline import Pipeline
 
 def construir_pipeline(nome_modelo: str, features_eleitas: list[str], cfg: dict) -> Pipeline:
     """Monta o Pipeline do modelo ``'A'`` ou ``'B'`` a partir de ``cfg['modelos']``."""
-    raise NotImplementedError("TODO(critério 5): pré-processador + seletor das eleitas + algoritmo")
+    raise NotImplementedError("TODO(F5): pré-processador + seletor das eleitas + algoritmo")
 
 
 def treinar_e_avaliar(pipeline: Pipeline, dev: pd.DataFrame, cfg: dict) -> dict:
     """Valida com CV cronológico, treina no dev inteiro e devolve métricas no formato de ``metricas_classificacao``."""
-    raise NotImplementedError("TODO(critério 5): treino e avaliação sob o protocolo comum")
+    raise NotImplementedError("TODO(F5): treino e avaliação sob o protocolo comum")

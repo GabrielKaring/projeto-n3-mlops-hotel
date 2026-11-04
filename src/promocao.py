@@ -1,6 +1,6 @@
-"""Etapa 5 do enunciado: eleição do vencedor e promoção controlada.
+"""Feature F8 (critério 8): eleição do vencedor, promoção controlada e previsões.
 
-STATUS: a implementar (ver docs/divisao_de_tarefas.md, critério 8).
+Dono: ver ``config/equipe.yaml``. STATUS: a implementar. Pronto quando: ver ``docs/divisao_de_tarefas.md``.
 
 Contrato de entrada (notebook 04):
   * Métricas dos modelos A e B do ciclo (notebook 03) e o manifesto ``models/modelo_vigente.json``
@@ -23,14 +23,14 @@ from __future__ import annotations
 
 def eleger_vencedor(resultados: dict[str, dict], cfg: dict) -> str:
     """Retorna ``'A'`` ou ``'B'`` conforme a métrica principal da config."""
-    raise NotImplementedError("TODO(critério 8): comparar automaticamente os dois candidatos")
+    raise NotImplementedError("TODO(F8): comparar automaticamente os dois candidatos")
 
 
 def decidir_promocao(vencedor: dict, vigente: dict | None, cfg: dict) -> dict:
     """Retorna ``{"decisao": "promovido"|"mantido", "motivo": str, ...}`` aplicando a regra da config."""
-    raise NotImplementedError("TODO(critério 8): regra de promoção com limiar de melhoria")
+    raise NotImplementedError("TODO(F8): regra de promoção com limiar de melhoria")
 
 
 def atualizar_manifesto(decisao: dict, cfg: dict) -> None:
     """Grava ``models/modelo_vigente.json`` preservando o histórico de modelos anteriores."""
-    raise NotImplementedError("TODO(critério 8): manifesto auditável do modelo vigente")
+    raise NotImplementedError("TODO(F8): manifesto auditável do modelo vigente")
