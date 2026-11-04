@@ -30,6 +30,8 @@ python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\a
 pip install -r requirements.txt
 ```
 
+Testado com Python 3.13, pandas 2.3, scikit-learn 1.9 e mlflow 3.18 (o que o `requirements.txt` instala em ambiente novo). O pandas está limitado a `<3` porque o mlflow 3.x exige isso; sem o teto o `pip install` trava. O workflow usa Python 3.12, ainda não testado no runner do GitHub.
+
 ## Execução local
 
 ```bash
