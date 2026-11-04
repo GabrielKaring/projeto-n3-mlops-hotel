@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Ambientes e segredos (nunca versionar)
+.venv/
+venv/
+env/
+.env
+*.pem
+*.key
+
+# Saídas intermediárias (recriadas a cada ciclo)
+data/processed/*
+!data/processed/.gitkeep
+
+# MLflow local (o histórico persistente é responsabilidade do critério 6)
+mlruns/
+mlflow.db
+
+# Saída da execução do workflow (publicada como artefato do GitHub Actions)
+evidencias/execucao/
+
+.DS_Store

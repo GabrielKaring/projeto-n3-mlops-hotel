@@ -1,0 +1,145 @@
+# config/config.yaml — fonte única de verdade do pipeline (Etapas 1 a 8).
+#
+# Seções marcadas "PROPOSTA INICIAL" pertencem a outros integrantes
+# (ver docs/divisao_de_tarefas.md). Os valores foram fixados ANTES de qualquer
+# treino, como o enunciado exige; mudanças devem vir com commit explicando o motivo.
+
+projeto:
+  nome: n3-hotel-cancelamento
+  seed: 42
+
+# ---------------------------------------------------------------------------
+# Etapa 1 — Problema, dados e avaliação (Gabriel)
+# ---------------------------------------------------------------------------
+dados:
+  fonte: "Hotel Booking Demand (Antonio, Almeida & Nunes, 2019, Data in Brief 22:41-49). Kaggle: jessemostipak/hotel-booking-demand"
+  licenca: "CC BY (artigo de dados original, acesso aberto)"
+  dir_raw: data/raw              # lotes já disponíveis para o pipeline
+  dir_incoming: data/incoming    # fila de lotes "futuros" (simula a chegada de dados novos)
+  dir_processed: data/processed  # saídas intermediárias (não versionadas)
+  manifesto: data/raw/manifest.json
+  lotes_iniciais: 18             # jul/2015 a dez/2016 já em data/raw; jan-ago/2017 chegam depois
+
+avaliacao:
+  tipo_problema: classificacao
+  alvo: is_canceled              # 1 = reserva cancelada
+  coluna_tempo: arrival_date
+  metrica_principal: f1_macro
+  direcao: maximizar
+  metricas_secundarias: [roc_auc, pr_auc, balanced_accuracy, recall_cancelamento, precision_cancelamento]
+  teste_fracao: 0.20             # últimos 20% (por data de chegada) ficam reservados à avaliação final
+  cv:
+    tipo: time_series_split      # janela expansiva, respeita a ordem cronológica
+    n_splits: 4
+  min_linhas_dev: 5000           # quantidade mínima para o ciclo rodar; abaixo disso o pipeline falha
+
+# ---------------------------------------------------------------------------
+# Etapa 2 — ETL e engenharia de atributos (Gabriel)
+# ---------------------------------------------------------------------------
+etl:
+  remover_colunas:
+    # Revelam o resultado da reserva
+    vazamento: [reservation_status, reservation_status_date]
+    # Só existem depois da reserva (check-in ou alterações posteriores)
+    posteriores_a_reserva: [assigned_room_type, booking_changes]
+    # Substituídas por atributos derivados ou que não generalizam para anos futuros
+    substituidas: [arrival_date_year, arrival_date_month, arrival_date_day_of_month, company]
+  duplicatas:
+    # O dataset não tem ID de reserva. Linhas idênticas dentro de um mesmo lote são mantidas: nos lotes
+    # iniciais, 82% das linhas repetidas são dos segmentos Groups/Offline TA-TO, há grupos de até 180
+    # linhas e 63% foram canceladas, o que indica reservas de vários quartos canceladas juntas
+    # (comportamento real). Remover tudo derrubaria a taxa de cancelamento de 36% para 25%.
+    # Os números são recalculados a cada ciclo no notebook 01.
+    #   entre_lotes: remove só a linha que reaparece em OUTRO lote (reentrega de dados)  <- padrão
+    #   todas:       remove qualquer linha idêntica (análise de sensibilidade)
+    #   nenhuma:     não remove
+    estrategia: entre_lotes
+  regras_dominio:
+    remover_sem_hospedes: true   # adults + children + babies == 0
+    remover_adr_negativo: true
+  outliers:
+    metodo: winsorizacao         # limites aprendidos SOMENTE no treino (dentro do Pipeline)
+    q_inf: 0.001
+    q_sup: 0.999
+  ohe_min_frequencia: 0.01       # categorias abaixo de 1% viram "infrequent"
+
+features:
+  meta: [lote_id, linha_origem]  # rastreabilidade; nunca entram no modelo
+  numericas_cauda_longa:         # recebem winsorização + padronização
+    - lead_time
+    - adr
+    - valor_estimado_estadia
+    - total_noites
+    - total_hospedes
+    - stays_in_weekend_nights
+    - stays_in_week_nights
+    - adults
+    - children
+    - babies
+    - days_in_waiting_list
+    - previous_cancellations
+    - previous_bookings_not_canceled
+  numericas_simples:             # padronização apenas
+    - arrival_date_week_number
+    - mes_chegada
+    - dia_semana_chegada
+    - razao_cancel_previo
+    - required_car_parking_spaces
+    - total_of_special_requests
+  categoricas:
+    - hotel
+    - meal
+    - country
+    - market_segment
+    - distribution_channel
+    - reserved_room_type
+    - deposit_type
+    - customer_type
+    - agent
+  binarias:
+    - is_repeated_guest
+    - tem_criancas
+    - tem_agente
+    - tem_empresa
+
+# ---------------------------------------------------------------------------
+# PROPOSTA INICIAL — Etapas 3 e 4: seleção de features e votação
+# ---------------------------------------------------------------------------
+selecao:
+  k_top: 20
+  metodos:
+    selectkbest: {score_func: mutual_info_classif}
+    random_forest: {n_estimators: 200, max_depth: 12, n_jobs: -1}
+    rfe: {estimador: logistic_regression, step: 0.1}
+  votacao:
+    min_votos: 2                 # feature eleita se aprovada por ao menos 2 dos 3 métodos
+    desempate: ranking_medio
+    min_features: 10             # se a regra eleger menos que isso, completa pelo ranking médio
+
+# ---------------------------------------------------------------------------
+# PROPOSTA INICIAL — Etapa 4: competição entre dois algoritmos
+# ---------------------------------------------------------------------------
+modelos:
+  A:
+    algoritmo: logistic_regression
+    params: {C: 1.0, max_iter: 1000, class_weight: balanced}
+  B:
+    algoritmo: random_forest
+    params: {n_estimators: 300, max_depth: 16, min_samples_leaf: 5, class_weight: balanced_subsample, n_jobs: -1}
+
+# ---------------------------------------------------------------------------
+# PROPOSTA INICIAL — Etapa 5: promoção controlada
+# ---------------------------------------------------------------------------
+promocao:
+  metrica: f1_macro
+  direcao: maximizar
+  min_melhoria_abs: 0.005        # candidato só substitui o vigente se superar em >= 0,005
+  piso_metrica: 0.60             # abaixo disso, nunca promove
+  manifesto: models/modelo_vigente.json
+
+# ---------------------------------------------------------------------------
+# PROPOSTA INICIAL — Etapa 6: MLflow
+# ---------------------------------------------------------------------------
+mlflow:
+  experimento: n3-hotel-cancelamento
+  tracking_dir: mlruns
