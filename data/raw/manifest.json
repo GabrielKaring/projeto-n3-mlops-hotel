@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "lotes": [
+    {
+      "lote_id": "lote_2015-07",
+      "arquivo": "lote_2015-07.csv.gz",
+      "sha256": "d81ebe8f927416f6f7b3c28b2796c0adc1ba20f5167c415805f681c8a0512d7e",
+      "n_linhas": 2776,
+      "chegada_min": "2015-07-01",
+      "chegada_max": "2015-07-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2015-08",
+      "arquivo": "lote_2015-08.csv.gz",
+      "sha256": "aec75d56ec2879060e2bdf9c2aa93b50db008ca703e58183e3319df852432f13",
+      "n_linhas": 3889,
+      "chegada_min": "2015-08-01",
+      "chegada_max": "2015-08-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2015-09",
+      "arquivo": "lote_2015-09.csv.gz",
+      "sha256": "e8f0be4783bef2d9b908dcc2872621a322790ecea6483d57b03f6ae794bc5492",
+      "n_linhas": 5114,
+      "chegada_min": "2015-09-01",
+      "chegada_max": "2015-09-30",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2015-10",
+      "arquivo": "lote_2015-10.csv.gz",
+      "sha256": "7818114648d507992ba2db2f3af01ff1326bf43cd266e7711688b1759274004e",
+      "n_linhas": 4957,
+      "chegada_min": "2015-10-01",
+      "chegada_max": "2015-10-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2015-11",
+      "arquivo": "lote_2015-11.csv.gz",
+      "sha256": "ae6a3d3f7861aceaeb1e36c4938b84be69a663a05d9111709bc2086fa62fd069",
+      "n_linhas": 2340,
+      "chegada_min": "2015-11-01",
+      "chegada_max": "2015-11-30",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2015-12",
+      "arquivo": "lote_2015-12.csv.gz",
+      "sha256": "443f1e3fe230893198eb88b7d1e1e3670c1cf528f8d023b47be51713705323ee",
+      "n_linhas": 2920,
+      "chegada_min": "2015-12-01",
+      "chegada_max": "2015-12-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-01",
+      "arquivo": "lote_2016-01.csv.gz",
+      "sha256": "42a43fd715e639be46d4fd84ced7b716efc4f73e4333724189c6800fdb28504c",
+      "n_linhas": 2248,
+      "chegada_min": "2016-01-01",
+      "chegada_max": "2016-01-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-02",
+      "arquivo": "lote_2016-02.csv.gz",
+      "sha256": "7ee033f68b576aeb23169cc7c7c95ed92ff24ad37c6a59869894509bc269b525",
+      "n_linhas": 3891,
+      "chegada_min": "2016-02-01",
+      "chegada_max": "2016-02-29",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-03",
+      "arquivo": "lote_2016-03.csv.gz",
+      "sha256": "02daa173a77ce70ead44a1b627e50149639b6ab53614dae099de0d6430c2b493",
+      "n_linhas": 4824,
+      "chegada_min": "2016-03-01",
+      "chegada_max": "2016-03-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-04",
+      "arquivo": "lote_2016-04.csv.gz",
+      "sha256": "e0b9392f9dde97c560cba3e4168574a53957acf2db7ca2572b23445ccebd7841",
+      "n_linhas": 5428,
+      "chegada_min": "2016-04-01",
+      "chegada_max": "2016-04-30",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-05",
+      "arquivo": "lote_2016-05.csv.gz",
+      "sha256": "7a2498660fcea51131bb804880ef70d04089728aec81d4b4ecd369b4cd868ccb",
+      "n_linhas": 5478,
+      "chegada_min": "2016-05-01",
+      "chegada_max": "2016-05-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-06",
+      "arquivo": "lote_2016-06.csv.gz",
+      "sha256": "e4f396f019ff27a74392626729a2b366d56522947daaee618f5e159d3d60a9b6",
+      "n_linhas": 5292,
+      "chegada_min": "2016-06-01",
+      "chegada_max": "2016-06-30",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-07",
+      "arquivo": "lote_2016-07.csv.gz",
+      "sha256": "29ea5dd1450cfa93241919e8f27f54fe0166ad6a484c8729cdba200c42205679",
+      "n_linhas": 4572,
+      "chegada_min": "2016-07-01",
+      "chegada_max": "2016-07-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-08",
+      "arquivo": "lote_2016-08.csv.gz",
+      "sha256": "97830f07be7c112ed16ffb1bd38c44855ac21415ca6747982eb347f1ac13ae6a",
+      "n_linhas": 5063,
+      "chegada_min": "2016-08-01",
+      "chegada_max": "2016-08-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-09",
+      "arquivo": "lote_2016-09.csv.gz",
+      "sha256": "c59b4898a8de780449dcbf824bca1bf5407e27daabeda805cefbabd256146a7e",
+      "n_linhas": 5394,
+      "chegada_min": "2016-09-01",
+      "chegada_max": "2016-09-30",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-10",
+      "arquivo": "lote_2016-10.csv.gz",
+      "sha256": "7e48a9da944038868a6b61e84cadf969b764b4793dde894ec26d16d39a3235fe",
+      "n_linhas": 6203,
+      "chegada_min": "2016-10-01",
+      "chegada_max": "2016-10-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-11",
+      "arquivo": "lote_2016-11.csv.gz",
+      "sha256": "ae75e386b732850c124ba6c8e1795c26b322694b0604b973842f3aac1bbba8e5",
+      "n_linhas": 4454,
+      "chegada_min": "2016-11-01",
+      "chegada_max": "2016-11-30",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    },
+    {
+      "lote_id": "lote_2016-12",
+      "arquivo": "lote_2016-12.csv.gz",
+      "sha256": "82bbf8663be8a8e29159fae8eef3147ca194e1262498a3f8dc41b18390704ef8",
+      "n_linhas": 3860,
+      "chegada_min": "2016-12-01",
+      "chegada_max": "2016-12-31",
+      "incorporado_em": "2026-11-04T16:52:34Z"
+    }
+  ]
+}
