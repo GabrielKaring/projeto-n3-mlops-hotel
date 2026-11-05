@@ -27,7 +27,7 @@ Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python 
 
 ## Definição de pronto e evidência de cada feature
 
-O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o dono adiciona em `tests/`.
+O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o dono adiciona em `tests/`. O checklist completo de cada feature, com a situação atual, está em [`gates.md`](gates.md).
 
 | Feature | Pronto quando | Evidência | Teste mínimo |
 |---|---|---|---|
