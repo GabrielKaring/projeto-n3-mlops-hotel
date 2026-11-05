@@ -12,7 +12,7 @@ A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equ
 |---|---|---|---|---|
 | **F1** | 1 · Problema, dados e avaliação | Gabriel | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
 | **F2** | 2 · ETL e engenharia de atributos | Gabriel | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
-| **F3** | 3 · Três métodos de seleção | Integrante 2 | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
+| **F3** | 3 · Três métodos de seleção | Integrante 2 | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
 | **F4** | 4 · Votação e eleição | Integrante 3 | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
 | **F5** | 5 · Dois algoritmos disputam | Integrante 4 | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
 | **F6** | 6 · MLflow e rastreabilidade | Integrante 5 | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
@@ -45,7 +45,7 @@ O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o
 ## Dependências entre as features
 
 ```
-F1,F2 (prontos) ──> F3 ──> F4 ──> F5 ──> F8
+F1,F2,F3 (prontos) ──────> F4 ──> F5 ──> F8
                                            ▲
 F6 (MLflow) registra F4, F5 e F8 ──────────┘
 F7 (workflow) executa 01 → 05 e persiste o estado entre execuções

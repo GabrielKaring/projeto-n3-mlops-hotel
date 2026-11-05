@@ -14,7 +14,7 @@ Cada feature é um critério do enunciado e tem um dono (1 a 2 features por pess
 |---|---|---|---|
 | F1 | 1 · Problema, dados e avaliação | Gabriel | ✅ pronto |
 | F2 | 2 · ETL e engenharia de atributos | Gabriel | ✅ pronto (testes + 2 ciclos de evidência) |
-| F3 | 3 · Três métodos de seleção | Integrante 2 | ⬜ esqueleto (`src/features.py`, notebook 02) |
+| F3 | 3 · Três métodos de seleção | Integrante 2 | ✅ pronto (testes + evidência em `evidencias/selecao/`) |
 | F4 | 4 · Votação e eleição das features | Integrante 3 | ⬜ esqueleto (`src/votacao.py`, notebook 02) |
 | F5 | 5 · Dois algoritmos disputam | Integrante 4 | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
 | F6 | 6 · MLflow e rastreabilidade | Integrante 5 | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
@@ -37,7 +37,7 @@ Testado com Python 3.13, pandas 2.3, scikit-learn 1.9 e mlflow 3.18 (o que o `re
 ## Execução local
 
 ```bash
-python -m pytest -q                      # testes (ingestão, ETL, ausência de vazamento, avaliação, divisão da equipe, histórico)
+python -m pytest -q                      # testes (ingestão, ETL, seleção de features, ausência de vazamento, avaliação, divisão da equipe, histórico)
 python -m src.ingestao                   # registra lotes novos em data/raw e mostra data_version
 python -m src.ingestao --liberar 1       # simula a chegada do próximo lote mensal (data/incoming -> data/raw)
 cd notebooks && jupyter nbconvert --to notebook --execute 01_etl.ipynb --output 01_executado.ipynb --output-dir ../evidencias/execucao
@@ -58,7 +58,7 @@ data/incoming/                         lotes futuros, liberados um a um para sim
 data/processed/                        saídas intermediárias do ciclo (não versionadas)
 docs/                                  decisões da Etapa 1 e divisão de tarefas
 notebooks/01_etl.ipynb ... 05_previsoes.ipynb
-src/                                   ingestao, preprocessamento, avaliacao (prontos); features, votacao, modelagem, rastreio, promocao (esqueletos)
+src/                                   ingestao, preprocessamento, avaliacao, features (prontos); votacao, modelagem, rastreio, promocao (esqueletos)
 tests/                                 pytest
 models/modelo_vigente.json             gerado pela promoção (ainda não existe)
 evidencias/                            diagnósticos e notebooks executados
