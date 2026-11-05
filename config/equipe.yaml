@@ -11,7 +11,7 @@
 #
 # Só o primeiro nome (os dois Gabriel levam o sobrenome). Quem commitar com outro nome precisa de uma linha no
 # .mailmap apontando para o nome daqui, senão o histórico não reconhece os commits.
-# Os donos de F4 a F10 seguem a ordem da lista e são proposta até o grupo confirmar.
+# Os donos de F4 a F10 são proposta até o grupo confirmar: a parte crítica final (F7, F8, F9) fica com Diego e Vinicius.
 
 integrantes:
   - {nome: "Gabriel Karing", github: ""}
@@ -41,12 +41,12 @@ features:
   F4:
     criterio: 4
     titulo: "Votação e eleição das features"
-    dono: "Gabriel Wendorff"
+    dono: "Guilherme"
     artefatos: ["src/votacao.py", "notebooks/02_votacao_features.ipynb (seção da votação)"]
   F5:
     criterio: 5
     titulo: "Treinamento dos dois algoritmos"
-    dono: "Guilherme"
+    dono: "Gabriel Wendorff"
     artefatos: ["src/modelagem.py", "notebooks/03_treino_competicao.ipynb"]
   F6:
     criterio: 6
@@ -56,12 +56,12 @@ features:
   F7:
     criterio: 7
     titulo: "Workflow único e agendamento"
-    dono: "José"
+    dono: "Diego"
     artefatos: [".github/workflows/pipeline_mlops.yml"]
   F8:
     criterio: 8
     titulo: "Eleição, promoção e previsões"
-    dono: "Lucas"
+    dono: "Diego"
     artefatos: ["src/promocao.py", "notebooks/04_selecao_promocao.ipynb", "notebooks/05_previsoes.ipynb", "models/modelo_vigente.json"]
   F9:
     criterio: 9
@@ -71,5 +71,5 @@ features:
   F10:
     criterio: 10
     titulo: "Recurso adicional justificado (sugestão: monitoramento de drift com alerta)"
-    dono: "Diego"
+    dono: "Lucas"
     artefatos: ["src/drift.py (a criar)", "evidencias/drift/"]
