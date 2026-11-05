@@ -15,9 +15,9 @@ Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica 
 | **F1** | 1 · Problema, dados e avaliação | Gabriel Karing | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
 | **F2** | 2 · ETL e engenharia de atributos | Gabriel Karing | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
 | **F3** | 3 · Três métodos de seleção | Gabriel Karing | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
-| **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto, falta registrar no MLflow |
+| **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
 | **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
-| **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
+| **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), registro no fim do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
 | **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
 | **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
 | **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
@@ -36,7 +36,7 @@ O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o
 | F3 | SelectKBest, importância do RF e RFE rodam sobre o mesmo X/y, ajustados só no treino/folds, rankings de cada método salvos | Tabela de scores por método no notebook 02 | `tests/test_features.py`: três rankings com o mesmo índice; sem uso do teste |
 | F4 | Regra de votação definida **antes** em `config.yaml`; tabela de votos, desempate e mínimo de features; `features_eleitas.json` gerado | `evidencias/votacao/votos_<cycle_id>.csv` | `tests/test_votacao.py`: voto, desempate e piso de features em casos pequenos |
 | F5 | Modelos A e B sobre as mesmas features, partição e métrica; cada um é um `Pipeline` completo serializado | `models/candidatos/<cycle_id>/`, `resultados_competicao.json` | `tests/test_modelagem.py`: A e B treinam e prevêem em dados sintéticos; mesmo protocolo |
-| F6 | Todo run com `cycle_id`, `data_version`, parâmetros, métricas, features e artefatos; dois ciclos recuperáveis; armazenamento persiste entre execuções do runner | Captura do MLflow com 2 ciclos + `run_id`s no relatório | `tests/test_rastreio.py`: run local com as tags do ciclo |
+| F6 | Todo run com `cycle_id`, `data_version`, parâmetros, métricas, features e artefatos; rankings e votação do notebook 02 registrados; dois ciclos recuperáveis; armazenamento persiste entre execuções do runner | Captura do MLflow com 2 ciclos + `run_id`s no relatório | `tests/test_rastreio.py`: run local com as tags do ciclo |
 | F7 | Um único YAML com `schedule`, notebooks 01→05 encadeados, falha interrompe, estado persistido entre execuções | Log de execução **agendada** (não só `workflow_dispatch`) | Execuções reais no Actions (anexar link/log) |
 | F8 | Comparação automática A×B, regra de promoção/manutenção, vigente preservado, modelos antigos mantidos, previsões com o vigente e seu pré-processamento | `models/modelo_vigente.json`, previsões, decisão em 2 ciclos | `tests/test_promocao.py`: primeiro ciclo, melhora suficiente, melhora insuficiente, abaixo do piso |
 | F9 | README reproduzível, relatório PDF com a tabela de votação, a decisão de promoção e as limitações, histórico de commits por integrante | `reports/relatorio_n3.pdf`, `HISTORICO_DESENVOLVIMENTO.md` | Seguir o README em ambiente limpo |

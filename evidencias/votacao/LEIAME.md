@@ -24,7 +24,7 @@ O piso de 10 features não precisou ser usado, e todas as eleitas existem nos 4 
 
 ## Limitações
 
-- O registro no MLflow ainda não foi feito, porque depende de `src/rastreio.py` (F6).
+- O registro no MLflow é responsabilidade da F6 e será adicionado por ela ao fim do notebook 02.
 - Há redundância no conjunto: `deposit_type_No Deposit` e `deposit_type_Non Refund` são quase complementares, e `total_noites` contém `stays_in_week_nights`. A votação não remove atributos redundantes.
 - `deposit_type_Non Refund` tem 99% de cancelamento no dev, um padrão contraintuitivo para reservas sem reembolso. Vale citá-lo no relatório como ponto a investigar.
 - O conjunto vem da média entre folds, então o CV da F5 tende a sair levemente otimista.

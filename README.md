@@ -15,7 +15,7 @@ Cada feature é um critério do enunciado e tem um dono, ou dois quando dividida
 | F1 | 1 · Problema, dados e avaliação | Gabriel Karing | ✅ pronto |
 | F2 | 2 · ETL e engenharia de atributos | Gabriel Karing | ✅ pronto (testes + 2 ciclos de evidência) |
 | F3 | 3 · Três métodos de seleção | Gabriel Karing | ✅ pronto (testes + evidência em `evidencias/selecao/`) |
-| F4 | 4 · Votação e eleição das features | Gabriel Karing | ✅ pronto, falta registrar no MLflow (testes + evidência em `evidencias/votacao/`) |
+| F4 | 4 · Votação e eleição das features | Gabriel Karing | ✅ pronto (testes + evidência em `evidencias/votacao/`) |
 | F5 | 5 · Dois algoritmos disputam | Gabriel Wendorff | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
 | F6 | 6 · MLflow e rastreabilidade | José | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
 | F7 | 7 · Workflow único e agendamento | Diego | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |

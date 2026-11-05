@@ -10,7 +10,7 @@ Contrato de saída (para o notebook 03, feature F5):
   * ``data/processed/features_eleitas.json`` com: cycle_id, data_version, features eleitas
     (nomes após o pré-processador), regra de votação usada e k_top.
   * ``evidencias/votacao/votos_<cycle_id>.csv`` com a tabela de votos e os rankings dos 3 métodos.
-  * O registro no MLflow dos votos e do conjunto final depende de ``src/rastreio.py`` (feature F6).
+  * O registro no MLflow dos votos e do conjunto final é feito pela feature F6, no notebook 02.
 
 Regra: cada método vota nas features que aprovou (top-k, com empates). É eleita a feature com pelo menos
 ``min_votos``. Se sobrarem menos de ``min_features``, o conjunto é completado pelo melhor ranking médio.

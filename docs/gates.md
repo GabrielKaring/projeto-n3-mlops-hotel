@@ -18,10 +18,10 @@ Situação conferida em 05/11/2026, na branch `f3-selecao` (PR #1 ainda aberto).
 | G0 | Regras do grupo e do repositório | Todos | | 🔴 bloqueado | Grupo acima do limite e acesso ao repositório |
 | G1 | Problema, dados e avaliação | Gabriel Karing | | ✅ passou | |
 | G2 | ETL e atributos | Gabriel Karing | G1 | ✅ passou | Refazer os dois ciclos no pipeline final |
-| G3 | Três métodos de seleção | Gabriel Karing | G2 | 🟡 parcial | Registro no MLflow, merge |
-| G4 | Votação | Gabriel Karing | G3 | 🟡 parcial | Registro no MLflow, merge |
+| G3 | Três métodos de seleção | Gabriel Karing | G2 | 🟡 parcial | Merge |
+| G4 | Votação | Gabriel Karing | G3 | 🟡 parcial | Merge |
 | G5 | Dois algoritmos | Gabriel Wendorff | G4 | ⬜ não iniciado | Tudo |
-| G6 | MLflow | José | | ⬜ não iniciado | Tudo |
+| G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | ⬜ não iniciado | Tudo |
 | G7 | Workflow e agendamento | Diego | G6 | 🟡 esqueleto | Agendamento, encadeamento, persistência |
 | G8 | Promoção e previsões | Diego | G5, G6 | ⬜ não iniciado | Tudo |
 | G9 | Repositório, relatório e evidências | Vinicius | todos | 🟡 parcial | Relatório e evidências oficiais |
@@ -67,7 +67,6 @@ Evidência: `evidencias/selecao/`.
 - [x] Ranking ou importância de cada método salvo.
 - [x] Ajuste só no treino e dentro de cada fold, com teste de ausência de vazamento.
 - [x] Cada método entrega a lista de features aprovadas (`listas_aprovadas` e colunas `aprovada_*`).
-- [ ] Rankings e parâmetros registrados no MLflow com `cycle_id` (depende do G6).
 - [ ] PR #1 integrado à `main`.
 
 ## G4 · Votação e eleição
@@ -79,7 +78,6 @@ Evidência: `evidencias/votacao/`.
 - [x] O empate na fronteira do top-k está tratado: as empatadas recebem o voto.
 - [x] Tabela de votos por feature gerada a cada ciclo.
 - [x] Um único conjunto final salvo em `features_eleitas.json`. Falta a F5 usá-lo.
-- [ ] Votos, conjunto final, parâmetros e `cycle_id` registrados no MLflow.
 - [x] Testes de voto, desempate e mínimo de features.
 - [ ] PR #1 integrado à `main`.
 
@@ -101,7 +99,7 @@ Evidência esperada: `models/candidatos/<cycle_id>/`, `resultados_competicao.jso
 Evidência esperada: captura do MLflow e `run_id`s no relatório.
 
 - [ ] Experimento, `run_id`, `cycle_id` e `data_version` em todo run.
-- [ ] Rankings, votação e features eleitas registrados.
+- [ ] Registro chamado no fim do notebook 02: rankings, votos, features eleitas, parâmetros e `cycle_id`. Os artefatos já são gerados (`caminhos_rankings` e `caminhos_votacao`).
 - [ ] Algoritmos, parâmetros, métricas e modelos serializados registrados.
 - [ ] Decisão de promoção ou manutenção registrada.
 - [ ] Histórico sobrevive ao fim do runner, por artefato baixável ou armazenamento persistente.

@@ -52,7 +52,7 @@ features:
     criterio: 6
     titulo: "MLflow e rastreabilidade"
     dono: "José"
-    artefatos: ["src/rastreio.py", "config/config.yaml (mlflow)"]
+    artefatos: ["src/rastreio.py", "config/config.yaml (mlflow)", "notebooks/02_votacao_features.ipynb (registro no MLflow)"]
   F7:
     criterio: 7
     titulo: "Workflow único e agendamento"
