@@ -8,7 +8,7 @@ A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equ
 
 ## Quem entrega o quê
 
-Os donos de F4 a F10 são uma proposta, na ordem da lista do grupo, até serem confirmados. Nomes terminados em "…" ainda precisam ser completados.
+Os donos de F4 a F10 são uma proposta, na ordem da lista do grupo, até serem confirmados.
 
 | Feature | Critério | Dono (proposta) | Entrega | Status |
 |---|---|---|---|---|
@@ -16,12 +16,12 @@ Os donos de F4 a F10 são uma proposta, na ordem da lista do grupo, até serem c
 | **F2** | 2 · ETL e engenharia de atributos | Gabriel Karing | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
 | **F3** | 3 · Três métodos de seleção | Gabriel Karing | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
 | **F4** | 4 · Votação e eleição | Gabriel Wendorff | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
-| **F5** | 5 · Dois algoritmos disputam | Guilherme Gabrie… | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
-| **F6** | 6 · MLflow e rastreabilidade | José Marcos Zoz… | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
-| **F7** | 7 · Workflow único e agendamento | José Marcos Zoz… | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
-| **F8** | 8 · Eleição, promoção e previsões | Lucas Eduardo M… | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
-| **F9** | 9 · Repositório, relatório e evidências | Vinicius Fernand… | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
-| **F10** | 10 · Recurso adicional | Diego Planinsch… | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
+| **F5** | 5 · Dois algoritmos disputam | Guilherme | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
+| **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
+| **F7** | 7 · Workflow único e agendamento | José | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
+| **F8** | 8 · Eleição, promoção e previsões | Lucas | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
+| **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
+| **F10** | 10 · Recurso adicional | Diego | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
 
 Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python -m pytest tests/test_equipe.py` e faça um commit `[equipe] ...`. O nome em `integrantes` deve ser **igual ao nome dos seus commits no git** (ver `.mailmap`); é assim que o histórico por feature reconhece o seu trabalho.
 

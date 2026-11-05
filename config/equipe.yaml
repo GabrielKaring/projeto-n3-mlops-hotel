@@ -9,33 +9,34 @@
 # "nome" deve ser igual ao nome dos commits do git (veja .mailmap), senão o histórico por feature
 # não reconhece os commits da pessoa.
 #
-# PENDENTE: nomes terminados em "…" estão cortados na lista do Teams; completar com o nome dos commits.
+# Só o primeiro nome (os dois Gabriel levam o sobrenome). Quem commitar com outro nome precisa de uma linha no
+# .mailmap apontando para o nome daqui, senão o histórico não reconhece os commits.
 # Os donos de F4 a F10 seguem a ordem da lista e são proposta até o grupo confirmar.
 
 integrantes:
-  - {nome: "Gabriel Henrique Karing", github: ""}
-  - {nome: "Diego Planinsch…", github: ""}
+  - {nome: "Gabriel Karing", github: ""}
+  - {nome: "Diego", github: ""}
   - {nome: "Gabriel Wendorff", github: ""}
-  - {nome: "Guilherme Gabrie…", github: ""}
-  - {nome: "José Marcos Zoz…", github: ""}
-  - {nome: "Lucas Eduardo M…", github: ""}
-  - {nome: "Vinicius Fernand…", github: ""}
+  - {nome: "Guilherme", github: ""}
+  - {nome: "José", github: ""}
+  - {nome: "Lucas", github: ""}
+  - {nome: "Vinicius", github: ""}
 
 features:
   F1:
     criterio: 1
     titulo: "Problema, dados e avaliação"
-    dono: "Gabriel Henrique Karing"
+    dono: "Gabriel Karing"
     artefatos: ["docs/etapa1_problema_dados_avaliacao.md", "config/config.yaml (dados, avaliacao)", "src/avaliacao.py"]
   F2:
     criterio: 2
     titulo: "ETL e engenharia de atributos"
-    dono: "Gabriel Henrique Karing"
+    dono: "Gabriel Karing"
     artefatos: ["src/ingestao.py", "src/preprocessamento.py", "notebooks/01_etl.ipynb"]
   F3:
     criterio: 3
     titulo: "Três métodos de seleção de features"
-    dono: "Gabriel Henrique Karing"
+    dono: "Gabriel Karing"
     artefatos: ["src/features.py", "notebooks/02_votacao_features.ipynb (seção dos métodos)"]
   F4:
     criterio: 4
@@ -45,30 +46,30 @@ features:
   F5:
     criterio: 5
     titulo: "Treinamento dos dois algoritmos"
-    dono: "Guilherme Gabrie…"
+    dono: "Guilherme"
     artefatos: ["src/modelagem.py", "notebooks/03_treino_competicao.ipynb"]
   F6:
     criterio: 6
     titulo: "MLflow e rastreabilidade"
-    dono: "José Marcos Zoz…"
+    dono: "José"
     artefatos: ["src/rastreio.py", "config/config.yaml (mlflow)"]
   F7:
     criterio: 7
     titulo: "Workflow único e agendamento"
-    dono: "José Marcos Zoz…"
+    dono: "José"
     artefatos: [".github/workflows/pipeline_mlops.yml"]
   F8:
     criterio: 8
     titulo: "Eleição, promoção e previsões"
-    dono: "Lucas Eduardo M…"
+    dono: "Lucas"
     artefatos: ["src/promocao.py", "notebooks/04_selecao_promocao.ipynb", "notebooks/05_previsoes.ipynb", "models/modelo_vigente.json"]
   F9:
     criterio: 9
     titulo: "Repositório, relatório e evidências"
-    dono: "Vinicius Fernand…"
+    dono: "Vinicius"
     artefatos: ["README.md", "reports/relatorio_n3.pdf", "evidencias/"]
   F10:
     criterio: 10
     titulo: "Recurso adicional justificado (sugestão: monitoramento de drift com alerta)"
-    dono: "Diego Planinsch…"
+    dono: "Diego"
     artefatos: ["src/drift.py (a criar)", "evidencias/drift/"]

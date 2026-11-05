@@ -16,12 +16,12 @@ Cada feature é um critério do enunciado e tem um dono (1 a 3 features por pess
 | F2 | 2 · ETL e engenharia de atributos | Gabriel Karing | ✅ pronto (testes + 2 ciclos de evidência) |
 | F3 | 3 · Três métodos de seleção | Gabriel Karing | ✅ pronto (testes + evidência em `evidencias/selecao/`) |
 | F4 | 4 · Votação e eleição das features | Gabriel Wendorff | ⬜ esqueleto (`src/votacao.py`, notebook 02) |
-| F5 | 5 · Dois algoritmos disputam | Guilherme Gabrie… | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
-| F6 | 6 · MLflow e rastreabilidade | José Marcos Zoz… | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
-| F7 | 7 · Workflow único e agendamento | José Marcos Zoz… | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
-| F8 | 8 · Eleição, promoção e previsões | Lucas Eduardo M… | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
-| F9 | 9 · Repositório, relatório e evidências | Vinicius Fernand… | 🟨 README e histórico prontos; falta o relatório PDF |
-| F10 | 10 · Recurso adicional | Diego Planinsch… | ⬜ ideia sugerida em `docs/divisao_de_tarefas.md` |
+| F5 | 5 · Dois algoritmos disputam | Guilherme | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
+| F6 | 6 · MLflow e rastreabilidade | José | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
+| F7 | 7 · Workflow único e agendamento | José | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
+| F8 | 8 · Eleição, promoção e previsões | Lucas | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
+| F9 | 9 · Repositório, relatório e evidências | Vinicius | 🟨 README e histórico prontos; falta o relatório PDF |
+| F10 | 10 · Recurso adicional | Diego | ⬜ ideia sugerida em `docs/divisao_de_tarefas.md` |
 
 Definição de pronto, evidência e teste de cada feature: [`docs/divisao_de_tarefas.md`](docs/divisao_de_tarefas.md). Commits seguem `[Fn] descrição`; o [`HISTORICO_DESENVOLVIMENTO.md`](HISTORICO_DESENVOLVIMENTO.md) mostra, por feature, quem fez o quê.
 
