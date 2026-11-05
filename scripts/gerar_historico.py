@@ -58,9 +58,14 @@ def git_log() -> list[dict]:
     return commits
 
 
+def donos_da_feature(feature: dict) -> list[str]:
+    """O campo ``dono`` é um nome ou, em feature dividida, uma lista de nomes."""
+    return feature["dono"] if isinstance(feature["dono"], list) else [feature["dono"]]
+
+
 def secao_por_feature(commits: list[dict], equipe: dict) -> list[str]:
     """Tabela feature -> dono -> commits do dono / de outros, mais o resumo por pessoa."""
-    donos = {fid: f["dono"] for fid, f in equipe["features"].items()}
+    donos = {fid: donos_da_feature(f) for fid, f in equipe["features"].items()}
     L = [
         "## Visão por feature", "",
         "Commits com a tag `[Fn]` no início da mensagem. \"Do dono\" conta commits cujo autor é o dono da feature em "
@@ -71,15 +76,15 @@ def secao_por_feature(commits: list[dict], equipe: dict) -> list[str]:
     for fid in sorted(equipe["features"], key=lambda x: int(x[1:])):
         f = equipe["features"][fid]
         cs = [c for c in commits if fid in c["features"]]
-        do_dono = sum(c["autor"] == f["dono"] for c in cs)
+        do_dono = sum(c["autor"] in donos[fid] for c in cs)
         apoio = len(cs) - do_dono
         situacao = "✅ com commits do dono" if do_dono else "⬜ sem commits do dono"
-        L.append(f"| {fid} | {f['titulo']} | {f['dono']} | {do_dono} | {apoio} | {situacao} |")
+        L.append(f"| {fid} | {f['titulo']} | {', '.join(donos[fid])} | {do_dono} | {apoio} | {situacao} |")
     L.append("")
 
     L += ["### Por integrante", "", "| Integrante | Features | Commits nas próprias features |", "|---|---|---:|"]
     for i in equipe["integrantes"]:
-        meus = sorted((fid for fid, d in donos.items() if d == i["nome"]), key=lambda x: int(x[1:]))
+        meus = sorted((fid for fid, d in donos.items() if i["nome"] in d), key=lambda x: int(x[1:]))
         n = sum(1 for c in commits if c["autor"] == i["nome"] and any(x in meus for x in c["features"]))
         L.append(f"| {i['nome']} | {', '.join(meus) or '—'} | {n} |")
     sem_tag = [c for c in commits if not c["features"]]

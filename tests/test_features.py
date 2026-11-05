@@ -16,7 +16,13 @@ from sklearn.metrics import mutual_info_score
 
 import src.features
 from src.avaliacao import criar_cv
-from src.features import calcular_rankings, calcular_rankings_por_fold, salvar_rankings, tabela_rankings
+from src.features import (
+    calcular_rankings,
+    calcular_rankings_por_fold,
+    listas_aprovadas,
+    salvar_rankings,
+    tabela_rankings,
+)
 from src.preprocessamento import limpar_e_engenhar, lista_features
 
 METODOS = {"selectkbest", "random_forest", "rfe"}
@@ -195,7 +201,7 @@ def test_feature_ausente_em_um_fold_entra_na_uniao_e_conta_zero(dev_sintetico, c
     X_bruto.iloc[so_no_ultimo, X_bruto.columns.get_loc("agent")] = "TARDIO"
 
     rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
-    tabela = tabela_rankings(rankings, por_fold)
+    tabela = tabela_rankings(rankings, por_fold, 1)
 
     assert tabela.loc["agent_TARDIO", "folds_presente"] == 1
     no_fold = por_fold.query("feature == 'agent_TARDIO' and metodo == 'random_forest'")["score"].item()
@@ -215,17 +221,41 @@ def test_scores_iguais_empatam_mesmo_com_ruido_de_ponto_flutuante(dev_sintetico,
     y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
     rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
 
-    assert tabela_rankings(rankings, por_fold)["posicao_rfe"].to_dict() == {"igual_a": 1, "igual_b": 1}
+    assert tabela_rankings(rankings, por_fold, 1)["posicao_rfe"].to_dict() == {"igual_a": 1, "igual_b": 1}
 
 
 def test_csv_preserva_posicoes_de_scores_proximos(tmp_path: Path):
     score = pd.Series({"a": 0.00009112, "b": 0.00009144}, name="random_forest").rename_axis("feature")
     por_fold = pd.DataFrame({"fold": 1, "metodo": "random_forest", "feature": score.index, "score": score.to_numpy()})
-    tabela = tabela_rankings({"random_forest": score}, por_fold)
+    tabela = tabela_rankings({"random_forest": score}, por_fold, 1)
     ctx = {"cycle_id": "ciclo-x", "data_version": "dv001-abc"}
     caminhos = salvar_rankings(tabela, por_fold, ctx, tmp_path)
     salvo = pd.read_csv(caminhos["rankings"], index_col="feature")["score_random_forest"]
     assert salvo["a"] < salvo["b"]
+
+
+def test_listas_aprovadas_tem_o_top_k_de_cada_metodo_em_ordem():
+    rankings = {
+        "m1": pd.Series({"a": 0.1, "b": 0.9, "c": 0.5}),
+        "m2": pd.Series({"a": 0.9, "b": 0.1, "c": 0.5}),
+    }
+    assert listas_aprovadas(rankings, 2) == {"m1": ["b", "c"], "m2": ["a", "c"]}
+
+
+def test_listas_aprovadas_mantem_empates_na_fronteira():
+    score = pd.Series({"a": 0.9, "c": 0.5, "b": 0.5, "d": 0.1})
+    assert listas_aprovadas({"m": score}, 2) == {"m": ["a", "b", "c"]}
+
+
+def test_score_zero_nao_aprova_mesmo_dentro_do_top_k():
+    score = pd.Series({"a": 0.9, "b": 0.0, "c": 0.0})
+    assert listas_aprovadas({"m": score}, 2) == {"m": ["a"]}
+
+
+def test_tabela_marca_as_aprovadas():
+    score = pd.Series({"a": 0.9, "b": 0.5, "c": 0.1}, name="m").rename_axis("feature")
+    por_fold = pd.DataFrame({"fold": 1, "metodo": "m", "feature": score.index, "score": score.to_numpy()})
+    assert tabela_rankings({"m": score}, por_fold, 2)["aprovada_m"].to_dict() == {"a": 1, "b": 1, "c": 0}
 
 
 def test_salvar_rankings_identifica_o_ciclo(dev_sintetico, cfg_rapido, tmp_path: Path):
@@ -233,12 +263,12 @@ def test_salvar_rankings_identifica_o_ciclo(dev_sintetico, cfg_rapido, tmp_path:
     y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
     rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
     ctx = {"cycle_id": "ciclo-x", "data_version": "dv001-abc"}
-    caminhos = salvar_rankings(tabela_rankings(rankings, por_fold), por_fold, ctx, tmp_path)
+    caminhos = salvar_rankings(tabela_rankings(rankings, por_fold, 1), por_fold, ctx, tmp_path)
 
     salvo = pd.read_csv(caminhos["rankings"])
     assert caminhos["rankings"].name == "rankings_ciclo-x.csv"
     assert set(salvo["cycle_id"]) == {"ciclo-x"} and set(salvo["data_version"]) == {"dv001-abc"}
-    assert {"score_rfe", "posicao_rfe", "folds_presente"} <= set(salvo.columns)
+    assert {"score_rfe", "posicao_rfe", "aprovada_rfe", "folds_presente"} <= set(salvo.columns)
     assert len(pd.read_csv(caminhos["por_fold"])) == len(por_fold)
 
 

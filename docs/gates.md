@@ -18,14 +18,14 @@ Situação conferida em 05/11/2026, na branch `f3-selecao` (PR #1 ainda aberto).
 | G0 | Regras do grupo e do repositório | Todos | | 🔴 bloqueado | Grupo acima do limite e acesso ao repositório |
 | G1 | Problema, dados e avaliação | Gabriel Karing | | ✅ passou | |
 | G2 | ETL e atributos | Gabriel Karing | G1 | ✅ passou | Refazer os dois ciclos no pipeline final |
-| G3 | Três métodos de seleção | Gabriel Karing | G2 | 🟡 parcial | Lista de aprovadas, registro no MLflow, merge |
-| G4 | Votação | Guilherme | G3 | ⬜ não iniciado | Tudo |
+| G3 | Três métodos de seleção | Gabriel Karing | G2 | 🟡 parcial | Registro no MLflow, merge |
+| G4 | Votação | Gabriel Karing | G3 | 🟡 parcial | Registro no MLflow, merge |
 | G5 | Dois algoritmos | Gabriel Wendorff | G4 | ⬜ não iniciado | Tudo |
 | G6 | MLflow | José | | ⬜ não iniciado | Tudo |
 | G7 | Workflow e agendamento | Diego | G6 | 🟡 esqueleto | Agendamento, encadeamento, persistência |
 | G8 | Promoção e previsões | Diego | G5, G6 | ⬜ não iniciado | Tudo |
 | G9 | Repositório, relatório e evidências | Vinicius | todos | 🟡 parcial | Relatório e evidências oficiais |
-| G10 | Recurso adicional | Lucas | G2, G7 | ⬜ não iniciado | Tudo |
+| G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | ⬜ não iniciado | Tudo |
 | GF | Teste integrado final | Todos | todos | ⬜ não iniciado | Tudo |
 
 Ordem do trabalho: `G1 → G2 → G3 → G4 → G5 → G8 → G9 → GF`. G6 e G7 correm em paralelo desde o início, e G10 entra no fluxo pelo G7.
@@ -66,21 +66,22 @@ Evidência: `evidencias/selecao/`.
 - [x] Três métodos no notebook 02, sobre os mesmos dados.
 - [x] Ranking ou importância de cada método salvo.
 - [x] Ajuste só no treino e dentro de cada fold, com teste de ausência de vazamento.
-- [ ] **Cada método entrega a lista de features aprovadas.** O enunciado e o slide 7 pedem isso; hoje há scores e posições, e o top-k só aparece como tabela no notebook.
+- [x] Cada método entrega a lista de features aprovadas (`listas_aprovadas` e colunas `aprovada_*`).
 - [ ] Rankings e parâmetros registrados no MLflow com `cycle_id` (depende do G6).
 - [ ] PR #1 integrado à `main`.
 
 ## G4 · Votação e eleição
 
-Evidência esperada: `evidencias/votacao/votos_<cycle_id>.csv`.
+Evidência: `evidencias/votacao/`.
 
-- [ ] Regra definida antes da comparação, em `config.yaml`, e justificada.
-- [ ] Top-k, regra de desempate e quantidade mínima de features aplicados.
-- [ ] O empate na fronteira do top-k está tratado (hoje o RFE tem 21 features no top-20).
-- [ ] Tabela de votos por feature gerada a cada ciclo.
-- [ ] Um único conjunto final salvo em `features_eleitas.json`, usado pelos modelos.
+- [x] Regra definida antes da comparação, em `config.yaml`, e justificada no notebook 02.
+- [x] Top-k, regra de desempate e quantidade mínima de features aplicados.
+- [x] O empate na fronteira do top-k está tratado: as empatadas recebem o voto.
+- [x] Tabela de votos por feature gerada a cada ciclo.
+- [x] Um único conjunto final salvo em `features_eleitas.json`. Falta a F5 usá-lo.
 - [ ] Votos, conjunto final, parâmetros e `cycle_id` registrados no MLflow.
-- [ ] Testes de voto, desempate e mínimo de features.
+- [x] Testes de voto, desempate e mínimo de features.
+- [ ] PR #1 integrado à `main`.
 
 ## G5 · Dois algoritmos
 
@@ -89,7 +90,7 @@ Evidência esperada: `models/candidatos/<cycle_id>/`, `resultados_competicao.jso
 - [ ] Dois algoritmos distintos no notebook 03.
 - [ ] Mesmas features eleitas, mesmo treino, mesma partição e mesma métrica.
 - [ ] Folds gerados com `dividir_cv`.
-- [ ] Feature eleita ausente em um ajuste do one-hot é tratada, como `agent_28`, que não existe no fold 1.
+- [ ] Feature eleita ausente em um ajuste do one-hot é tratada. Neste ciclo todas as eleitas existem nos 4 folds, mas isso pode mudar.
 - [ ] Limitação da média entre folds medida ou declarada: o conjunto eleito já viu parte das validações.
 - [ ] Modelo serializado junto com pré-processamento e features.
 - [ ] Dois runs comparáveis no MLflow, com o mesmo `cycle_id`.

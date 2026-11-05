@@ -21,6 +21,21 @@ def test_extrair_features(assunto, esperado):
     assert gh.extrair_features(assunto) == esperado
 
 
+def test_feature_dividida_conta_os_dois_donos():
+    equipe = {
+        "integrantes": [{"nome": "Ana"}, {"nome": "Beto"}, {"nome": "Caio"}],
+        "features": {"F1": {"titulo": "t1", "dono": ["Ana", "Beto"]}},
+    }
+    commits = [
+        {"hash": "a", "autor": "Ana", "data": "d", "assunto": "[F1] x", "features": ["F1"]},
+        {"hash": "b", "autor": "Beto", "data": "d", "assunto": "[F1] y", "features": ["F1"]},
+        {"hash": "c", "autor": "Caio", "data": "d", "assunto": "[F1] z", "features": ["F1"]},
+    ]
+    texto = "\n".join(gh.secao_por_feature(commits, equipe))
+    assert "| F1 | t1 | Ana, Beto | 2 | 1 | ✅ com commits do dono |" in texto
+    assert "| Ana | F1 | 1 |" in texto and "| Beto | F1 | 1 |" in texto and "| Caio | — | 0 |" in texto
+
+
 def test_secao_por_feature_distingue_dono_de_apoio():
     equipe = {
         "integrantes": [{"nome": "Ana"}, {"nome": "Beto"}],

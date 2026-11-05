@@ -10,6 +10,7 @@ Contrato de entrada (notebook 02, seção dos métodos):
 Contrato de saída (consumido por ``src/votacao.py``, feature F4):
   * ``{método: Series(score por feature)}`` com os nomes DEPOIS do pré-processador e o mesmo índice nos
     três métodos. Maior score = melhor; todo score é >= 0. Empates são possíveis (a F4 define o desempate).
+  * ``listas_aprovadas`` devolve a lista de features aprovadas por método (top-k), que a F4 usa como votos.
 
 Dentro de cada fold não há vazamento: ``calcular_rankings_por_fold`` reajusta o pré-processador e os três
 métodos usando só o treino daquele fold do ``dividir_cv``. A validação do último fold não influencia nada, e
@@ -120,12 +121,28 @@ def calcular_rankings_por_fold(
     return rankings, por_fold
 
 
-def tabela_rankings(rankings: dict[str, pd.Series], por_fold: pd.DataFrame) -> pd.DataFrame:
-    """Uma linha por feature: score e posição (1 = melhor) em cada método e folds em que existiu."""
+def listas_aprovadas(rankings: dict[str, pd.Series], k_top: int) -> dict[str, list[str]]:
+    """Features aprovadas por método: as ``k_top`` melhores, da maior para a menor pontuação.
+
+    Empatadas na fronteira entram todas, porque cortar uma seria arbitrário; o desempate é da votação.
+    Score zero nunca aprova: o método não viu sinal nenhum na feature.
+    """
+    aprovadas = {}
+    for metodo, score in rankings.items():
+        selecao = score[(score.rank(ascending=False, method="min") <= k_top) & (score > 0)]
+        ordenada = selecao.rename_axis("feature").reset_index(name="score").sort_values(["score", "feature"], ascending=[False, True])
+        aprovadas[metodo] = ordenada["feature"].tolist()
+    return aprovadas
+
+
+def tabela_rankings(rankings: dict[str, pd.Series], por_fold: pd.DataFrame, k_top: int) -> pd.DataFrame:
+    """Uma linha por feature: score, posição (1 = melhor) e aprovação em cada método e folds em que existiu."""
+    aprovadas = listas_aprovadas(rankings, k_top)
     colunas = {}
     for metodo, score in rankings.items():
         colunas[f"score_{metodo}"] = score
         colunas[f"posicao_{metodo}"] = score.rank(ascending=False, method="min").astype(int)
+        colunas[f"aprovada_{metodo}"] = score.index.isin(aprovadas[metodo]).astype(int)
     tabela = pd.DataFrame(colunas)
     tabela["folds_presente"] = por_fold.groupby("feature")["fold"].nunique()
     tabela.index.name = "feature"

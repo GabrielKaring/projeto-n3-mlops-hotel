@@ -1,27 +1,27 @@
 # Divisão de tarefas por feature
 
-Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ..., F10 = critério 10) e tem **um dono**, que responde por ela na avaliação individual. Cada integrante tem de **1 a 3 features**.
+Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ..., F10 = critério 10) e tem **um dono** (a F10 é dividida por dois), que responde por ela na avaliação individual. Cada integrante tem de **1 a 4 features**.
 
-A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 3 (ou ficar com 0).
+A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 4 (ou ficar com 0).
 
 > **Atenção:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega. Com 5 pessoas, basta remover dois integrantes de `equipe.yaml` e redistribuir.
 
 ## Quem entrega o quê
 
-Os donos de F4 a F10 são uma proposta até serem confirmados. A parte crítica final (F7, F8 e F9) fica com Diego e Vinicius.
+Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica final (F7, F8 e F9) fica com Diego e Vinicius.
 
 | Feature | Critério | Dono (proposta) | Entrega | Status |
 |---|---|---|---|---|
 | **F1** | 1 · Problema, dados e avaliação | Gabriel Karing | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
 | **F2** | 2 · ETL e engenharia de atributos | Gabriel Karing | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
 | **F3** | 3 · Três métodos de seleção | Gabriel Karing | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
-| **F4** | 4 · Votação e eleição | Guilherme | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
+| **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto, falta registrar no MLflow |
 | **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
 | **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
 | **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
 | **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
 | **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
-| **F10** | 10 · Recurso adicional | Lucas | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
+| **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
 
 Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python -m pytest tests/test_equipe.py` e faça um commit `[equipe] ...`. O nome em `integrantes` deve ser **igual ao nome dos seus commits no git** (ver `.mailmap`); é assim que o histórico por feature reconhece o seu trabalho.
 
@@ -47,7 +47,7 @@ O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o
 ## Dependências entre as features
 
 ```
-F1,F2,F3 (prontos) ──────> F4 ──> F5 ──> F8
+F1,F2,F3,F4 (prontos) ───────────> F5 ──> F8
                                            ▲
 F6 (MLflow) registra F4, F5 e F8 ──────────┘
 F7 (workflow) executa 01 → 05 e persiste o estado entre execuções
@@ -55,11 +55,12 @@ F10 (drift) lê os dados de F2 e alerta no fluxo de F7
 ```
 
 Pares que precisam conversar cedo (as interfaces são os contratos nas docstrings de `src/`):
-- **F3 → F4:** F3 devolve `{método: Series}` com o mesmo índice; F4 consome.
+- **F3 → F4:** F3 devolve `{método: Series}` com o mesmo índice e `listas_aprovadas`; F4 consome.
+- **F4 → F5:** F5 lê `data/processed/features_eleitas.json`.
 - **F6 ↔ F7:** o runner do GitHub Actions é efêmero, então o MLflow, o manifesto dos lotes e o `modelo_vigente.json` precisam de armazenamento persistente. José (F6) e Diego (F7) precisam combinar isso cedo, porque F6 e F7 agora têm donos diferentes.
 - **F5 → F8:** F8 lê os modelos e métricas em `models/candidatos/` e `resultados_competicao.json`.
 
-O notebook 02 é compartilhado por F3 e F4: cada um edita **só a sua seção** para não gerar conflito de merge em `.ipynb`.
+O notebook 02 é compartilhado por F3 e F4.
 
 ## O que já está pronto e como usar
 

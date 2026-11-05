@@ -10,7 +10,7 @@ Execução local em 05/11/2026 de `notebooks/02_votacao_features.ipynb`, seção
 | `data_version` | `dv018-f95c3940` (os mesmos dados do ciclo 1 de `evidencias/etl/`) |
 | Dev | 62.807 linhas, 4 folds cronológicos, 76 features após o pré-processador (união dos folds) |
 
-O notebook termina em erro na célula da F4 (`NotImplementedError`), que ainda não foi implementada. A seção F3 rodou inteira antes dela.
+O notebook roda até o fim sem erros. A votação que usa estas listas está em `../votacao/`.
 
 ## Resultado
 
@@ -31,6 +31,7 @@ Estabilidade do top-20 entre folds seguidos (Jaccard):
 | RFE | 0,33 | 0,43 | 0,74 |
 
 - Quatro features estão no top-20 dos três métodos: `deposit_type_No Deposit`, `deposit_type_Non Refund`, `razao_cancel_previo` e `required_car_parking_spaces`.
+- Cada método entrega sua lista de aprovadas, impressa no notebook e nas colunas `aprovada_*` do CSV.
 - SelectKBest e Random Forest concordam bastante entre si. O RFE traz um ponto de vista diferente, mas é o menos estável.
 - Features empatadas na fronteira entram todas no top-k, e o desempate fica para a F4. Por isso o top-20 do RFE tem 21 features: `agent_250` e `agent_28` empatam na posição 20.
 - `agent_28` não existe no fold 1, porque não passa de 1% naquele treino. O RFE a manteve nos outros três folds. Se for eleita, a F5 precisa tratar os ajustes em que a coluna não for gerada.

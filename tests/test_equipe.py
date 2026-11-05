@@ -1,4 +1,4 @@
-"""Garante a divisão de trabalho: 10 features, cada uma com um dono, e 1 a 3 features por pessoa."""
+"""Garante a divisão de trabalho: 10 features, cada uma com um ou dois donos, e 1 a 4 features por pessoa."""
 from collections import Counter
 from pathlib import Path
 
@@ -21,12 +21,18 @@ def test_nomes_dos_integrantes_sao_unicos():
     assert len(NOMES) == len(set(NOMES))
 
 
+def donos(feature: dict) -> list[str]:
+    return feature["dono"] if isinstance(feature["dono"], list) else [feature["dono"]]
+
+
 def test_toda_feature_tem_dono_conhecido():
     for fid, f in FEATURES.items():
-        assert f["dono"] in NOMES, f"{fid}: dono '{f['dono']}' não está em integrantes"
+        assert 1 <= len(set(donos(f))) <= 2, f"{fid} deve ter um ou dois donos"
+        for dono in donos(f):
+            assert dono in NOMES, f"{fid}: dono '{dono}' não está em integrantes"
 
 
 @pytest.mark.parametrize("nome", NOMES)
-def test_cada_integrante_tem_de_1_a_3_features(nome):
-    qtd = Counter(f["dono"] for f in FEATURES.values())[nome]
-    assert 1 <= qtd <= 3, f"{nome} tem {qtd} feature(s); o combinado é de 1 a 3"
+def test_cada_integrante_tem_de_1_a_4_features(nome):
+    qtd = Counter(dono for f in FEATURES.values() for dono in donos(f))[nome]
+    assert 1 <= qtd <= 4, f"{nome} tem {qtd} feature(s); o combinado é de 1 a 4"

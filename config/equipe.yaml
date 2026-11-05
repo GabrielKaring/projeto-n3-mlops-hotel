@@ -2,8 +2,8 @@
 #
 # 1 feature = 1 critério do enunciado (F1 = critério 1, ..., F10 = critério 10).
 # Regras verificadas por tests/test_equipe.py:
-#   - toda feature F1..F10 tem exatamente um dono, e o dono consta em "integrantes";
-#   - cada integrante tem de 1 a 3 features.
+#   - toda feature F1..F10 tem um dono, ou uma lista de até dois quando é dividida, e eles constam em "integrantes";
+#   - cada integrante tem de 1 a 4 features.
 #
 # Para trocar um dono, edite só o campo "dono" e rode `python -m pytest tests/test_equipe.py`.
 # "nome" deve ser igual ao nome dos commits do git (veja .mailmap), senão o histórico por feature
@@ -11,7 +11,7 @@
 #
 # Só o primeiro nome (os dois Gabriel levam o sobrenome). Quem commitar com outro nome precisa de uma linha no
 # .mailmap apontando para o nome daqui, senão o histórico não reconhece os commits.
-# Os donos de F4 a F10 são proposta até o grupo confirmar: a parte crítica final (F7, F8, F9) fica com Diego e Vinicius.
+# Os donos de F5 a F10 são proposta até o grupo confirmar: a parte crítica final (F7, F8, F9) fica com Diego e Vinicius.
 
 integrantes:
   - {nome: "Gabriel Karing", github: ""}
@@ -41,7 +41,7 @@ features:
   F4:
     criterio: 4
     titulo: "Votação e eleição das features"
-    dono: "Guilherme"
+    dono: "Gabriel Karing"
     artefatos: ["src/votacao.py", "notebooks/02_votacao_features.ipynb (seção da votação)"]
   F5:
     criterio: 5
@@ -71,5 +71,5 @@ features:
   F10:
     criterio: 10
     titulo: "Recurso adicional justificado (sugestão: monitoramento de drift com alerta)"
-    dono: "Lucas"
+    dono: ["Lucas", "Guilherme"]
     artefatos: ["src/drift.py (a criar)", "evidencias/drift/"]
