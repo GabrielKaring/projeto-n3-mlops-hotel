@@ -1,25 +1,27 @@
 # Divisão de tarefas por feature
 
-Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ..., F10 = critério 10) e tem **um dono**, que responde por ela na avaliação individual. Cada integrante tem de **1 a 2 features**.
+Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ..., F10 = critério 10) e tem **um dono**, que responde por ela na avaliação individual. Cada integrante tem de **1 a 3 features**.
 
-A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 2 (ou ficar com 0).
+A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 3 (ou ficar com 0).
 
-> **Atenção:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega. Com 5 pessoas a divisão cabe exatamente (2 features cada); basta remover dois integrantes de `equipe.yaml` e redistribuir.
+> **Atenção:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega. Com 5 pessoas, basta remover dois integrantes de `equipe.yaml` e redistribuir.
 
 ## Quem entrega o quê
 
+Os donos de F4 a F10 são uma proposta, na ordem da lista do grupo, até serem confirmados. Nomes terminados em "…" ainda precisam ser completados.
+
 | Feature | Critério | Dono (proposta) | Entrega | Status |
 |---|---|---|---|---|
-| **F1** | 1 · Problema, dados e avaliação | Gabriel | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
-| **F2** | 2 · ETL e engenharia de atributos | Gabriel | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
-| **F3** | 3 · Três métodos de seleção | Integrante 2 | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
-| **F4** | 4 · Votação e eleição | Integrante 3 | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
-| **F5** | 5 · Dois algoritmos disputam | Integrante 4 | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
-| **F6** | 6 · MLflow e rastreabilidade | Integrante 5 | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
-| **F7** | 7 · Workflow único e agendamento | Integrante 5 | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
-| **F8** | 8 · Eleição, promoção e previsões | Integrante 6 | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
-| **F9** | 9 · Repositório, relatório e evidências | Integrante 7 | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
-| **F10** | 10 · Recurso adicional | Integrante 7 | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
+| **F1** | 1 · Problema, dados e avaliação | Gabriel Karing | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
+| **F2** | 2 · ETL e engenharia de atributos | Gabriel Karing | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
+| **F3** | 3 · Três métodos de seleção | Gabriel Karing | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
+| **F4** | 4 · Votação e eleição | Gabriel Wendorff | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
+| **F5** | 5 · Dois algoritmos disputam | Guilherme Gabrie… | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
+| **F6** | 6 · MLflow e rastreabilidade | José Marcos Zoz… | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
+| **F7** | 7 · Workflow único e agendamento | José Marcos Zoz… | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
+| **F8** | 8 · Eleição, promoção e previsões | Lucas Eduardo M… | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
+| **F9** | 9 · Repositório, relatório e evidências | Vinicius Fernand… | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
+| **F10** | 10 · Recurso adicional | Diego Planinsch… | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
 
 Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python -m pytest tests/test_equipe.py` e faça um commit `[equipe] ...`. O nome em `integrantes` deve ser **igual ao nome dos seus commits no git** (ver `.mailmap`); é assim que o histórico por feature reconhece o seu trabalho.
 
@@ -64,7 +66,7 @@ O notebook 02 é compartilhado por F3 e F4: cada um edita **só a sua seção** 
 ```python
 from src.config import carregar_config, carregar_contexto
 from src.preprocessamento import carregar_particao, construir_preprocessador, lista_features
-from src.avaliacao import criar_cv, metricas_classificacao, melhorou
+from src.avaliacao import dividir_cv, metricas_classificacao, melhorou
 
 cfg = carregar_config()
 ctx = carregar_contexto(cfg)            # cycle_id, data_version, colunas, caminhos
@@ -73,7 +75,7 @@ pre = construir_preprocessador(cfg)     # NÃO ajustado: ajuste só no treino / 
 ```
 
 Regras que valem para todos (vêm do enunciado):
-- A métrica (`f1_macro`) e o protocolo (`criar_cv`) estão em `config/config.yaml`. Não troquem depois de ver resultados.
+- A métrica (`f1_macro`) e o protocolo (`dividir_cv`) estão em `config/config.yaml`. Não troquem depois de ver resultados.
 - O conjunto de **teste** só aparece na avaliação final (notebooks 04/05).
 - Seleção de features e pré-processamento são ajustados só com dados de treino, dentro de cada fold.
 - Cada execução carrega o mesmo `cycle_id` e `data_version`, do início ao fim.

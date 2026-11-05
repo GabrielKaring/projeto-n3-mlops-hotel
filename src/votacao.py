@@ -3,7 +3,7 @@
 Dono: ver ``config/equipe.yaml``. STATUS: a implementar. Pronto quando: ver ``docs/divisao_de_tarefas.md``.
 
 Contrato de entrada:
-  * ``rankings`` produzidos por ``src.features.calcular_rankings`` (feature F3).
+  * ``rankings`` produzidos por ``src.features.calcular_rankings_por_fold`` (feature F3).
   * Regra de votação em ``cfg["selecao"]["votacao"]``, definida ANTES de ver resultados.
 
 Contrato de saída (para o notebook 03, feature F5):

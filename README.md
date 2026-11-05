@@ -8,20 +8,20 @@ Pipeline preditivo versionado e agendado que, a cada ciclo, incorpora dados novo
 
 ## Status por feature
 
-Cada feature é um critério do enunciado e tem um dono (1 a 2 features por pessoa), definido em [`config/equipe.yaml`](config/equipe.yaml).
+Cada feature é um critério do enunciado e tem um dono (1 a 3 features por pessoa), definido em [`config/equipe.yaml`](config/equipe.yaml).
 
 | Feature | Critério | Dono (proposta) | Status |
 |---|---|---|---|
-| F1 | 1 · Problema, dados e avaliação | Gabriel | ✅ pronto |
-| F2 | 2 · ETL e engenharia de atributos | Gabriel | ✅ pronto (testes + 2 ciclos de evidência) |
-| F3 | 3 · Três métodos de seleção | Integrante 2 | ✅ pronto (testes + evidência em `evidencias/selecao/`) |
-| F4 | 4 · Votação e eleição das features | Integrante 3 | ⬜ esqueleto (`src/votacao.py`, notebook 02) |
-| F5 | 5 · Dois algoritmos disputam | Integrante 4 | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
-| F6 | 6 · MLflow e rastreabilidade | Integrante 5 | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
-| F7 | 7 · Workflow único e agendamento | Integrante 5 | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
-| F8 | 8 · Eleição, promoção e previsões | Integrante 6 | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
-| F9 | 9 · Repositório, relatório e evidências | Integrante 7 | 🟨 README e histórico prontos; falta o relatório PDF |
-| F10 | 10 · Recurso adicional | Integrante 7 | ⬜ ideia sugerida em `docs/divisao_de_tarefas.md` |
+| F1 | 1 · Problema, dados e avaliação | Gabriel Karing | ✅ pronto |
+| F2 | 2 · ETL e engenharia de atributos | Gabriel Karing | ✅ pronto (testes + 2 ciclos de evidência) |
+| F3 | 3 · Três métodos de seleção | Gabriel Karing | ✅ pronto (testes + evidência em `evidencias/selecao/`) |
+| F4 | 4 · Votação e eleição das features | Gabriel Wendorff | ⬜ esqueleto (`src/votacao.py`, notebook 02) |
+| F5 | 5 · Dois algoritmos disputam | Guilherme Gabrie… | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
+| F6 | 6 · MLflow e rastreabilidade | José Marcos Zoz… | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
+| F7 | 7 · Workflow único e agendamento | José Marcos Zoz… | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
+| F8 | 8 · Eleição, promoção e previsões | Lucas Eduardo M… | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
+| F9 | 9 · Repositório, relatório e evidências | Vinicius Fernand… | 🟨 README e histórico prontos; falta o relatório PDF |
+| F10 | 10 · Recurso adicional | Diego Planinsch… | ⬜ ideia sugerida em `docs/divisao_de_tarefas.md` |
 
 Definição de pronto, evidência e teste de cada feature: [`docs/divisao_de_tarefas.md`](docs/divisao_de_tarefas.md). Commits seguem `[Fn] descrição`; o [`HISTORICO_DESENVOLVIMENTO.md`](HISTORICO_DESENVOLVIMENTO.md) mostra, por feature, quem fez o quê.
 

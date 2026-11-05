@@ -9,7 +9,7 @@ projeto:
   seed: 42
 
 # ---------------------------------------------------------------------------
-# Etapa 1 — Problema, dados e avaliação (Gabriel)
+# Etapa 1 — Problema, dados e avaliação (Gabriel Karing)
 # ---------------------------------------------------------------------------
 dados:
   fonte: "Hotel Booking Demand (Antonio, Almeida & Nunes, 2019, Data in Brief 22:41-49). Kaggle: jessemostipak/hotel-booking-demand"
@@ -34,14 +34,16 @@ avaliacao:
   min_linhas_dev: 5000           # quantidade mínima para o ciclo rodar; abaixo disso o pipeline falha
 
 # ---------------------------------------------------------------------------
-# Etapa 2 — ETL e engenharia de atributos (Gabriel)
+# Etapa 2 — ETL e engenharia de atributos (Gabriel Karing)
 # ---------------------------------------------------------------------------
 etl:
   remover_colunas:
     # Revelam o resultado da reserva
     vazamento: [reservation_status, reservation_status_date]
     # Só existem depois da reserva (check-in ou alterações posteriores)
-    posteriores_a_reserva: [assigned_room_type, booking_changes]
+    # country: o artigo do dataset (Antonio et al., 2019) avisa que a nacionalidade correta costuma ser
+    # conhecida só no check-in, que reservas canceladas não têm. Retirada antes do treino de qualquer modelo.
+    posteriores_a_reserva: [assigned_room_type, booking_changes, country]
     # Substituídas por atributos derivados ou que não generalizam para anos futuros
     substituidas: [arrival_date_year, arrival_date_month, arrival_date_day_of_month, company]
   duplicatas:
@@ -89,7 +91,6 @@ features:
   categoricas:
     - hotel
     - meal
-    - country
     - market_segment
     - distribution_channel
     - reserved_room_type
@@ -108,7 +109,10 @@ features:
 selecao:
   k_top: 20
   metodos:
-    selectkbest: {score_func: mutual_info_classif}
+    selectkbest:
+      score_func: mutual_info_classif
+      # Contagens e códigos de poucos valores, tratados como discretos. Colunas 0/1 são detectadas sozinhas.
+      discretas: [adults, children, babies, dia_semana_chegada]
     random_forest: {n_estimators: 200, max_depth: 12, n_jobs: -1}
     rfe: {estimador: logistic_regression, step: 0.1, params: {max_iter: 1000}}
   votacao:

@@ -8,7 +8,7 @@ Contrato de entrada (notebook 03):
 
 Regras do enunciado:
   * Modelo A e Modelo B usam as MESMAS features eleitas, a mesma partição e a mesma métrica.
-  * Avaliar com ``src.avaliacao.criar_cv`` e ``metricas_classificacao`` (protocolo único).
+  * Avaliar com ``src.avaliacao.dividir_cv`` e ``metricas_classificacao`` (protocolo único).
   * Cada modelo é um Pipeline completo (pré-processador + seleção das features eleitas + algoritmo),
     para que a serialização leve junto tudo que a previsão precisa.
   * Registrar hiperparâmetros, seed, métricas, features e artefatos dos dois no MLflow, com o mesmo cycle_id.

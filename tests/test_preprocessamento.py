@@ -190,3 +190,10 @@ def test_config_nao_aceita_estrategia_inexistente(cfg, df_bruto_multilote):
     ruim["etl"]["duplicatas"]["estrategia"] = "talvez"
     with pytest.raises(ValueError, match="desconhecida"):
         limpar_e_engenhar(df_bruto_multilote, ruim)
+
+
+def test_country_nao_chega_ao_modelo(df_bruto_multilote, cfg):
+    """A nacionalidade correta costuma ser conhecida só no check-in (docs/etapa1, seção 3)."""
+    df, rel = limpar_e_engenhar(df_bruto_multilote, cfg)
+    assert "country" not in lista_features(cfg) and "country" not in df.columns
+    assert "country" in rel["colunas_removidas"]

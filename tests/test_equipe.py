@@ -1,4 +1,4 @@
-"""Garante a divisão de trabalho: 10 features, cada uma com um dono, e 1 a 2 features por pessoa."""
+"""Garante a divisão de trabalho: 10 features, cada uma com um dono, e 1 a 3 features por pessoa."""
 from collections import Counter
 from pathlib import Path
 
@@ -27,6 +27,6 @@ def test_toda_feature_tem_dono_conhecido():
 
 
 @pytest.mark.parametrize("nome", NOMES)
-def test_cada_integrante_tem_de_1_a_2_features(nome):
+def test_cada_integrante_tem_de_1_a_3_features(nome):
     qtd = Counter(f["dono"] for f in FEATURES.values())[nome]
-    assert 1 <= qtd <= 2, f"{nome} tem {qtd} feature(s); o combinado é de 1 a 2"
+    assert 1 <= qtd <= 3, f"{nome} tem {qtd} feature(s); o combinado é de 1 a 3"

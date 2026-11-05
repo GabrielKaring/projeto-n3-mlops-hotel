@@ -1,10 +1,11 @@
 """Protocolo de avaliação único para todo o pipeline (Etapa 1).
 
 Todos os candidatos (Modelo A, Modelo B e o modelo vigente) devem ser medidos com estas funções e
-com o mesmo ``criar_cv``, para que a comparação seja justa e reprodutível.
+com os mesmos folds de ``dividir_cv``, para que a comparação seja justa e reprodutível.
 """
 from __future__ import annotations
 
+import pandas as pd
 from sklearn.metrics import (
     average_precision_score,
     balanced_accuracy_score,
@@ -36,6 +37,17 @@ def criar_cv(cfg: dict) -> TimeSeriesSplit:
     if cv["tipo"] != "time_series_split":
         raise ValueError(f"Tipo de CV não suportado: {cv['tipo']}")
     return TimeSeriesSplit(n_splits=cv["n_splits"])
+
+
+def dividir_cv(tempo: pd.Series, cfg: dict):
+    """Folds de ``criar_cv``, depois de confirmar que as linhas estão em ordem cronológica.
+
+    O ``TimeSeriesSplit`` só olha a posição das linhas: fora de ordem, ele treinaria com o futuro sem avisar.
+    ``tempo`` é a coluna de data, alinhada às linhas que serão divididas. Datas repetidas são aceitas.
+    """
+    if not tempo.is_monotonic_increasing:  # também é falso se houver data ausente
+        raise ValueError("Os dados precisam estar em ordem cronológica e sem datas ausentes para a validação cruzada")
+    return criar_cv(cfg).split(tempo)
 
 
 def melhorou(novo: float, base: float, direcao: str = "maximizar", min_melhoria: float = 0.0) -> bool:

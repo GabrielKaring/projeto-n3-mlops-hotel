@@ -2,14 +2,19 @@
 from __future__ import annotations
 
 import copy
+import io
 import json
+import tokenize
+import warnings
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal, assert_series_equal
+from sklearn.metrics import mutual_info_score
 
+import src.features
 from src.avaliacao import criar_cv
 from src.features import calcular_rankings, calcular_rankings_por_fold, salvar_rankings, tabela_rankings
 from src.preprocessamento import limpar_e_engenhar, lista_features
@@ -60,6 +65,24 @@ def test_features_com_sinal_ficam_acima_do_ruido_em_todos_os_metodos(X_y, cfg_ra
         assert score[["sinal", "binaria_sinal"]].min() > score.filter(like="ruido").max(), metodo
 
 
+def test_coluna_discreta_da_config_usa_o_estimador_discreto(X_y, cfg_rapido):
+    """Contagem padronizada: o score é a informação mútua exata entre os grupos, sem aviso do sklearn."""
+    X, y = X_y
+    contagem = np.random.default_rng(1).integers(0, 4, len(X)).astype(float)
+    X = X.assign(contagem=(contagem - contagem.mean()) / contagem.std())
+    c = copy.deepcopy(cfg_rapido)
+    c["selecao"]["metodos"]["selectkbest"]["discretas"] = ["contagem"]
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        score = calcular_rankings(X, y, c)["selectkbest"]
+    assert score["contagem"] == pytest.approx(mutual_info_score(contagem, y))
+
+
+def test_colunas_discretas_da_config_existem_nas_features(cfg):
+    discretas = cfg["selecao"]["metodos"]["selectkbest"]["discretas"]
+    assert set(discretas) <= set(lista_features(cfg))
+
+
 def test_rfe_mantem_exatamente_k_top(X_y, cfg_rapido):
     X, y = X_y
     rfe = calcular_rankings(X, y, cfg_rapido)["rfe"]
@@ -88,6 +111,18 @@ def test_metodo_nao_suportado_falha_em_vez_de_trocar_em_silencio(X_y, cfg_rapido
         calcular_rankings(X, y, c)
 
 
+@pytest.mark.parametrize("alteracao", ["sobra", "falta"])
+def test_lista_de_metodos_diferente_da_implementada_falha(X_y, cfg_rapido, alteracao):
+    X, y = X_y
+    c = copy.deepcopy(cfg_rapido)
+    if alteracao == "sobra":
+        c["selecao"]["metodos"]["novo_metodo"] = {}
+    else:
+        del c["selecao"]["metodos"]["rfe"]
+    with pytest.raises(ValueError, match="exatamente"):
+        calcular_rankings(X, y, c)
+
+
 def test_indices_desalinhados_falham(X_y, cfg_rapido):
     X, y = X_y
     with pytest.raises(ValueError, match="mesmo índice"):
@@ -97,12 +132,26 @@ def test_indices_desalinhados_falham(X_y, cfg_rapido):
 def test_por_fold_entrega_o_contrato_da_f4(dev_sintetico, cfg_rapido):
     X_bruto = dev_sintetico[lista_features(cfg_rapido)]
     y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
-    rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, cfg_rapido)
+    rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
     assert set(rankings) == METODOS
     indices = [list(s.index) for s in rankings.values()]
     assert indices[0] == indices[1] == indices[2]
     assert not any(s.isna().any() for s in rankings.values())
     assert sorted(por_fold["fold"].unique()) == list(range(1, cfg_rapido["avaliacao"]["cv"]["n_splits"] + 1))
+
+
+def test_por_fold_recusa_dados_fora_de_ordem(dev_sintetico, cfg_rapido):
+    X_bruto = dev_sintetico[lista_features(cfg_rapido)]
+    y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
+    with pytest.raises(ValueError, match="ordem cronológica"):
+        calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"].iloc[::-1], cfg_rapido)
+
+
+def test_por_fold_recusa_tempo_de_outro_tamanho(dev_sintetico, cfg_rapido):
+    X_bruto = dev_sintetico[lista_features(cfg_rapido)]
+    y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
+    with pytest.raises(ValueError, match="mesmo número de linhas"):
+        calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"].iloc[:-1], cfg_rapido)
 
 
 def test_validacao_do_ultimo_fold_nao_influencia_a_selecao(dev_sintetico, cfg_rapido):
@@ -114,11 +163,11 @@ def test_validacao_do_ultimo_fold_nao_influencia_a_selecao(dev_sintetico, cfg_ra
     X_alterado, y_alterado = X_bruto.copy(), y.copy()
     linhas = X_bruto.index[validacao]
     X_alterado.loc[linhas, "lead_time"] = 100_000
-    X_alterado.loc[linhas, "country"] = "CATEGORIA_NOVA"
+    X_alterado.loc[linhas, "agent"] = "CATEGORIA_NOVA"
     y_alterado.loc[linhas] = 1 - y_alterado.loc[linhas]
 
-    _, original = calcular_rankings_por_fold(X_bruto, y, cfg_rapido)
-    _, alterado = calcular_rankings_por_fold(X_alterado, y_alterado, cfg_rapido)
+    _, original = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
+    _, alterado = calcular_rankings_por_fold(X_alterado, y_alterado, dev_sintetico["arrival_date"], cfg_rapido)
     assert_frame_equal(original, alterado)
 
 
@@ -132,8 +181,8 @@ def test_treino_alterado_muda_a_selecao(dev_sintetico, cfg_rapido):
     X_alterado = X_bruto.copy()
     X_alterado.iloc[treino, X_alterado.columns.get_loc("lead_time")] = 100_000
 
-    _, original = calcular_rankings_por_fold(X_bruto, y, cfg_rapido)
-    _, alterado = calcular_rankings_por_fold(X_alterado, y_alterado, cfg_rapido)
+    _, original = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
+    _, alterado = calcular_rankings_por_fold(X_alterado, y_alterado, dev_sintetico["arrival_date"], cfg_rapido)
     assert not original["score"].equals(alterado["score"])
 
 
@@ -143,20 +192,46 @@ def test_feature_ausente_em_um_fold_entra_na_uniao_e_conta_zero(dev_sintetico, c
     y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
     divisoes = list(criar_cv(cfg_rapido).split(X_bruto))
     so_no_ultimo = np.setdiff1d(divisoes[-1][0], divisoes[-2][0])
-    X_bruto.iloc[so_no_ultimo, X_bruto.columns.get_loc("country")] = "TARDIO"
+    X_bruto.iloc[so_no_ultimo, X_bruto.columns.get_loc("agent")] = "TARDIO"
 
-    rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, cfg_rapido)
+    rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
     tabela = tabela_rankings(rankings, por_fold)
 
-    assert tabela.loc["country_TARDIO", "folds_presente"] == 1
-    no_fold = por_fold.query("feature == 'country_TARDIO' and metodo == 'random_forest'")["score"].item()
-    assert rankings["random_forest"]["country_TARDIO"] == pytest.approx(no_fold / len(divisoes))
+    assert tabela.loc["agent_TARDIO", "folds_presente"] == 1
+    no_fold = por_fold.query("feature == 'agent_TARDIO' and metodo == 'random_forest'")["score"].item()
+    assert rankings["random_forest"]["agent_TARDIO"] == pytest.approx(no_fold / len(divisoes))
+
+
+def test_scores_iguais_empatam_mesmo_com_ruido_de_ponto_flutuante(dev_sintetico, cfg_rapido, monkeypatch):
+    """Parcelas observadas no RFE real: média igual, mas diferente no último bit."""
+    parcelas = {"igual_a": iter([8 / 10, 2 / 10, 7 / 9, 7 / 9]), "igual_b": iter([3 / 10, 7 / 10, 7 / 9, 7 / 9])}
+
+    def falso_calcular_rankings(X, y, cfg):
+        score = pd.Series({nome: next(valores) for nome, valores in parcelas.items()})
+        return {metodo: score for metodo in cfg["selecao"]["metodos"]}
+
+    monkeypatch.setattr(src.features, "calcular_rankings", falso_calcular_rankings)
+    X_bruto = dev_sintetico[lista_features(cfg_rapido)]
+    y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
+    rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
+
+    assert tabela_rankings(rankings, por_fold)["posicao_rfe"].to_dict() == {"igual_a": 1, "igual_b": 1}
+
+
+def test_csv_preserva_posicoes_de_scores_proximos(tmp_path: Path):
+    score = pd.Series({"a": 0.00009112, "b": 0.00009144}, name="random_forest").rename_axis("feature")
+    por_fold = pd.DataFrame({"fold": 1, "metodo": "random_forest", "feature": score.index, "score": score.to_numpy()})
+    tabela = tabela_rankings({"random_forest": score}, por_fold)
+    ctx = {"cycle_id": "ciclo-x", "data_version": "dv001-abc"}
+    caminhos = salvar_rankings(tabela, por_fold, ctx, tmp_path)
+    salvo = pd.read_csv(caminhos["rankings"], index_col="feature")["score_random_forest"]
+    assert salvo["a"] < salvo["b"]
 
 
 def test_salvar_rankings_identifica_o_ciclo(dev_sintetico, cfg_rapido, tmp_path: Path):
     X_bruto = dev_sintetico[lista_features(cfg_rapido)]
     y = dev_sintetico[cfg_rapido["avaliacao"]["alvo"]]
-    rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, cfg_rapido)
+    rankings, por_fold = calcular_rankings_por_fold(X_bruto, y, dev_sintetico["arrival_date"], cfg_rapido)
     ctx = {"cycle_id": "ciclo-x", "data_version": "dv001-abc"}
     caminhos = salvar_rankings(tabela_rankings(rankings, por_fold), por_fold, ctx, tmp_path)
 
@@ -172,4 +247,7 @@ def test_notebook_da_selecao_nao_abre_o_conjunto_de_teste():
     celulas = json.loads(caminho.read_text(encoding="utf-8"))["cells"]
     codigo = "\n".join("".join(c["source"]) for c in celulas if c["cell_type"] == "code")
     assert 'carregar_particao("dev"' in codigo
-    assert "teste" not in codigo.lower()
+    # Comentários ficam de fora: o notebook é dividido com a F4 e "teste" em comentário não abre arquivo nenhum.
+    tokens = tokenize.generate_tokens(io.StringIO(codigo).readline)
+    sem_comentarios = " ".join(t.string for t in tokens if t.type != tokenize.COMMENT)
+    assert "teste" not in sem_comentarios.lower()
