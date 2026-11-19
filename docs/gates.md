@@ -83,16 +83,16 @@ Evidência: `evidencias/votacao/`.
 
 ## G5 · Dois algoritmos
 
-Evidência esperada: `models/candidatos/<cycle_id>/`, `resultados_competicao.json`.
+Evidência: `evidencias/competicao/` (o modelo serializado fica em `models/candidatos/<cycle_id>/`, fora do git).
 
-- [ ] Dois algoritmos distintos no notebook 03.
-- [ ] Mesmas features eleitas, mesmo treino, mesma partição e mesma métrica.
-- [ ] Folds gerados com `dividir_cv`.
-- [ ] Feature eleita ausente em um ajuste do one-hot é tratada. Neste ciclo todas as eleitas existem nos 4 folds, mas isso pode mudar.
-- [ ] Limitação da média entre folds medida ou declarada: o conjunto eleito já viu parte das validações.
-- [ ] Modelo serializado junto com pré-processamento e features.
-- [ ] Dois runs comparáveis no MLflow, com o mesmo `cycle_id`.
-- [ ] Hiperparâmetros, seeds, métricas, features e artefatos registrados.
+- [x] Dois algoritmos distintos no notebook 03 (A = regressão logística, B = random forest).
+- [x] Mesmas features eleitas, mesmo treino, mesma partição e mesma métrica.
+- [x] Folds gerados com `dividir_cv`.
+- [x] Feature eleita ausente em um ajuste do one-hot é tratada: entra zerada e fica anotada em `features_ausentes`.
+- [x] Limitação da média entre folds medida: CV com eleição refeita por fold, comparado ao CV oficial.
+- [x] Modelo serializado junto com pré-processamento e features (um `Pipeline` por modelo).
+- [ ] Dois runs comparáveis no MLflow, com o mesmo `cycle_id`. A célula já existe no notebook 03; falta a F6.
+- [x] Hiperparâmetros, seeds, métricas e features em `resultados_competicao.json`. No MLflow, depende da F6.
 
 ## G6 · MLflow e rastreabilidade
 
