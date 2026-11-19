@@ -142,8 +142,10 @@ promocao:
   manifesto: models/modelo_vigente.json
 
 # ---------------------------------------------------------------------------
-# PROPOSTA INICIAL — Etapa 6: MLflow
+# Etapa 6 — MLflow e rastreabilidade (José, feature F6)
 # ---------------------------------------------------------------------------
+# Todo o histórico (banco SQLite + artefatos) fica numa única pasta. O runner do GitHub Actions é
+# efêmero, então o workflow (F7) precisa recuperar e guardar esta pasta a cada ciclo: ver docs/f6_mlflow.md.
 mlflow:
   experimento: n3-hotel-cancelamento
-  tracking_dir: mlruns
+  dir_estado: mlflow_estado      # mlflow.db + artefatos/ (não versionada na main)

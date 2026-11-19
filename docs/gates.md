@@ -21,7 +21,7 @@ Situação conferida em 05/11/2026, na branch `f3-selecao` (PR #1 ainda aberto).
 | G3 | Três métodos de seleção | Gabriel Karing | G2 | 🟡 parcial | Merge |
 | G4 | Votação | Gabriel Karing | G3 | 🟡 parcial | Merge |
 | G5 | Dois algoritmos | Gabriel Wendorff | G4 | ⬜ não iniciado | Tudo |
-| G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | ⬜ não iniciado | Tudo |
+| G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | 🟡 parcial | Persistência no Actions (com F7), runs de F5 e F8, captura da interface |
 | G7 | Workflow e agendamento | Diego | G6 | 🟡 esqueleto | Agendamento, encadeamento, persistência |
 | G8 | Promoção e previsões | Diego | G5, G6 | ⬜ não iniciado | Tudo |
 | G9 | Repositório, relatório e evidências | Vinicius | todos | 🟡 parcial | Relatório e evidências oficiais |
@@ -96,14 +96,14 @@ Evidência esperada: `models/candidatos/<cycle_id>/`, `resultados_competicao.jso
 
 ## G6 · MLflow e rastreabilidade
 
-Evidência esperada: captura do MLflow e `run_id`s no relatório.
+Evidência: `evidencias/mlflow/` (2 ciclos locais com `run_id`s). Detalhes em [`f6_mlflow.md`](f6_mlflow.md). Falta a captura do MLflow no relatório.
 
-- [ ] Experimento, `run_id`, `cycle_id` e `data_version` em todo run.
-- [ ] Registro chamado no fim do notebook 02: rankings, votos, features eleitas, parâmetros e `cycle_id`. Os artefatos já são gerados (`caminhos_rankings` e `caminhos_votacao`).
-- [ ] Algoritmos, parâmetros, métricas e modelos serializados registrados.
-- [ ] Decisão de promoção ou manutenção registrada.
-- [ ] Histórico sobrevive ao fim do runner, por artefato baixável ou armazenamento persistente.
-- [ ] Pelo menos dois ciclos recuperáveis e consultáveis.
+- [x] Experimento, `run_id`, `cycle_id` e `data_version` em todo run. `iniciar_run` recusa contexto sem as duas tags (`tests/test_rastreio.py`).
+- [x] Registro chamado no fim do notebook 02: rankings, votos, features eleitas, parâmetros e `cycle_id`.
+- [ ] Algoritmos, parâmetros, métricas e modelos serializados registrados. **As funções existem e têm teste (`registrar_parametros`, `registrar_metricas`, `registrar_modelo`); falta a F5 chamá-las no notebook 03.**
+- [ ] Decisão de promoção ou manutenção registrada. **`registrar_decisao` existe e tem teste; falta a F8 chamá-la no notebook 04.**
+- [ ] Histórico sobrevive ao fim do runner, por artefato baixável ou armazenamento persistente. **O estado é uma pasta só (`mlflow_estado/`) e funciona em outro caminho (teste de relocação); falta a F7 guardá-la. Proposta: branch `estado-pipeline`.**
+- [x] Pelo menos dois ciclos recuperáveis e consultáveis (`historico_ciclos`, `python -m src.rastreio`). Hoje só locais.
 - [ ] José e Diego combinaram onde o estado fica guardado.
 
 ## G7 · Workflow único e agendamento
