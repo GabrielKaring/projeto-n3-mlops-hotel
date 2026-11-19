@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 import pytest
 
-from src.avaliacao import criar_cv, melhorou, metricas_classificacao
+from src.avaliacao import criar_cv, dividir_cv, melhorou, metricas_classificacao
 
 
 def test_metricas_perfeitas_e_chaves():
@@ -23,6 +24,24 @@ def test_cv_e_cronologico(cfg):
     assert len(folds) == cfg["avaliacao"]["cv"]["n_splits"]
     for treino, val in folds:
         assert treino.max() < val.min()  # validação sempre no futuro do treino
+
+
+def test_dividir_cv_aceita_datas_repetidas_e_mantem_os_folds(cfg):
+    tempo = pd.Series(pd.date_range("2016-01-01", periods=50).repeat(2))
+    folds = list(dividir_cv(tempo, cfg))
+    esperados = list(criar_cv(cfg).split(tempo))
+    assert len(folds) == cfg["avaliacao"]["cv"]["n_splits"]
+    for (treino, val), (treino_esp, val_esp) in zip(folds, esperados):
+        assert np.array_equal(treino, treino_esp) and np.array_equal(val, val_esp)
+
+
+@pytest.mark.parametrize("tempo", [
+    pd.Series(pd.to_datetime(["2016-01-02", "2016-01-01", "2016-01-03"])),
+    pd.Series(pd.to_datetime(["2016-01-01", None, "2016-01-03"])),
+], ids=["fora_de_ordem", "data_ausente"])
+def test_dividir_cv_recusa_ordem_invalida(cfg, tempo):
+    with pytest.raises(ValueError, match="ordem cronológica"):
+        dividir_cv(tempo, cfg)
 
 
 def test_cv_tipo_desconhecido(cfg):

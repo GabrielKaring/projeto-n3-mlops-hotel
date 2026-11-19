@@ -1,6 +1,6 @@
 # Etapa 1 · Problema, dados e avaliação
 
-Critérios 1 e 2 do enunciado. Tudo aqui foi definido **antes** de qualquer treino e está espelhado em `config/config.yaml`.
+Critérios 1 e 2 do enunciado. Tudo aqui foi definido **antes** do treino de qualquer modelo e está espelhado em `config/config.yaml`.
 
 ## 1. Problema
 
@@ -35,9 +35,11 @@ Previsão **no ato da reserva**. Só entram atributos conhecidos nesse instante.
 | `reservation_status_date` | Descartada | Data do desfecho |
 | `assigned_room_type` | Descartada | Atribuído no check-in; em reservas canceladas quase nunca difere do reservado (1,8% contra 18,8% nas não canceladas) |
 | `booking_changes` | Descartada | Acumula alterações até o desfecho |
+| `country` | Descartada | O artigo do dataset avisa que a nacionalidade correta costuma ser conhecida só no check-in, e reservas canceladas não chegam a ele. Retirada na F3, antes de treinar modelos: ver `evidencias/selecao/LEIAME.md` |
 | `arrival_date_year/month/day_of_month` | Substituídas | Viram `mes_chegada` e `dia_semana_chegada`. O ano não generaliza para datas futuras |
 | `company` | Substituída | 94% ausente; vira `tem_empresa` |
 | `total_of_special_requests`, `required_car_parking_spaces` | **Mantidas** | Suposição: fazem parte da reserva. Se o grupo concluir que são registradas depois, retirar em `config.yaml` |
+| `adults`, `children`, `stays_in_*`, `meal` | **Mantidas** | Suposição: refletem a reserva. O artigo avisa que costumam mudar até o check-in e que sua distribuição difere entre canceladas e não canceladas, então podem carregar parte do mesmo problema de `country` |
 
 Atributos derivados: `total_noites`, `total_hospedes`, `tem_criancas`, `valor_estimado_estadia`, `razao_cancel_previo`, `tem_agente`, `tem_empresa`, `mes_chegada`, `dia_semana_chegada`.
 

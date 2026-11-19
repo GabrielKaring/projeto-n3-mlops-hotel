@@ -2,70 +2,74 @@
 #
 # 1 feature = 1 critério do enunciado (F1 = critério 1, ..., F10 = critério 10).
 # Regras verificadas por tests/test_equipe.py:
-#   - toda feature F1..F10 tem exatamente um dono, e o dono consta em "integrantes";
-#   - cada integrante tem de 1 a 2 features.
+#   - toda feature F1..F10 tem um dono, ou uma lista de até dois quando é dividida, e eles constam em "integrantes";
+#   - cada integrante tem de 1 a 4 features.
 #
 # Para trocar um dono, edite só o campo "dono" e rode `python -m pytest tests/test_equipe.py`.
 # "nome" deve ser igual ao nome dos commits do git (veja .mailmap), senão o histórico por feature
-# não reconhece os commits da pessoa. Troque "Integrante N" pelo nome real.
+# não reconhece os commits da pessoa.
+#
+# Só o primeiro nome (os dois Gabriel levam o sobrenome). Quem commitar com outro nome precisa de uma linha no
+# .mailmap apontando para o nome daqui, senão o histórico não reconhece os commits.
+# Os donos de F5 a F10 são proposta até o grupo confirmar: a parte crítica final (F7, F8, F9) fica com Diego e Vinicius.
 
 integrantes:
-  - {nome: "Gabriel Henrique Karing", github: ""}
-  - {nome: "Integrante 2", github: ""}
-  - {nome: "Integrante 3", github: ""}
-  - {nome: "Integrante 4", github: ""}
-  - {nome: "Integrante 5", github: ""}
-  - {nome: "Integrante 6", github: ""}
-  - {nome: "Integrante 7", github: ""}
+  - {nome: "Gabriel Karing", github: ""}
+  - {nome: "Diego", github: ""}
+  - {nome: "Gabriel Wendorff", github: ""}
+  - {nome: "Guilherme", github: ""}
+  - {nome: "José", github: ""}
+  - {nome: "Lucas", github: ""}
+  - {nome: "Vinicius", github: ""}
 
 features:
   F1:
     criterio: 1
     titulo: "Problema, dados e avaliação"
-    dono: "Gabriel Henrique Karing"
+    dono: "Gabriel Karing"
     artefatos: ["docs/etapa1_problema_dados_avaliacao.md", "config/config.yaml (dados, avaliacao)", "src/avaliacao.py"]
   F2:
     criterio: 2
     titulo: "ETL e engenharia de atributos"
-    dono: "Gabriel Henrique Karing"
+    dono: "Gabriel Karing"
     artefatos: ["src/ingestao.py", "src/preprocessamento.py", "notebooks/01_etl.ipynb"]
   F3:
     criterio: 3
     titulo: "Três métodos de seleção de features"
-    dono: "Integrante 2"
+    dono: "Gabriel Karing"
     artefatos: ["src/features.py", "notebooks/02_votacao_features.ipynb (seção dos métodos)"]
   F4:
     criterio: 4
     titulo: "Votação e eleição das features"
-    dono: "Integrante 3"
+    dono: "Gabriel Karing"
     artefatos: ["src/votacao.py", "notebooks/02_votacao_features.ipynb (seção da votação)"]
   F5:
     criterio: 5
     titulo: "Treinamento dos dois algoritmos"
-    dono: "Integrante 4"
+    dono: "Gabriel Wendorff"
     artefatos: ["src/modelagem.py", "notebooks/03_treino_competicao.ipynb"]
   F6:
     criterio: 6
     titulo: "MLflow e rastreabilidade"
-    dono: "Integrante 5"
-    artefatos: ["src/rastreio.py", "config/config.yaml (mlflow)"]
+    dono: "José"
+    artefatos: ["src/rastreio.py", "config/config.yaml (mlflow)", "notebooks/02_votacao_features.ipynb (registro no MLflow)"]
   F7:
     criterio: 7
     titulo: "Workflow único e agendamento"
-    dono: "Integrante 5"
+    dono: "Diego"
     artefatos: [".github/workflows/pipeline_mlops.yml"]
   F8:
     criterio: 8
     titulo: "Eleição, promoção e previsões"
-    dono: "Integrante 6"
+    dono: "Diego"
     artefatos: ["src/promocao.py", "notebooks/04_selecao_promocao.ipynb", "notebooks/05_previsoes.ipynb", "models/modelo_vigente.json"]
   F9:
     criterio: 9
     titulo: "Repositório, relatório e evidências"
-    dono: "Integrante 7"
+    dono: "Vinicius"
     artefatos: ["README.md", "reports/relatorio_n3.pdf", "evidencias/"]
   F10:
     criterio: 10
     titulo: "Recurso adicional justificado (sugestão: monitoramento de drift com alerta)"
-    dono: "Integrante 7"
+    dono: ["Lucas", "Guilherme"]
     artefatos: ["src/drift.py (a criar)", "evidencias/drift/"]

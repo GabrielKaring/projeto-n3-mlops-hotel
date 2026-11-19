@@ -1,31 +1,33 @@
 # Divisão de tarefas por feature
 
-Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ..., F10 = critério 10) e tem **um dono**, que responde por ela na avaliação individual. Cada integrante tem de **1 a 2 features**.
+Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ..., F10 = critério 10) e tem **um dono** (a F10 é dividida por dois), que responde por ela na avaliação individual. Cada integrante tem de **1 a 4 features**.
 
-A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 2 (ou ficar com 0).
+A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 4 (ou ficar com 0).
 
-> **Atenção:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega. Com 5 pessoas a divisão cabe exatamente (2 features cada); basta remover dois integrantes de `equipe.yaml` e redistribuir.
+> **Atenção:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega. Com 5 pessoas, basta remover dois integrantes de `equipe.yaml` e redistribuir.
 
 ## Quem entrega o quê
 
+Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica final (F7, F8 e F9) fica com Diego e Vinicius.
+
 | Feature | Critério | Dono (proposta) | Entrega | Status |
 |---|---|---|---|---|
-| **F1** | 1 · Problema, dados e avaliação | Gabriel | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
-| **F2** | 2 · ETL e engenharia de atributos | Gabriel | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
-| **F3** | 3 · Três métodos de seleção | Integrante 2 | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
-| **F4** | 4 · Votação e eleição | Integrante 3 | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
-| **F5** | 5 · Dois algoritmos disputam | Integrante 4 | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
-| **F6** | 6 · MLflow e rastreabilidade | Integrante 5 | `src/rastreio.py`, `config.yaml` (mlflow) | ⬜ a fazer |
-| **F7** | 7 · Workflow único e agendamento | Integrante 5 | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
-| **F8** | 8 · Eleição, promoção e previsões | Integrante 6 | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
-| **F9** | 9 · Repositório, relatório e evidências | Integrante 7 | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
-| **F10** | 10 · Recurso adicional | Integrante 7 | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
+| **F1** | 1 · Problema, dados e avaliação | Gabriel Karing | `docs/etapa1_problema_dados_avaliacao.md`, `src/avaliacao.py`, `config.yaml` (dados, avaliação) | ✅ pronto |
+| **F2** | 2 · ETL e engenharia de atributos | Gabriel Karing | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
+| **F3** | 3 · Três métodos de seleção | Gabriel Karing | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
+| **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
+| **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
+| **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), registro no fim do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
+| **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
+| **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
+| **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
+| **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
 
 Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python -m pytest tests/test_equipe.py` e faça um commit `[equipe] ...`. O nome em `integrantes` deve ser **igual ao nome dos seus commits no git** (ver `.mailmap`); é assim que o histórico por feature reconhece o seu trabalho.
 
 ## Definição de pronto e evidência de cada feature
 
-O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o dono adiciona em `tests/`.
+O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o dono adiciona em `tests/`. O checklist completo de cada feature, com a situação atual, está em [`gates.md`](gates.md).
 
 | Feature | Pronto quando | Evidência | Teste mínimo |
 |---|---|---|---|
@@ -34,7 +36,7 @@ O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o
 | F3 | SelectKBest, importância do RF e RFE rodam sobre o mesmo X/y, ajustados só no treino/folds, rankings de cada método salvos | Tabela de scores por método no notebook 02 | `tests/test_features.py`: três rankings com o mesmo índice; sem uso do teste |
 | F4 | Regra de votação definida **antes** em `config.yaml`; tabela de votos, desempate e mínimo de features; `features_eleitas.json` gerado | `evidencias/votacao/votos_<cycle_id>.csv` | `tests/test_votacao.py`: voto, desempate e piso de features em casos pequenos |
 | F5 | Modelos A e B sobre as mesmas features, partição e métrica; cada um é um `Pipeline` completo serializado | `models/candidatos/<cycle_id>/`, `resultados_competicao.json` | `tests/test_modelagem.py`: A e B treinam e prevêem em dados sintéticos; mesmo protocolo |
-| F6 | Todo run com `cycle_id`, `data_version`, parâmetros, métricas, features e artefatos; dois ciclos recuperáveis; armazenamento persiste entre execuções do runner | Captura do MLflow com 2 ciclos + `run_id`s no relatório | `tests/test_rastreio.py`: run local com as tags do ciclo |
+| F6 | Todo run com `cycle_id`, `data_version`, parâmetros, métricas, features e artefatos; rankings e votação do notebook 02 registrados; dois ciclos recuperáveis; armazenamento persiste entre execuções do runner | Captura do MLflow com 2 ciclos + `run_id`s no relatório | `tests/test_rastreio.py`: run local com as tags do ciclo |
 | F7 | Um único YAML com `schedule`, notebooks 01→05 encadeados, falha interrompe, estado persistido entre execuções | Log de execução **agendada** (não só `workflow_dispatch`) | Execuções reais no Actions (anexar link/log) |
 | F8 | Comparação automática A×B, regra de promoção/manutenção, vigente preservado, modelos antigos mantidos, previsões com o vigente e seu pré-processamento | `models/modelo_vigente.json`, previsões, decisão em 2 ciclos | `tests/test_promocao.py`: primeiro ciclo, melhora suficiente, melhora insuficiente, abaixo do piso |
 | F9 | README reproduzível, relatório PDF com a tabela de votação, a decisão de promoção e as limitações, histórico de commits por integrante | `reports/relatorio_n3.pdf`, `HISTORICO_DESENVOLVIMENTO.md` | Seguir o README em ambiente limpo |
@@ -45,7 +47,7 @@ O dono mostra a evidência no relatório e na apresentação. "Teste" é o que o
 ## Dependências entre as features
 
 ```
-F1,F2 (prontos) ──> F3 ──> F4 ──> F5 ──> F8
+F1,F2,F3,F4 (prontos) ───────────> F5 ──> F8
                                            ▲
 F6 (MLflow) registra F4, F5 e F8 ──────────┘
 F7 (workflow) executa 01 → 05 e persiste o estado entre execuções
@@ -53,18 +55,19 @@ F10 (drift) lê os dados de F2 e alerta no fluxo de F7
 ```
 
 Pares que precisam conversar cedo (as interfaces são os contratos nas docstrings de `src/`):
-- **F3 → F4:** F3 devolve `{método: Series}` com o mesmo índice; F4 consome.
-- **F6 ↔ F7:** o runner do GitHub Actions é efêmero, então o MLflow, o manifesto dos lotes e o `modelo_vigente.json` precisam de armazenamento persistente. Como o **mesmo dono** cuida das duas na proposta, esta decisão fica com uma pessoa só.
+- **F3 → F4:** F3 devolve `{método: Series}` com o mesmo índice e `listas_aprovadas`; F4 consome.
+- **F4 → F5:** F5 lê `data/processed/features_eleitas.json`.
+- **F6 ↔ F7:** o runner do GitHub Actions é efêmero, então o MLflow, o manifesto dos lotes e o `modelo_vigente.json` precisam de armazenamento persistente. José (F6) e Diego (F7) precisam combinar isso cedo, porque F6 e F7 agora têm donos diferentes.
 - **F5 → F8:** F8 lê os modelos e métricas em `models/candidatos/` e `resultados_competicao.json`.
 
-O notebook 02 é compartilhado por F3 e F4: cada um edita **só a sua seção** para não gerar conflito de merge em `.ipynb`.
+O notebook 02 é compartilhado por F3 e F4.
 
 ## O que já está pronto e como usar
 
 ```python
 from src.config import carregar_config, carregar_contexto
 from src.preprocessamento import carregar_particao, construir_preprocessador, lista_features
-from src.avaliacao import criar_cv, metricas_classificacao, melhorou
+from src.avaliacao import dividir_cv, metricas_classificacao, melhorou
 
 cfg = carregar_config()
 ctx = carregar_contexto(cfg)            # cycle_id, data_version, colunas, caminhos
@@ -73,7 +76,7 @@ pre = construir_preprocessador(cfg)     # NÃO ajustado: ajuste só no treino / 
 ```
 
 Regras que valem para todos (vêm do enunciado):
-- A métrica (`f1_macro`) e o protocolo (`criar_cv`) estão em `config/config.yaml`. Não troquem depois de ver resultados.
+- A métrica (`f1_macro`) e o protocolo (`dividir_cv`) estão em `config/config.yaml`. Não troquem depois de ver resultados.
 - O conjunto de **teste** só aparece na avaliação final (notebooks 04/05).
 - Seleção de features e pré-processamento são ajustados só com dados de treino, dentro de cada fold.
 - Cada execução carrega o mesmo `cycle_id` e `data_version`, do início ao fim.

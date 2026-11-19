@@ -9,6 +9,8 @@ Requisitos do enunciado:
   * Todo run carrega ``cycle_id`` e ``data_version`` (tags ou parâmetros) e o ``run_id`` volta ao chamador.
   * Registrar parâmetros, métricas, features eleitas e artefatos (modelo, tabela de votos).
   * Dois ciclos diferentes precisam ser recuperáveis depois.
+  * Esta feature também adiciona o registro ao fim do notebook 02: rankings, votos, features eleitas e
+    parâmetros da votação. Os arquivos já existem em ``caminhos_rankings`` e ``caminhos_votacao``.
   * O runner do GitHub Actions é efêmero: definir onde o armazenamento do MLflow persiste entre ciclos
     (combinar com o dono da feature F7).
 """
