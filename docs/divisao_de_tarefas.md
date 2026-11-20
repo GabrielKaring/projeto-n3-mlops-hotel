@@ -18,7 +18,7 @@ Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica 
 | **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
 | **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ✅ pronto (falta o registro no MLflow, que depende da F6) |
 | **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), seção F6 do `notebooks/02_votacao_features.ipynb`, `docs/f6_mlflow.md` | 🟨 falta a persistência no Actions (com F7) |
-| **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
+| **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml`, `scripts/executar_notebook.sh`, `docs/f7_workflow.md` | 🟨 implementado (falta rodar no Actions, depois do merge na `main`) |
 | **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
 | **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
 | **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
