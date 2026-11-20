@@ -28,3 +28,7 @@ evidencias/execucao/
 
 # Modelos treinados (o B passa de 50 MB). Onde eles persistem entre ciclos é decidido na F6/F7.
 models/candidatos/
+# Vencedores de cada ciclo, comprimidos (F8). Persistem como assets da Release do GitHub, enviados pelo workflow (F7).
+models/registro/
+# Manifesto do vigente (F8): a fonte oficial fica na branch estado-pipeline (F7); cópias das decisões em evidencias/promocao/.
+models/modelo_vigente.json
