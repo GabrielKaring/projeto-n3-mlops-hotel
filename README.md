@@ -17,7 +17,7 @@ Cada feature é um critério do enunciado e tem um dono, ou dois quando dividida
 | F3 | 3 · Três métodos de seleção | Gabriel Karing | ✅ pronto (testes + evidência em `evidencias/selecao/`) |
 | F4 | 4 · Votação e eleição das features | Gabriel Karing | ✅ pronto (testes + evidência em `evidencias/votacao/`) |
 | F5 | 5 · Dois algoritmos disputam | Gabriel Wendorff | ⬜ esqueleto (`src/modelagem.py`, notebook 03) |
-| F6 | 6 · MLflow e rastreabilidade | José | ⬜ esqueleto (`src/rastreio.py`) e config proposta |
+| F6 | 6 · MLflow e rastreabilidade | José | 🟨 registro, consulta e testes prontos (`src/rastreio.py`, evidência em `evidencias/mlflow/`); falta a persistência no Actions, combinada com a F7 |
 | F7 | 7 · Workflow único e agendamento | Diego | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
 | F8 | 8 · Eleição, promoção e previsões | Diego | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
 | F9 | 9 · Repositório, relatório e evidências | Vinicius | 🟨 README e histórico prontos; falta o relatório PDF |
@@ -37,7 +37,7 @@ Testado com Python 3.13, pandas 2.3, scikit-learn 1.9 e mlflow 3.18 (o que o `re
 ## Execução local
 
 ```bash
-python -m pytest -q                      # testes (ingestão, ETL, seleção de features, votação, ausência de vazamento, avaliação, divisão da equipe, histórico)
+python -m pytest -q                      # testes (ingestão, ETL, seleção de features, votação, ausência de vazamento, avaliação, MLflow, divisão da equipe, histórico)
 python -m src.ingestao                   # registra lotes novos em data/raw e mostra data_version
 python -m src.ingestao --liberar 1       # simula a chegada do próximo lote mensal (data/incoming -> data/raw)
 cd notebooks && jupyter nbconvert --to notebook --execute 01_etl.ipynb --output 01_executado.ipynb --output-dir ../evidencias/execucao
@@ -58,9 +58,10 @@ data/incoming/                         lotes futuros, liberados um a um para sim
 data/processed/                        saídas intermediárias do ciclo (não versionadas)
 docs/                                  decisões da Etapa 1 e divisão de tarefas
 notebooks/01_etl.ipynb ... 05_previsoes.ipynb
-src/                                   ingestao, preprocessamento, avaliacao, features, votacao (prontos); modelagem, rastreio, promocao (esqueletos)
+src/                                   ingestao, preprocessamento, avaliacao, features, votacao, rastreio (prontos); modelagem, promocao (esqueletos)
 tests/                                 pytest
 models/modelo_vigente.json             gerado pela promoção (ainda não existe)
+mlflow_estado/                         histórico do MLflow: mlflow.db + artefatos/ (não versionado; ver docs/f6_mlflow.md)
 evidencias/                            diagnósticos e notebooks executados
 scripts/                               preparar_lotes.py, gerar_historico.py
 ```
@@ -69,9 +70,18 @@ scripts/                               preparar_lotes.py, gerar_historico.py
 
 O notebook 01 grava `data/processed/ciclo_atual.json` (com `cycle_id`, `data_version`, caminhos e colunas), `dev.parquet` e `teste.parquet`. Os demais apenas leem, via `src.config.carregar_contexto`. O conjunto de teste só é aberto na avaliação final. Cada ciclo carrega o mesmo `cycle_id` e `data_version` do começo ao fim.
 
-## Execução agendada e MLflow
+## MLflow
 
-Ainda não implementados (features F7 e F6). O esqueleto do workflow lista as pendências. Lembrete: o runner do GitHub Actions é efêmero, então o histórico do MLflow, o manifesto dos lotes e o modelo vigente precisam de armazenamento persistente entre ciclos.
+Cada notebook registra seus runs no experimento `n3-hotel-cancelamento`, sempre com as tags `cycle_id` e `data_version`. O histórico fica em `mlflow_estado/` (SQLite + artefatos). Detalhes em [`docs/f6_mlflow.md`](docs/f6_mlflow.md).
+
+```bash
+python -m src.rastreio                                           # lista ciclos e runs; exporta evidencias/mlflow/historico_runs.csv
+mlflow ui --backend-store-uri sqlite:///mlflow_estado/mlflow.db  # interface em http://127.0.0.1:5000
+```
+
+## Execução agendada
+
+Ainda não implementada (feature F7). O esqueleto do workflow lista as pendências. Lembrete: o runner do GitHub Actions é efêmero, então o histórico do MLflow (`mlflow_estado/`), o manifesto dos lotes e o modelo vigente precisam de armazenamento persistente entre ciclos. A F6 propõe uma branch `estado-pipeline` em [`docs/f6_mlflow.md`](docs/f6_mlflow.md).
 
 ## Dados e licença
 
