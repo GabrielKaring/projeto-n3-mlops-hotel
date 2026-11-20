@@ -16,7 +16,7 @@ Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica 
 | **F2** | 2 · ETL e engenharia de atributos | Gabriel Karing | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
 | **F3** | 3 · Três métodos de seleção | Gabriel Karing | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
 | **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
-| **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ⬜ a fazer |
+| **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ✅ pronto (falta o registro no MLflow, que depende da F6) |
 | **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), registro no fim do `notebooks/02_votacao_features.ipynb` | ⬜ a fazer |
 | **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
 | **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
