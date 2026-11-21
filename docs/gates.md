@@ -25,7 +25,7 @@ Situação conferida em 05/11/2026, na branch `f3-selecao` (PR #1 ainda aberto).
 | G7 | Workflow e agendamento | Diego | G6 | 🟡 esqueleto | Agendamento, encadeamento, persistência |
 | G8 | Promoção e previsões | Diego | G5, G6 | ⬜ não iniciado | Tudo |
 | G9 | Repositório, relatório e evidências | Vinicius | todos | 🟡 parcial | Relatório e evidências oficiais |
-| G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | ⬜ não iniciado | Tudo |
+| G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | 🟡 em andamento | Rodar os testes, passo no workflow, execução real e relatório |
 | GF | Teste integrado final | Todos | todos | ⬜ não iniciado | Tudo |
 
 Ordem do trabalho: `G1 → G2 → G3 → G4 → G5 → G8 → G9 → GF`. G6 e G7 correm em paralelo desde o início, e G10 entra no fluxo pelo G7.
@@ -151,7 +151,7 @@ Evidência esperada: `reports/relatorio_n3.pdf`, `README.md`, `HISTORICO_DESENVO
 
 Evidência esperada: pasta em `evidencias/` e seção no relatório.
 
-- [ ] Recurso escolhido e registrado, sem repetir os critérios 1 a 9. A validação de `validar_dados_brutos` faz parte da F2 e não conta.
+- [x] Recurso escolhido e registrado, sem repetir os critérios 1 a 9. A validação de `validar_dados_brutos` faz parte da F2 e não conta. Monitoramento de drift com alerta: [`f10_drift.md`](f10_drift.md).
 - [ ] Responde a uma necessidade real do projeto, demonstrada com dados.
 - [ ] Integrado ao fluxo ou ao uso do modelo, e não um script solto.
 - [ ] Resultado demonstrado com execução real.
