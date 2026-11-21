@@ -21,7 +21,7 @@ Cada feature é um critério do enunciado e tem um dono, ou dois quando dividida
 | F7 | 7 · Workflow único e agendamento | Diego | 🟨 esqueleto roda testes e o notebook 01; **sem `schedule` e nunca executado no Actions** |
 | F8 | 8 · Eleição, promoção e previsões | Diego | ⬜ esqueleto (`src/promocao.py`, notebooks 04 e 05) |
 | F9 | 9 · Repositório, relatório e evidências | Vinicius | 🟨 README e histórico prontos; falta o relatório PDF |
-| F10 | 10 · Recurso adicional | Lucas e Guilherme | ⬜ ideia sugerida em `docs/divisao_de_tarefas.md` |
+| F10 | 10 · Recurso adicional (drift com alerta) | Lucas e Guilherme | 🟨 regra, `src/drift.py` e testes na branch `f10-drift` ([`docs/f10_drift.md`](docs/f10_drift.md)); falta integrar no workflow e gerar evidências |
 
 Definição de pronto, evidência e teste de cada feature: [`docs/divisao_de_tarefas.md`](docs/divisao_de_tarefas.md). Commits seguem `[Fn] descrição`; o [`HISTORICO_DESENVOLVIMENTO.md`](HISTORICO_DESENVOLVIMENTO.md) mostra, por feature, quem fez o quê.
 
@@ -40,6 +40,7 @@ Testado com Python 3.13, pandas 2.3, scikit-learn 1.9 e mlflow 3.18 (o que o `re
 python -m pytest -q                      # testes (ingestão, ETL, seleção de features, votação, ausência de vazamento, avaliação, divisão da equipe, histórico)
 python -m src.ingestao                   # registra lotes novos em data/raw e mostra data_version
 python -m src.ingestao --liberar 1       # simula a chegada do próximo lote mensal (data/incoming -> data/raw)
+python -m src.drift --historico          # drift do lote mais recente contra a referência (F10), saídas em evidencias/drift/
 cd notebooks && jupyter nbconvert --to notebook --execute 01_etl.ipynb --output 01_executado.ipynb --output-dir ../evidencias/execucao
 ```
 

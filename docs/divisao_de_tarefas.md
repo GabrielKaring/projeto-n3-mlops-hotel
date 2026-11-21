@@ -21,7 +21,7 @@ Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica 
 | **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
 | **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
 | **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
-| **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py` (a criar), `evidencias/drift/` | ⬜ a definir |
+| **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py`, `tests/test_drift.py`, `docs/f10_drift.md`, `evidencias/drift/` | 🟨 em andamento |
 
 Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python -m pytest tests/test_equipe.py` e faça um commit `[equipe] ...`. O nome em `integrantes` deve ser **igual ao nome dos seus commits no git** (ver `.mailmap`); é assim que o histórico por feature reconhece o seu trabalho.
 

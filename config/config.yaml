@@ -147,3 +147,33 @@ promocao:
 mlflow:
   experimento: n3-hotel-cancelamento
   tracking_dir: mlruns
+
+# ---------------------------------------------------------------------------
+# Critério 10 — Recurso adicional: monitoramento de drift com alerta (F10)
+# ---------------------------------------------------------------------------
+# Regra fixada ANTES de rodar o monitoramento nos dados reais. Justificativa em docs/f10_drift.md.
+drift:
+  # Contra o que o lote novo é comparado. Reservas de hotel são sazonais: comparar abril com o ano inteiro
+  # acusaria "drift" todo verão. Por isso a referência é o mesmo mês do ano anterior (sazonal); sem esse
+  # mês, os últimos `janela_lotes` lotes antes do atual (anteriores).
+  referencia: sazonal            # sazonal | anteriores
+  janela_lotes: 12
+  # PSI (Population Stability Index), limiares usuais na literatura de risco de crédito (Siddiqi, 2006):
+  # < 0,10 estável; 0,10 a 0,25 atenção; >= 0,25 mudança relevante.
+  psi:
+    atencao: 0.10
+    alerta: 0.25
+  n_bins: 10                     # numéricas: decis da referência
+  max_valores_discretos: 10      # numérica com até 10 valores distintos na referência é tratada como categoria
+  # Categorias raras (< 1% na referência) viram uma só, como no one-hot do modelo (etl.ohe_min_frequencia).
+  # Sem isso, as centenas de valores de `agent` inflariam o PSI só por ruído de amostragem.
+  min_frequencia_categoria: 0.01
+  # Drift do alvo: variação absoluta da taxa de cancelamento, em pontos percentuais. Com base de ~37%,
+  # 5 p.p. já mudam o volume esperado de quartos livres e o overbooking.
+  alvo:
+    atencao_pp: 3.0
+    alerta_pp: 5.0
+  min_linhas: 500                # abaixo disso o PSI é ruidoso: o lote é marcado "amostra_insuficiente" e não alerta
+  # Calendário muda por construção entre lotes mensais (semana do ano, dia da semana): não é drift.
+  ignorar: [arrival_date_week_number, mes_chegada, dia_semana_chegada]
+  dir_evidencias: evidencias/drift

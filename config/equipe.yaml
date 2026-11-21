@@ -72,4 +72,4 @@ features:
     criterio: 10
     titulo: "Recurso adicional justificado (sugestão: monitoramento de drift com alerta)"
     dono: ["Lucas", "Guilherme"]
-    artefatos: ["src/drift.py (a criar)", "evidencias/drift/"]
+    artefatos: ["src/drift.py", "tests/test_drift.py", "docs/f10_drift.md", "evidencias/drift/"]
