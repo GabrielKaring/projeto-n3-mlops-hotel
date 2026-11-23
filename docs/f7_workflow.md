@@ -23,7 +23,7 @@ Dono: Diego. Workflow em [`.github/workflows/pipeline_mlops.yml`](../.github/wor
 | 3 | Devolve para `data/raw/` os lotes que ciclos anteriores já liberaram | sim |
 | 4 | Baixa o modelo vigente da Release `modelos` | sim. Sem ele não há comparação justa |
 | 5 | `python -m src.ingestao --liberar 1`: chega um lote novo | sim |
-| 6 | Notebooks 01 → 02 → 03 → 04, um por passo | sim |
+| 6 | Notebook 01, monitoramento de drift (`python -m src.drift --historico`, F10) e notebooks 02 → 03 → 04, um por passo | sim. No drift, o alerta só avisa (`::warning`); um erro no passo interrompe |
 | 7 | Envia o vencedor do ciclo para a Release `modelos` | sim |
 | 8 | Notebook 05 (previsões no próximo lote) | sim |
 | 9 | Exporta o histórico do MLflow (`python -m src.rastreio`) | roda mesmo após falha |
