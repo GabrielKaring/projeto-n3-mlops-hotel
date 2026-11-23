@@ -6,6 +6,35 @@ Pipeline preditivo versionado e agendado que, a cada ciclo, incorpora dados novo
 
 **Problema:** prever se uma reserva de hotel será cancelada (classificação binária), usando o dataset público [Hotel Booking Demand](https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand). Detalhes e decisões em [`docs/etapa1_problema_dados_avaliacao.md`](docs/etapa1_problema_dados_avaliacao.md).
 
+## Quem usaria
+
+A **gestão de receita e de reservas do hotel**. No momento em que uma reserva entra, o modelo estima a chance de ela ser cancelada. Com isso a equipe pode:
+
+- decidir quanto overbooking aceitar em cada data, sem ficar com quartos vazios nem recusar hóspede no balcão;
+- pedir depósito, confirmar por contato ou oferecer tarifa não reembolsável às reservas de risco alto;
+- prever a ocupação real (e não só a reservada) para escalar equipe e compras.
+
+Quem opera o pipeline (a equipe de dados) acompanha os ciclos no MLflow e o alerta de drift, que avisa quando o perfil das reservas mudou e o modelo pode estar desatualizado.
+
+## Principais resultados
+
+Execuções do pipeline no GitHub Actions até 23/11/2026 (F1 macro no **teste do ciclo**, vencedor e vigente avaliados nos mesmos registros). Cópia das evidências em [`evidencias/actions/`](evidencias/actions/) e do manifesto em [`models/modelo_vigente_actions.json`](models/modelo_vigente_actions.json).
+
+| Execução | Dados (lote novo) | A · F1 CV | B · F1 CV | Vencedor no teste | Vigente no teste | Decisão |
+|---|---|---|---|---|---|---|
+| [45090760506](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506) | dv019 (jan/2017) | 0,747 | 0,790 | B · 0,731 | nenhum | promovido (1º ciclo) |
+| [45099413735](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735) | dv020 (fev/2017) | 0,769 | 0,787 | B · 0,743 | 0,723 | promovido (+0,020) |
+| [45099857641](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) | dv021 (mar/2017) | 0,731 | 0,767 | B · 0,737 | 0,742 | mantido |
+| [45154548830](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`) | dv022 (abr/2017) | 0,711 | 0,744 | B · 0,749 | 0,752 | mantido |
+
+- **O Random Forest (B) venceu a regressão logística (A) em todos os ciclos**, no CV e na ROC-AUC (~0,85 contra ~0,83). No teste, o F1 macro ficou entre **0,73 e 0,75**.
+- **A regra de promoção funcionou nos dois sentidos:** promoveu quando o ganho passou de 0,005 e manteve o vigente quando o candidato não era melhor. O vigente atual é o B do ciclo dv020.
+- **O agendamento roda sozinho:** a execução 45154548830 veio do `schedule`, com todos os passos verdes. A falha simulada (45091260105) parou o fluxo antes da promoção.
+- **Onde o modelo erra:** com o vigente atual no teste do último ciclo agendado (dv022; medido numa execução local com o mesmo código, dados e seed, que reproduz o Actions), o erro total é de 21%. O erro que mais aparece é deixar passar cancelamento: 44,5% das reservas canceladas não foram previstas, contra 7,8% de alarme falso entre as que vieram. Quase todos os erros são de reservas sem depósito, e 73% deles vêm de agências online (*Online TA*); a faixa de 180 a 364 dias de antecedência tem a maior taxa de erro (35%). Detalhes e matriz de confusão na seção 7 do relatório.
+- **Drift:** a taxa de cancelamento de 2017 sobe em relação ao mesmo mês de 2016 (jan/2017: +9,2 p.p.; abr/2017: +5,5 p.p.), e o alerta avisou. Em 23/11 o `agent` saiu do status geral do alerta, porque disparava em todo lote ([`docs/f10_drift.md`](docs/f10_drift.md)).
+
+Relatório completo: [`reports/relatorio_n3.pdf`](reports/relatorio_n3.pdf).
+
 ## Status por feature
 
 Cada feature é um critério do enunciado e tem um dono, ou dois quando dividida (1 a 4 features por pessoa), definido em [`config/equipe.yaml`](config/equipe.yaml).
@@ -40,7 +69,8 @@ Testado com Python 3.13, pandas 2.3, scikit-learn 1.9 e mlflow 3.18 (o que o `re
 python -m pytest -q                      # testes (ingestão, ETL, seleção de features, votação, ausência de vazamento, avaliação, MLflow, divisão da equipe, histórico)
 python -m src.ingestao                   # registra lotes novos em data/raw e mostra data_version
 python -m src.ingestao --liberar 1       # simula a chegada do próximo lote mensal (data/incoming -> data/raw)
-python -m src.drift --historico          # drift do lote mais recente contra a referência (F10), saídas em evidencias/drift/
+python -m src.drift --historico          # drift do lote mais recente contra a referência (F10), saídas em evidencias/drift/ e run 01_drift no MLflow
+python -m src.prever --json exemplos/reserva_exemplo.json   # demonstração: uma reserva nova (precisa de um vigente, ver abaixo)
 ```
 
 Um ciclo completo, na mesma ordem do workflow (os notebooks executados vão para `evidencias/execucao/`):
@@ -62,6 +92,26 @@ No Windows, rode o `bash` pelo Git Bash ou WSL. Leva uns 2 minutos por ciclo.
 
 Os dados já estão no repositório, divididos em lotes mensais. Para regerá-los a partir do CSV original do Kaggle: `python scripts/preparar_lotes.py hotel_bookings.csv`.
 
+## Demonstração de uso
+
+O uso final do modelo é responder, para uma reserva que acabou de entrar, qual a chance de ela ser cancelada. A entrada é um JSON com os campos do dataset conhecidos no ato da reserva, **sem** o desfecho (`is_canceled`) e sem as colunas que só existem depois (`assigned_room_type`, `booking_changes`, `reservation_status`, `reservation_status_date`). `country`, `agent`, `company` e `children` são opcionais. Exemplos: [`exemplos/reserva_exemplo.json`](exemplos/reserva_exemplo.json) (uma reserva) e [`exemplos/reservas_exemplo.json`](exemplos/reservas_exemplo.json) (três).
+
+```bash
+python -m src.prever --json exemplos/reservas_exemplo.json
+```
+
+```
+Reserva 1 (City Hotel, chegada 15/09/2017): chance de cancelamento 83,9% -> risco alto
+Reserva 2 (City Hotel, chegada 12/10/2017): chance de cancelamento 100,0% -> risco alto
+Reserva 3 (Resort Hotel, chegada 22/09/2017): chance de cancelamento 1,9% -> risco baixo
+Limiar: 50% (a partir dele, risco alto; o mesmo corte da avaliação do modelo)
+Modelo vigente: B do ciclo 20261123T021937Z-gha45099413735-1
+```
+
+A saída acima é do vigente do Actions (B do ciclo dv020). A reserva passa pelo mesmo ETL do treino, no modo inferência, e pelo vigente, carregado como no notebook 05 (`models/modelo_vigente.json` + o `Pipeline` completo em `models/registro/`). Em Python: `from src.prever import prever_reserva`.
+
+O vigente existe depois de um ciclo local (seção anterior). Para usar o vigente do Actions sem rodar um ciclo, siga [`models/LEIAME.md`](models/LEIAME.md). O notebook 05 também faz essa demonstração em todo ciclo e grava `evidencias/previsoes/demonstracao_<cycle_id>.csv`.
+
 ## Estrutura
 
 ```
@@ -73,14 +123,19 @@ data/incoming/                         lotes futuros, liberados um a um para sim
 data/processed/                        saídas intermediárias do ciclo (não versionadas)
 docs/                                  decisões de cada feature, divisão de tarefas e gates
 notebooks/01_etl.ipynb ... 05_previsoes.ipynb
-src/                                   ingestao, preprocessamento, avaliacao, features, votacao, modelagem, rastreio, promocao, drift
+src/                                   ingestao, preprocessamento, avaliacao, features, votacao, modelagem, rastreio,
+                                       promocao, analise_erros, drift, prever (demonstração de uso)
 tests/                                 pytest
-models/modelo_vigente.json             vigente e histórico de decisões (gerado pelo notebook 04)
+exemplos/                              reservas novas, sem rótulo, para a demonstração de uso
+models/modelo_vigente.json             vigente e histórico de decisões (gerado pelo notebook 04; oficial na branch estado-pipeline)
+models/modelo_vigente_actions.json     cópia do manifesto do Actions (ver models/LEIAME.md)
 models/registro/                       vencedor de cada ciclo (no Actions, fica na Release `modelos`)
 mlflow_estado/                         histórico do MLflow: mlflow.db + artefatos/ (não versionado; ver docs/f6_mlflow.md)
-evidencias/                            diagnósticos, notebooks executados, drift, decisões e previsões
+evidencias/                            diagnósticos, notebooks executados, drift, decisões, análise de erros e previsões
+evidencias/actions/                    cópia das evidências das execuções no GitHub Actions
 reports/relatorio_n3.pdf               relatório final
-scripts/                               preparar_lotes.py, gerar_historico.py, executar_notebook.sh
+scripts/                               preparar_lotes.py, gerar_historico.py, executar_notebook.sh, gerar_relatorio.py,
+                                       copiar_evidencias_actions.py
 ```
 
 ## Contrato entre notebooks
@@ -89,7 +144,7 @@ O notebook 01 grava `data/processed/ciclo_atual.json` (com `cycle_id`, `data_ver
 
 ## MLflow
 
-Cada notebook registra seus runs no experimento `n3-hotel-cancelamento`, sempre com as tags `cycle_id` e `data_version`. O histórico fica em `mlflow_estado/` (SQLite + artefatos). Detalhes em [`docs/f6_mlflow.md`](docs/f6_mlflow.md).
+Cada notebook registra seus runs no experimento `n3-hotel-cancelamento`, sempre com as tags `cycle_id` e `data_version`. Por ciclo são 5 runs: `01_drift`, `02_votacao`, `03_modelo_A`, `03_modelo_B` e `04_promocao` (este com a decisão, a matriz de confusão e a análise de erros). O histórico fica em `mlflow_estado/` (SQLite + artefatos). Detalhes em [`docs/f6_mlflow.md`](docs/f6_mlflow.md).
 
 ```bash
 python -m src.rastreio                                           # lista ciclos e runs; exporta evidencias/mlflow/historico_runs.csv
@@ -121,8 +176,21 @@ Isso sobrescreve o `data/raw/manifest.json` local. Para voltar: `git checkout --
 
 O notebook 05 carrega o vigente (Pipeline completo: pré-processamento, features eleitas e algoritmo) e prevê o próximo lote de `data/incoming/`, que ainda não participou da escolha do modelo. As previsões ficam em `evidencias/previsoes/previsoes_<cycle_id>.csv`, com o ciclo e o modelo que previu. Quando esse lote chega no ciclo seguinte, o próprio notebook confere as previsões com o rótulo real.
 
+O notebook 04 também grava a matriz de confusão e a análise de erros do modelo em uso no teste do ciclo (por hotel, segmento, tipo de depósito, tipo de cliente, canal e faixa de antecedência) em `evidencias/promocao/`.
+
+**Quando os lotes acabam.** Com o `schedule` diário, o último lote de 2017 entra em 27/11. Daí em diante o notebook 05 avisa, mostra as últimas previsões feitas e mantém a demonstração; o agendamento não foi alterado. Detalhes em [`docs/f7_workflow.md`](docs/f7_workflow.md).
+
 Para prever com o modelo vigente localmente, rode o ciclo completo acima (ou abra o estado do Actions e baixe o vigente com `gh release download modelos --dir models/registro`) e depois `bash scripts/executar_notebook.sh 05_previsoes`.
 
 ## Dados e licença
 
 Antonio, Almeida & Nunes (2019). *Hotel booking demand datasets*. Data in Brief 22:41-49. DOI 10.1016/j.dib.2018.11.126. Licença **CC BY** (artigo de dados original). Nenhum segredo ou dado restrito é versionado.
+
+## Referências
+
+- ANTONIO, N.; ALMEIDA, A.; NUNES, L. Hotel booking demand datasets. *Data in Brief*, v. 22, p. 41-49, 2019. DOI: [10.1016/j.dib.2018.11.126](https://doi.org/10.1016/j.dib.2018.11.126).
+- MOSTIPAK, J. *Hotel booking demand* (versão do dataset no Kaggle). Disponível em: <https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand>.
+- PEDREGOSA, F. et al. Scikit-learn: Machine Learning in Python. *Journal of Machine Learning Research*, v. 12, p. 2825-2830, 2011. Documentação: <https://scikit-learn.org>.
+- MLflow: plataforma aberta para o ciclo de vida de modelos de machine learning. Documentação: <https://mlflow.org/docs/latest/>.
+- SIDDIQI, N. *Credit Risk Scorecards: Developing and Implementing Intelligent Credit Scoring*. Hoboken: Wiley, 2006. (Limiares usuais do PSI usados no monitoramento de drift.)
+- GitHub Actions: documentação de workflows e eventos `schedule` e `workflow_dispatch`. <https://docs.github.com/actions>.

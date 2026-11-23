@@ -15,15 +15,6 @@ from src import rastreio
 from src.votacao import eleger_features, votar
 
 
-@pytest.fixture(scope="session")
-def banco_modelo(cfg: dict, tmp_path_factory) -> Path:
-    """Banco vazio já migrado, criado uma vez só: criar do zero leva ~10 s por teste."""
-    c = copy.deepcopy(cfg)
-    c["mlflow"]["dir_estado"] = str(tmp_path_factory.mktemp("modelo") / "estado")
-    rastreio.configurar_mlflow(c)
-    return Path(c["mlflow"]["dir_estado"]) / rastreio.NOME_BANCO
-
-
 @pytest.fixture()
 def cfg_mlflow(cfg: dict, tmp_path: Path, banco_modelo: Path) -> dict:
     """Config com o estado do MLflow numa pasta temporária (não toca no mlflow_estado/ do projeto)."""

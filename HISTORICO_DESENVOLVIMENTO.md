@@ -6,14 +6,14 @@ _Gerado em 23/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. N�
 
 | Integrante | Commits | Primeiro | Último | Linhas + | Linhas − |
 |---|---:|---|---|---:|---:|
-| Gabriel Karing | 17 | 2026-11-04 | 2026-11-05 | 12,193 | 2,522 |
-| Vinicius | 14 | 2026-11-23 | 2026-11-23 | 1,423 | 192 |
+| Gabriel Karing | 20 | 2026-11-04 | 2026-11-23 | 15,348 | 10,965 |
+| Vinicius | 15 | 2026-11-23 | 2026-11-23 | 1,440 | 198 |
 | Gabriel Wendorff | 3 | 2026-11-19 | 2026-11-19 | 1,497 | 39 |
 | Diego | 2 | 2026-11-19 | 2026-11-19 | 11,338 | 99 |
 | Guilherme | 2 | 2026-11-21 | 2026-11-21 | 840 | 5 |
 | José | 1 | 2026-11-19 | 2026-11-19 | 6,022 | 35 |
 
-Total: 39 commits de 6 integrante(s).
+Total: 43 commits de 6 integrante(s).
 
 ## Visão por feature
 
@@ -22,27 +22,27 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | Feature | Título | Dono | Commits do dono | Commits de apoio | Situação |
 |---|---|---|---:|---:|---|
 | F1 | Problema, dados e avaliação | Gabriel Karing | 1 | 0 | ✅ com commits do dono |
-| F2 | ETL e engenharia de atributos | Gabriel Karing | 3 | 0 | ✅ com commits do dono |
+| F2 | ETL e engenharia de atributos | Gabriel Karing | 4 | 0 | ✅ com commits do dono |
 | F3 | Três métodos de seleção de features | Gabriel Karing | 3 | 0 | ✅ com commits do dono |
 | F4 | Votação e eleição das features | Gabriel Karing | 2 | 0 | ✅ com commits do dono |
 | F5 | Treinamento dos dois algoritmos | Gabriel Wendorff | 3 | 1 | ✅ com commits do dono |
 | F6 | MLflow e rastreabilidade | José | 1 | 2 | ✅ com commits do dono |
 | F7 | Workflow único e agendamento | Diego | 0 | 4 | ⬜ sem commits do dono |
-| F8 | Eleição, promoção e previsões | Diego | 0 | 0 | ⬜ sem commits do dono |
-| F9 | Repositório, relatório e evidências | Vinicius | 6 | 0 | ✅ com commits do dono |
-| F10 | Recurso adicional justificado (sugestão: monitoramento de drift com alerta) | Lucas, Guilherme | 2 | 1 | ✅ com commits do dono |
+| F8 | Eleição, promoção e previsões | Diego | 0 | 1 | ⬜ sem commits do dono |
+| F9 | Repositório, relatório e evidências | Vinicius | 7 | 1 | ✅ com commits do dono |
+| F10 | Recurso adicional justificado (sugestão: monitoramento de drift com alerta) | Lucas, Guilherme | 2 | 2 | ✅ com commits do dono |
 
 ### Por integrante
 
 | Integrante | Features | Commits nas próprias features |
 |---|---|---:|
-| Gabriel Karing | F1, F2, F3, F4 | 8 |
+| Gabriel Karing | F1, F2, F3, F4 | 9 |
 | Diego | F7, F8 | 0 |
 | Gabriel Wendorff | F5 | 3 |
 | Guilherme | F10 | 2 |
 | José | F6 | 1 |
 | Lucas | F10 | 0 |
-| Vinicius | F9 | 6 |
+| Vinicius | F9 | 7 |
 
 13 commit(s) sem tag de feature (docs, equipe, correções).
 
@@ -55,6 +55,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `709df2e` 2026-11-04 · Gabriel Karing · [F2] ingestão em lotes mensais com manifesto, sha256 e data_version
 - `9fd2630` 2026-11-04 · Gabriel Karing · [F2] ETL, engenharia de atributos, partição temporal e protocolo de avaliação
 - `99816f1` 2026-11-04 · Gabriel Karing · [F2] notebook 01 executado em dois ciclos (dv018 e dv019)
+- `e443c57` 2026-11-23 · Gabriel Karing · [F2][F8] demonstração de uso com reserva nova e análise de erros
 
 #### F3 · Três métodos de seleção de features
 
@@ -87,6 +88,10 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `67523ef` 2026-11-23 · Vinicius · [F7] agendamento temporário a cada 10 min
 - `90272e1` 2026-11-23 · Vinicius · [F7] tira o agendamento temporário, fica só o diário
 
+#### F8 · Eleição, promoção e previsões
+
+- `e443c57` 2026-11-23 · Gabriel Karing · [F2][F8] demonstração de uso com reserva nova e análise de erros
+
 #### F9 · Repositório, relatório e evidências
 
 - `f57facc` 2026-11-23 · Vinicius · [F9] reconhece os commits do Diego no histórico (.mailmap)
@@ -95,12 +100,15 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `85e874c` 2026-11-23 · Vinicius · [F9] relatório final com os ciclos do Actions
 - `7b00b27` 2026-11-23 · Vinicius · [F9] regenera o histórico de desenvolvimento
 - `0178de1` 2026-11-23 · Vinicius · [F9] relatório com o ciclo agendado
+- `73d525c` 2026-11-23 · Vinicius · [F9] regenera o histórico de desenvolvimento
+- `acd6f6f` 2026-11-23 · Gabriel Karing · [F9] relatório, README e evidências do Actions na main
 
 #### F10 · Recurso adicional justificado (sugestão: monitoramento de drift com alerta)
 
 - `9ccf80e` 2026-11-21 · Guilherme · [F10] fixa a regra do monitoramento de drift antes de rodar nos dados
 - `c48af1d` 2026-11-21 · Guilherme · [F10] implementa o monitoramento de drift com alerta, testes e documentação
 - `c01be7e` 2026-11-23 · Vinicius · [F10] liga o monitoramento de drift no workflow, logo depois do notebook 01
+- `89738e9` 2026-11-23 · Gabriel Karing · [F10] drift sem alarme por troca de agências e registrado no MLflow
 
 ## Linha do tempo
 
@@ -145,6 +153,10 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | 2026-11-23 | `90272e1` | Vinicius | [F7] tira o agendamento temporário, fica só o diário | 1 |
 | 2026-11-23 | `0178de1` | Vinicius | [F9] relatório com o ciclo agendado | 2 |
 | 2026-11-23 | `0ff2b4c` | Vinicius | [docs] marca o G7 como passou | 2 |
+| 2026-11-23 | `73d525c` | Vinicius | [F9] regenera o histórico de desenvolvimento | 1 |
+| 2026-11-23 | `e443c57` | Gabriel Karing | [F2][F8] demonstração de uso com reserva nova e análise de erros | 13 |
+| 2026-11-23 | `89738e9` | Gabriel Karing | [F10] drift sem alarme por troca de agências e registrado no MLflow | 7 |
+| 2026-11-23 | `acd6f6f` | Gabriel Karing | [F9] relatório, README e evidências do Actions na main | 39 |
 
 ## Contribuições de Gabriel Karing
 
@@ -165,6 +177,9 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `f9b4929` 2026-11-05 · [docs] adiciona os gates de entrega a partir do enunciado
 - `70d55b0` 2026-11-05 · [F3][F4] adiciona as listas de aprovadas e implementa a votação
 - `69f4175` 2026-11-05 · [F4][F6] passa para a F6 o registro da seleção e da votação no MLflow
+- `e443c57` 2026-11-23 · [F2][F8] demonstração de uso com reserva nova e análise de erros
+- `89738e9` 2026-11-23 · [F10] drift sem alarme por troca de agências e registrado no MLflow
+- `acd6f6f` 2026-11-23 · [F9] relatório, README e evidências do Actions na main
 
 ## Contribuições de Gabriel Wendorff
 
@@ -202,3 +217,4 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `90272e1` 2026-11-23 · [F7] tira o agendamento temporário, fica só o diário
 - `0178de1` 2026-11-23 · [F9] relatório com o ciclo agendado
 - `0ff2b4c` 2026-11-23 · [docs] marca o G7 como passou
+- `73d525c` 2026-11-23 · [F9] regenera o histórico de desenvolvimento

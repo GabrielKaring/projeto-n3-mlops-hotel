@@ -11,7 +11,7 @@ Um **gate** é o conjunto de condições verificáveis que uma feature precisa c
 
 ## Painel
 
-Situação conferida em 22/11/2026, na `main`, depois das execuções no Actions.
+Situação em 23/11/2026, na `main`.
 
 | Gate | O que cobre | Dono | Depende de | Situação | O que falta |
 |---|---|---|---|---|---|
@@ -24,18 +24,20 @@ Situação conferida em 22/11/2026, na `main`, depois das execuções no Actions
 | G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | ✅ passou | |
 | G7 | Workflow e agendamento | Diego | G6 | ✅ passou | |
 | G8 | Promoção e previsões | Diego | G5, G6 | ✅ passou | |
-| G9 | Repositório, relatório e evidências | Vinicius | todos | ✅ passou | |
-| G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | ✅ passou | Ajustar o `agent` para o alerta não disparar em todo lote (ver relatório) |
-| GF | Teste integrado final | Todos | todos | ⬜ a fazer | Teste do grupo: seguir o README e conferir o checklist abaixo |
+| G9 | Repositório, relatório e evidências | Vinicius | todos | ✅ passou | Regenerar o `HISTORICO_DESENVOLVIMENTO.md` depois do último commit |
+| G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | ✅ passou | |
+| GF | Teste integrado final | Todos | todos | ✅ passou | |
 
 Ordem do trabalho: `G1 → G2 → G3 → G4 → G5 → G8 → G9 → GF`. G6 e G7 correm em paralelo desde o início, e G10 entra no fluxo pelo G7.
+
+**Evidências usadas abaixo.** Execuções do Actions: [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506), [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) (falha simulada), [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735), [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) e [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`). A cópia do que elas produziram está em [`evidencias/actions/`](../evidencias/actions/), uma pasta por feature, e o manifesto em `models/modelo_vigente_actions.json`.
 
 ## G0 · Regras do grupo e do repositório
 
 - [ ] Grupo com até 5 integrantes, ou exceção confirmada pelo professor. **Hoje são 7.**
 - [ ] Repositório acessível ao professor. **Hoje é privado.**
 - [ ] Todos os integrantes com acesso de escrita. **Hoje só há 2 colaboradores.**
-- [ ] Commits de cada pessoa com o nome de `config/equipe.yaml`, ou com linha no `.mailmap`.
+- [x] Commits de cada pessoa com o nome de `config/equipe.yaml` ou com linha no `.mailmap`. O Lucas ainda não tem commit.
 - [x] Sem tokens, senhas, ambientes virtuais ou dados restritos versionados.
 - [x] Dados públicos, com fonte e licença indicadas.
 
@@ -46,127 +48,101 @@ Evidência: `docs/etapa1_problema_dados_avaliacao.md`.
 - [x] Tipo de problema escolhido e justificado.
 - [x] Fonte, licença, unidade de observação, alvo, atributos e limitações descritos.
 - [x] Métrica principal e direção definidas antes de treinar qualquer modelo.
-- [x] Partição respeita a ordem cronológica, com teste reservado à avaliação final.
+- [x] Partição cronológica, com teste reservado à avaliação final.
 - [x] Forma de chegada de novos registros explicada.
 
 ## G2 · ETL e engenharia de atributos
-
-Evidência: `evidencias/etl/`.
 
 - [x] Ausentes, duplicatas, inconsistências e outliers verificados no notebook 01.
 - [x] Tratamentos justificados e diagnóstico de antes e depois.
 - [x] Transformações ajustadas só no treino, via `Pipeline`/`ColumnTransformer`.
 - [x] Novos lotes identificados e incorporados sem duplicação, com `data_version`.
-- [ ] Dois ciclos refeitos no pipeline final. Os atuais são locais e anteriores à retirada de `country`.
+- [x] Ciclos refeitos no pipeline final, sem `country`: #2, #4, #5 e #6 (`dv019` a `dv022`).
 
 ## G3 · Três métodos de seleção
-
-Evidência: `evidencias/selecao/`.
 
 - [x] Três métodos no notebook 02, sobre os mesmos dados.
 - [x] Ranking ou importância de cada método salvo.
 - [x] Ajuste só no treino e dentro de cada fold, com teste de ausência de vazamento.
-- [x] Cada método entrega a lista de features aprovadas (`listas_aprovadas` e colunas `aprovada_*`).
-- [ ] PR #1 integrado à `main`.
+- [x] Cada método entrega a lista de features aprovadas.
+- [x] PR #1 integrado à `main` (19/11).
 
 ## G4 · Votação e eleição
 
-Evidência: `evidencias/votacao/`.
-
-- [x] Regra definida antes da comparação, em `config.yaml`, e justificada no notebook 02.
-- [x] Top-k, regra de desempate e quantidade mínima de features aplicados.
-- [x] O empate na fronteira do top-k está tratado: as empatadas recebem o voto.
-- [x] Tabela de votos por feature gerada a cada ciclo.
-- [x] Um único conjunto final salvo em `features_eleitas.json`. Falta a F5 usá-lo.
+- [x] Regra definida antes, em `config.yaml`, e justificada no notebook 02.
+- [x] Top-k, desempate e quantidade mínima de features aplicados; empatadas na fronteira recebem o voto.
+- [x] Tabela de votos gerada a cada ciclo.
+- [x] Um único conjunto final (`features_eleitas.json`), usado pelos dois modelos da F5.
 - [x] Testes de voto, desempate e mínimo de features.
-- [ ] PR #1 integrado à `main`.
 
 ## G5 · Dois algoritmos
 
-Evidência: `evidencias/competicao/` (o modelo serializado fica em `models/candidatos/<cycle_id>/`, fora do git).
-
 - [x] Dois algoritmos distintos no notebook 03 (A = regressão logística, B = random forest).
-- [x] Mesmas features eleitas, mesmo treino, mesma partição e mesma métrica.
-- [x] Folds gerados com `dividir_cv`.
-- [x] Feature eleita ausente em um ajuste do one-hot é tratada: entra zerada e fica anotada em `features_ausentes`.
-- [x] Limitação da média entre folds medida: CV com eleição refeita por fold, comparado ao CV oficial.
-- [x] Modelo serializado junto com pré-processamento e features (um `Pipeline` por modelo).
-- [ ] Dois runs comparáveis no MLflow, com o mesmo `cycle_id`. A célula já existe no notebook 03; falta a F6.
-- [x] Hiperparâmetros, seeds, métricas e features em `resultados_competicao.json`. No MLflow, depende da F6.
+- [x] Mesmas features, treino, partição, folds (`dividir_cv`) e métrica.
+- [x] Feature eleita ausente num fold entra zerada e fica anotada em `features_ausentes`.
+- [x] Otimismo da média entre folds medido (CV com eleição refeita por fold).
+- [x] Modelo serializado com pré-processamento e features (um `Pipeline` por modelo).
+- [x] Dois runs comparáveis no MLflow por ciclo (`03_modelo_A` e `03_modelo_B`), com hiperparâmetros, seeds, métricas e features.
 
 ## G6 · MLflow e rastreabilidade
 
-Evidência: `evidencias/mlflow/` (2 ciclos locais com `run_id`s). Detalhes em [`f6_mlflow.md`](f6_mlflow.md). Falta a captura do MLflow no relatório.
+Detalhes em [`f6_mlflow.md`](f6_mlflow.md).
 
-- [x] Experimento, `run_id`, `cycle_id` e `data_version` em todo run. `iniciar_run` recusa contexto sem as duas tags (`tests/test_rastreio.py`).
-- [x] Registro chamado no fim do notebook 02: rankings, votos, features eleitas, parâmetros e `cycle_id`.
-- [ ] Algoritmos, parâmetros, métricas e modelos serializados registrados. **As funções existem e têm teste (`registrar_parametros`, `registrar_metricas`, `registrar_modelo`); falta a F5 chamá-las no notebook 03.**
-- [ ] Decisão de promoção ou manutenção registrada. **`registrar_decisao` existe e tem teste; falta a F8 chamá-la no notebook 04.**
-- [ ] Histórico sobrevive ao fim do runner, por artefato baixável ou armazenamento persistente. **O estado é uma pasta só (`mlflow_estado/`) e funciona em outro caminho (teste de relocação); falta a F7 guardá-la. Proposta: branch `estado-pipeline`.**
-- [x] Pelo menos dois ciclos recuperáveis e consultáveis (`historico_ciclos`, `python -m src.rastreio`). Hoje só locais.
-- [ ] José e Diego combinaram onde o estado fica guardado.
+- [x] `run_id`, `cycle_id` e `data_version` em todo run; `iniciar_run` recusa contexto sem as tags.
+- [x] Seleção e votação registradas no notebook 02; modelos no 03; decisão no 04 (tag `decisao`); drift no run `01_drift`.
+- [x] Histórico sobrevive ao fim do runner: `mlflow_estado/` vai para a branch `estado-pipeline` a cada execução.
+- [x] Ciclos recuperáveis e consultáveis (`python -m src.rastreio`): 4 completos e 1 com falha no Actions.
 
 ## G7 · Workflow único e agendamento
 
-Evidência esperada: YAML, logs e link da execução no Actions. Como funciona: [`f7_workflow.md`](f7_workflow.md).
+Como funciona: [`f7_workflow.md`](f7_workflow.md).
 
-- [x] Só existe `.github/workflows/pipeline_mlops.yml`, com `schedule` (diário, 09:00 UTC) e `workflow_dispatch` (verificado em `tests/test_workflow.py`).
-- [ ] Instala dependências e obtém dados e estado persistente. Implementado; falta rodar no Actions.
-- [x] Executa 01→02→03→04→05 em sequência, um notebook por passo, sem `--allow-errors` (verificado em `tests/test_workflow.py`).
-- [ ] Falha interrompe o fluxo e impede promoção indevida, com um teste real de falha. Implementado (entrada `falhar_em` do `workflow_dispatch`); falta a execução no Actions.
-- [ ] Manifesto, modelo vigente e histórico são recuperados de armazenamento persistente (branch `estado-pipeline` e Release `modelos`). Lógica simulada localmente em 3 execuções; falta rodar no Actions.
-- [ ] Publica o pacote completo de resultados. Implementado; falta rodar no Actions.
-- [ ] **Execução real pelo gatilho `schedule`.** A manual não substitui. **Hoje há 0 execuções no Actions.**
+- [x] Só existe `.github/workflows/pipeline_mlops.yml`, com `schedule` e `workflow_dispatch` (`tests/test_workflow.py`).
+- [x] Instala dependências e recupera dados, estado e vigente (branch `estado-pipeline` e Release `modelos`).
+- [x] Executa 01→02→03→04→05, um notebook por passo, sem `--allow-errors`.
+- [x] Falha interrompe o fluxo e impede promoção: #3 parou no 03, e o 04 e a Release não rodaram.
+- [x] Publica as evidências como artefato `evidencias-<run_id>`.
+- [x] **Execução real pelo `schedule`:** #6, com todos os passos verdes.
 
-> O `schedule` só dispara a partir da branch padrão, então o workflow precisa estar na `main`. O GitHub também pode atrasar os agendamentos: deixem folga antes da entrega. O repositório precisa de *Workflow permissions* = "Read and write".
+> O `schedule` só dispara a partir da branch padrão, pode atrasar e exige *Workflow permissions* = "Read and write".
 
 ## G8 · Promoção e previsões
 
-Evidência: `evidencias/promocao/` e `evidencias/previsoes/` (2 ciclos locais). Os modelos ficam em `models/registro/`, fora do git.
-
-- [x] Compara A e B automaticamente e elege o vencedor no notebook 04: maior média de `f1_macro` no CV do dev; empate vai para o menor desvio.
-- [x] Confronta o vencedor com o vigente em protocolo compatível, nos mesmos dados, e não com uma métrica antiga guardada: os dois são avaliados no teste do ciclo atual.
-- [x] Limiar de melhoria e verificações de qualidade definidos antes, em `config.yaml` (melhoria mínima de 0,005 e piso de 0,60).
-- [x] Mantém o vigente quando os critérios não são atendidos. Coberto por teste; não aconteceu nos 2 ciclos locais (os dois promoveram).
-- [x] Manifesto traz identificação, versão dos dados, features, métrica, `run_id` e decisão, com o histórico de todos os ciclos.
-- [ ] Modelos anteriores preservados e recuperáveis. Localmente sim (`models/registro/`, nunca sobrescrito). **No Actions, depende da F7 enviar os arquivos para a Release do GitHub.**
-- [x] Notebook 05 carrega o vigente com pré-processamento e features (o `Pipeline` completo da F5).
-- [x] Previsões em registros não usados na escolha do modelo: o próximo lote de `data/incoming/`, conferido quando ele chega no ciclo seguinte.
-- [x] Testes de primeiro ciclo, melhora suficiente, melhora insuficiente e abaixo do piso (`tests/test_promocao.py`).
+- [x] Vencedor eleito no notebook 04 pela maior média de `f1_macro` no CV; empate vai para o menor desvio.
+- [x] Vencedor e vigente avaliados no mesmo teste do ciclo atual.
+- [x] Melhoria mínima (0,005) e piso (0,60) definidos antes, em `config.yaml`.
+- [x] Mantém o vigente quando a regra não é atendida: #5 e #6.
+- [x] Manifesto com identificação, versão dos dados, features, métrica, `run_id`, decisão e histórico.
+- [x] Modelos anteriores preservados na Release `modelos`, sem sobrescrita.
+- [x] Notebook 05 carrega o vigente completo e prevê o próximo lote de `data/incoming/`, conferido quando ele chega.
+- [x] Testes de primeiro ciclo, melhora suficiente, insuficiente e abaixo do piso (`tests/test_promocao.py`).
 
 ## G9 · Repositório, relatório e evidências
 
-Evidência esperada: `reports/relatorio_n3.pdf`, `README.md`, `HISTORICO_DESENVOLVIMENTO.md`.
-
-- [ ] README explica instalação, execução local, execução agendada, consulta ao MLflow e reprodução das previsões. **Faltam agendamento, MLflow e previsões.**
-- [ ] Seguir o README em um ambiente limpo funciona.
-- [ ] Relatório em PDF identifica os integrantes.
-- [ ] Relatório cobre problema e dados, ETL, tabela de votação e comparação dos dois modelos.
-- [ ] Relatório cobre decisão de promoção, arquitetura do fluxo único e evidências de execução.
-- [ ] Relatório cobre limitações e conclusões, incluindo as suposições sobre `adults`, `children`, `stays_in_*` e `meal`.
-- [ ] Evidências do `schedule` e histórico do MLflow incluídos.
-- [ ] `HISTORICO_DESENVOLVIMENTO.md` regenerado no fim.
+- [x] README com instalação, execução local e agendada, MLflow, previsões e demonstração com uma reserva nova.
+- [x] Seguir o README em ambiente limpo funciona (GF).
+- [x] Relatório em PDF com integrantes, dados, ETL, votação, modelos, promoção, fluxo, evidências, limitações e conclusões.
+- [x] Evidências do `schedule` e histórico do MLflow na `main` (`evidencias/actions/`).
+- [ ] `HISTORICO_DESENVOLVIMENTO.md` regenerado depois do último commit (`python scripts/gerar_historico.py`).
 
 ## G10 · Recurso adicional
 
-Evidência esperada: pasta em `evidencias/` e seção no relatório.
+Monitoramento de drift com alerta: [`f10_drift.md`](f10_drift.md) e seção 9 do relatório.
 
-- [x] Recurso escolhido e registrado, sem repetir os critérios 1 a 9. A validação de `validar_dados_brutos` faz parte da F2 e não conta. Monitoramento de drift com alerta: [`f10_drift.md`](f10_drift.md).
-- [ ] Responde a uma necessidade real do projeto, demonstrada com dados.
-- [ ] Integrado ao fluxo ou ao uso do modelo, e não um script solto.
-- [ ] Resultado demonstrado com execução real.
-- [ ] Testes do recurso.
-- [ ] Relatório traz problema identificado, justificativa, solução, ponto de integração e resultado.
+- [x] Não repete os critérios 1 a 9.
+- [x] Responde a uma necessidade real, mostrada com dados (cancelamento de 2017 acima do de 2016).
+- [x] Integrado ao fluxo: passo logo depois do notebook 01, com `::warning`, resumo do job e run no MLflow.
+- [x] Demonstrado nas execuções do Actions e com testes (`tests/test_drift.py`).
 
 ## GF · Teste integrado final
 
-É o último gate e repete a checagem final do enunciado.
+Teste de 23/11/2026 numa cópia limpa da `main` (`git archive` de `73d525c`), seguindo o README: 2 ciclos locais que reproduziram bit a bit o F1 de #2 e #4, mais um ciclo com `data/incoming` vazio, sem erro.
 
-- [ ] Ciclo inicial e ciclo com lote adicional executados, identificando o que mudou.
-- [ ] Votação refeita em cada ciclo, com o mesmo `cycle_id` e `data_version` do início ao fim.
-- [ ] Dois modelos treinados e decisão automática registrada em cada ciclo.
-- [ ] Previsões com o modelo vigente, com logs sem erros.
-- [ ] Execução por `schedule` comprovada.
-- [ ] MLflow recupera os ciclos e suas decisões.
-- [ ] Recurso adicional demonstrado.
-- [ ] Teste só usado na avaliação final, e `python -m pytest -q` passando.
+- [x] Ciclo inicial e ciclo com lote adicional, identificando o que mudou.
+- [x] Votação refeita em cada ciclo, com o mesmo `cycle_id` e `data_version` do início ao fim.
+- [x] Dois modelos treinados e decisão automática registrada em cada ciclo.
+- [x] Previsões com o vigente, sem erro nos logs.
+- [x] Execução por `schedule` comprovada (#6).
+- [x] MLflow recupera os ciclos e as decisões.
+- [x] Recurso adicional demonstrado.
+- [x] Teste só na avaliação final, e `python -m pytest -q` passando.

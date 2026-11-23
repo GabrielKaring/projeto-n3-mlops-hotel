@@ -17,12 +17,17 @@ Contrato de saída (``evidencias/drift/``):
   * ``drift_<cycle_id>.json``: status geral, drift do alvo, PSI e status por feature, referência e limiares;
   * ``drift_<cycle_id>.csv`` e ``drift_<cycle_id>.png``: a tabela e o gráfico do PSI por feature;
   * com ``--historico``: ``historico_<cycle_id>.csv`` e ``.png``, um lote por linha;
-  * alerta no log. No GitHub Actions, ``::warning`` na execução e um resumo em ``$GITHUB_STEP_SUMMARY``.
+  * alerta no log. No GitHub Actions, ``::warning`` na execução e um resumo em ``$GITHUB_STEP_SUMMARY``;
+  * run ``01_drift`` no MLflow (``registrar_mlflow``), com o mesmo ``cycle_id`` e ``data_version``: PSI por
+    feature, variação do alvo, status e os arquivos acima.
+
+Features em ``drift.informativas`` (hoje só ``agent``) têm o PSI calculado e registrado, mas não entram no
+status geral: a justificativa está no ``config.yaml`` e em ``docs/f10_drift.md``.
 
 O monitoramento só lê dados. Nada do que ele calcula entra na seleção de features, no treino ou na
 promoção (critérios 3 a 8): é um aviso para quem opera o modelo, e não muda nenhuma decisão automática.
 
-Uso: ``python -m src.drift [--lote lote_2017-04] [--historico] [--falhar-em-alerta]``.
+Uso: ``python -m src.drift [--lote lote_2017-04] [--historico] [--falhar-em-alerta] [--sem-mlflow]``.
 """
 from __future__ import annotations
 
@@ -51,7 +56,8 @@ EPS = 1e-4                       # piso das proporções: evita log(0) quando um
 STATUS = ("ok", "atencao", "alerta")   # em ordem de gravidade
 RARAS = "<rara>"
 _PERIODO = re.compile(r"(\d{4})-(\d{2})$")
-COLUNAS_TABELA = ["feature", "tipo", "psi", "status"]
+COLUNAS_TABELA = ["feature", "tipo", "psi", "status", "no_status"]
+ETAPA_MLFLOW = "01_drift"
 
 # --------------------------------------------------------------------------- PSI
 
@@ -135,6 +141,11 @@ def colunas_monitoradas(cfg: dict) -> list[str]:
     return [c for c in lista_features(cfg) if c not in ignorar]
 
 
+def colunas_informativas(cfg: dict) -> set[str]:
+    """Features monitoradas que ficam fora do status geral (``drift.informativas``)."""
+    return set(cfg["drift"].get("informativas", [])) & set(colunas_monitoradas(cfg))
+
+
 def drift_alvo(ref: pd.DataFrame, atual: pd.DataFrame, cfg: dict) -> dict:
     """Variação da taxa de cancelamento, em pontos percentuais."""
     limites = cfg["drift"]["alvo"]
@@ -151,8 +162,9 @@ def drift_alvo(ref: pd.DataFrame, atual: pd.DataFrame, cfg: dict) -> dict:
 def avaliar_drift(df_ref: pd.DataFrame, df_atual: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, dict]:
     """Compara duas amostras já limpas pelo ETL. Devolve ``(tabela por feature, resumo)``.
 
-    O status geral é o mais grave entre as features e o alvo. Se uma das amostras tem menos de
-    ``drift.min_linhas`` linhas, o status é ``amostra_insuficiente`` e não há alerta.
+    O status geral é o mais grave entre o alvo e as features que entram no status (``no_status``), isto é,
+    todas menos as de ``drift.informativas``. Se uma das amostras tem menos de ``drift.min_linhas`` linhas,
+    o status é ``amostra_insuficiente`` e não há alerta.
     """
     d = cfg["drift"]
     if df_ref.empty or df_atual.empty:
@@ -163,6 +175,7 @@ def avaliar_drift(df_ref: pd.DataFrame, df_atual: pd.DataFrame, cfg: dict) -> tu
         raise ValueError(f"Colunas monitoradas ausentes: {faltando}")
 
     categoricas = set(cfg["features"]["categoricas"])
+    informativas = colunas_informativas(cfg)
     linhas = []
     for col in colunas:
         tipo = _tipo(col, df_ref[col], categoricas, d["max_valores_discretos"])
@@ -171,7 +184,8 @@ def avaliar_drift(df_ref: pd.DataFrame, df_atual: pd.DataFrame, cfg: dict) -> tu
         else:
             psi = psi_categorica(df_ref[col], df_atual[col], d.get("min_frequencia_categoria", 0.0))
         status = classificar(psi, d["psi"]["atencao"], d["psi"]["alerta"])
-        linhas.append({"feature": col, "tipo": tipo, "psi": round(psi, 4), "status": status})
+        linhas.append({"feature": col, "tipo": tipo, "psi": round(psi, 4), "status": status,
+                       "no_status": col not in informativas})
     tabela = (
         pd.DataFrame(linhas, columns=COLUNAS_TABELA)
         .sort_values(["psi", "feature"], ascending=[False, True])
@@ -180,10 +194,12 @@ def avaliar_drift(df_ref: pd.DataFrame, df_atual: pd.DataFrame, cfg: dict) -> tu
 
     alvo = drift_alvo(df_ref, df_atual, cfg)
     n_ref, n_atual = int(len(df_ref)), int(len(df_atual))
+    no_status = tabela[tabela["no_status"]]
+    fora = tabela[~tabela["no_status"]]
     if min(n_ref, n_atual) < d["min_linhas"]:
         status = "amostra_insuficiente"
     else:
-        status = max(list(tabela["status"]) + [alvo["status"]], key=STATUS.index)
+        status = max(list(no_status["status"]) + [alvo["status"]], key=STATUS.index)
 
     resumo = {
         "status": status,
@@ -191,9 +207,11 @@ def avaliar_drift(df_ref: pd.DataFrame, df_atual: pd.DataFrame, cfg: dict) -> tu
         "n_linhas_atual": n_atual,
         "alvo": alvo,
         "n_features": int(len(tabela)),
-        "n_features_atencao": int((tabela["status"] == "atencao").sum()),
-        "n_features_alerta": int((tabela["status"] == "alerta").sum()),
-        "features_alerta": tabela.loc[tabela["status"] == "alerta", "feature"].tolist(),
+        "n_features_atencao": int((no_status["status"] == "atencao").sum()),
+        "n_features_alerta": int((no_status["status"] == "alerta").sum()),
+        "features_alerta": no_status.loc[no_status["status"] == "alerta", "feature"].tolist(),
+        "features_informativas": sorted(fora["feature"]),
+        "features_informativas_alerta": fora.loc[fora["status"] == "alerta", "feature"].tolist(),
         "maior_psi": {"feature": str(tabela["feature"].iloc[0]), "psi": float(tabela["psi"].iloc[0])},
         "limiares": {"psi": d["psi"], "alvo": d["alvo"], "min_linhas": d["min_linhas"]},
     }
@@ -242,6 +260,8 @@ def monitorar_lote(df: pd.DataFrame, atual: str, cfg: dict, lotes: list[str] | N
             "n_features_atencao": 0,
             "n_features_alerta": 0,
             "features_alerta": [],
+            "features_informativas": sorted(colunas_informativas(cfg)),
+            "features_informativas_alerta": [],
             "maior_psi": None,
         }
         return pd.DataFrame(columns=COLUNAS_TABELA), {**base, **vazio}
@@ -272,6 +292,7 @@ def historico_drift(df: pd.DataFrame, cfg: dict, lotes: list[str] | None = None)
             "maior_psi": maior.get("psi"),
             "n_features_alerta": r["n_features_alerta"],
             "features_alerta": ";".join(r["features_alerta"]),
+            "informativas_alerta": ";".join(r["features_informativas_alerta"]),
             "status": r["status"],
         })
     return pd.DataFrame(linhas)
@@ -316,9 +337,11 @@ def _grafico_psi(tabela: pd.DataFrame, cfg: dict, caminho: Path, titulo: str) ->
     limites = cfg["drift"]["psi"]
     cores = {"ok": "#4C9F70", "atencao": "#E0A100", "alerta": "#C0392B"}
     t = tabela.iloc[::-1]
+    no_status = t["no_status"] if "no_status" in t else pd.Series(True, index=t.index)
+    nomes = [f if dentro else f"{f} (informativa)" for f, dentro in zip(t["feature"], no_status)]
     fig = Figure(figsize=(8, max(3.0, 0.28 * len(t) + 1.2)))
     ax = fig.subplots()
-    ax.barh(t["feature"], t["psi"], color=[cores[s] for s in t["status"]])
+    ax.barh(nomes, t["psi"], color=[cores[s] if dentro else "#B0B0B0" for s, dentro in zip(t["status"], no_status)])
     ax.axvline(limites["atencao"], ls="--", lw=1, color=cores["atencao"], label=f"atenção ({limites['atencao']})")
     ax.axvline(limites["alerta"], ls="--", lw=1, color=cores["alerta"], label=f"alerta ({limites['alerta']})")
     ax.set_xlabel("PSI (lote atual × referência)")
@@ -400,6 +423,8 @@ def mensagem_alerta(resumo: dict) -> str:
         )
     if resumo.get("features_alerta"):
         partes.append("PSI no nível de alerta em: " + ", ".join(resumo["features_alerta"]))
+    if resumo.get("features_informativas_alerta"):
+        partes.append("PSI alto só informativo, fora do status: " + ", ".join(resumo["features_informativas_alerta"]))
     return "; ".join(partes)
 
 
@@ -423,7 +448,9 @@ def _resumo_markdown(resumo: dict, tabela: pd.DataFrame, ctx: dict) -> str:
         ]
     if not tabela.empty:
         linhas += ["| Feature | Tipo | PSI | Status |", "|---|---|---|---|"]
-        linhas += [f"| {r.feature} | {r.tipo} | {r.psi:.3f} | {r.status} |" for r in tabela.head(10).itertuples()]
+        for r in tabela.head(10).itertuples():
+            status = r.status if getattr(r, "no_status", True) else f"{r.status} (informativa, fora do status)"
+            linhas.append(f"| {r.feature} | {r.tipo} | {r.psi:.3f} | {status} |")
     return "\n".join(linhas) + "\n"
 
 
@@ -448,12 +475,56 @@ def emitir_alerta(resumo: dict, tabela: pd.DataFrame, ctx: dict, ambiente: dict 
     return msg
 
 
+# --------------------------------------------------------------------------- MLflow
+
+
+def metricas_mlflow(tabela: pd.DataFrame, resumo: dict) -> dict[str, float]:
+    """PSI por feature (``psi_<feature>``), variação do alvo e contagens, prontos para o MLflow."""
+    metricas = {f"psi_{r.feature}": float(r.psi) for r in tabela.itertuples()}
+    alvo = resumo.get("alvo") or {}
+    for chave in ("taxa_referencia", "taxa_atual", "diferenca_pp"):
+        if alvo.get(chave) is not None:
+            metricas[f"alvo_{chave}"] = float(alvo[chave])
+    metricas["n_features_alerta"] = float(resumo["n_features_alerta"])
+    metricas["n_features_atencao"] = float(resumo["n_features_atencao"])
+    metricas["alerta"] = float(resumo["status"] == "alerta")
+    return metricas
+
+
+def registrar_mlflow(tabela: pd.DataFrame, resumo: dict, ctx: dict, cfg: dict, caminhos: dict[str, Path],
+                     raiz: Path = RAIZ) -> str:
+    """Run ``01_drift`` com o mesmo ``cycle_id``/``data_version`` do ciclo (F6). Devolve o ``run_id``.
+
+    Parâmetros: lote avaliado, referência e regra. Métricas: ``metricas_mlflow``. Tag ``drift_status``.
+    Artefatos: os arquivos de ``evidencias/drift/`` deste ciclo.
+    """
+    from src import rastreio   # import tardio: o MLflow só é carregado quando o registro é pedido
+
+    d = cfg["drift"]
+    with rastreio.iniciar_run(ETAPA_MLFLOW, ctx, cfg, raiz) as run:
+        rastreio.registrar_parametros({
+            "lote_atual": resumo["lote_atual"],
+            "referencia_tipo": resumo["referencia"]["tipo"],
+            "referencia_lotes": ";".join(resumo["referencia"]["lotes"]) or "nenhuma",
+            "regra": {"psi": d["psi"], "alvo": d["alvo"], "min_linhas": d["min_linhas"],
+                      "referencia": d["referencia"], "informativas": ";".join(sorted(colunas_informativas(cfg)))},
+        })
+        rastreio.registrar_metricas(metricas_mlflow(tabela, resumo))
+        import mlflow
+        mlflow.set_tag("drift_status", resumo["status"])
+        rastreio.registrar_artefatos([c for c in caminhos.values() if Path(c).is_file()], pasta="drift")
+    return run.info.run_id
+
+
 # --------------------------------------------------------------------------- execução
 
 
 def executar(cfg: dict, raiz: Path = RAIZ, lote: str | None = None, historico: bool = False,
-             ambiente: dict | None = None) -> dict:
-    """Fluxo completo: dados do ciclo -> drift do lote mais recente -> evidências -> alerta."""
+             ambiente: dict | None = None, mlflow: bool = False) -> dict:
+    """Fluxo completo: dados do ciclo -> drift do lote mais recente -> evidências -> alerta -> MLflow.
+
+    ``mlflow=True`` (padrão da linha de comando) registra o run ``01_drift``.
+    """
     df, manifesto = carregar_dados_monitorados(cfg, raiz)
     ctx = contexto_do_ciclo(cfg, manifesto, raiz, ambiente)
     lotes = sorted(l["lote_id"] for l in manifesto["lotes"])
@@ -465,7 +536,8 @@ def executar(cfg: dict, raiz: Path = RAIZ, lote: str | None = None, historico: b
         hist = historico_drift(df, cfg, lotes)
         caminhos.update(salvar_historico(hist, ctx, cfg, raiz))
     emitir_alerta(resumo, tabela, ctx, ambiente)
-    return {"ctx": ctx, "resumo": resumo, "tabela": tabela, "historico": hist, "caminhos": caminhos}
+    run_id = registrar_mlflow(tabela, resumo, ctx, cfg, caminhos, raiz) if mlflow else None
+    return {"ctx": ctx, "resumo": resumo, "tabela": tabela, "historico": hist, "caminhos": caminhos, "run_id": run_id}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -473,11 +545,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--lote", default=None, help="lote a avaliar, ex.: lote_2017-04 (padrão: o mais recente)")
     ap.add_argument("--historico", action="store_true", help="também avalia todos os lotes já incorporados")
     ap.add_argument("--falhar-em-alerta", action="store_true", help="sai com código 1 se o status geral for alerta")
+    ap.add_argument("--sem-mlflow", action="store_true", help="não registra o run 01_drift no MLflow")
     ap.add_argument("--config", default=None)
     args = ap.parse_args(argv)
 
-    r = executar(carregar_config(args.config), lote=args.lote, historico=args.historico)
+    r = executar(carregar_config(args.config), lote=args.lote, historico=args.historico, mlflow=not args.sem_mlflow)
     print(json.dumps({k: str(v) for k, v in r["caminhos"].items()}, indent=2, ensure_ascii=False))
+    if r["run_id"]:
+        print(f"MLflow: run {ETAPA_MLFLOW} {r['run_id']}")
     return 1 if args.falhar_em_alerta and r["resumo"]["status"] == "alerta" else 0
 
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import json
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -10,7 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src import drift, ingestao
+from src import drift, ingestao, rastreio
 from src.config import salvar_contexto
 from src.preprocessamento import limpar_e_engenhar, lista_features
 from tests.helpers import gerar_reservas
@@ -54,6 +55,11 @@ def test_regra_de_drift_esta_na_config(cfg):
     assert 0 < d["alvo"]["atencao_pp"] < d["alvo"]["alerta_pp"]
     assert set(d["ignorar"]) <= set(lista_features(cfg))
     assert set(drift.colunas_monitoradas(cfg)).isdisjoint(d["ignorar"])
+    assert set(d["informativas"]) <= set(drift.colunas_monitoradas(cfg))  # informativa continua monitorada
+
+
+def test_agent_fica_fora_do_status_geral(cfg):
+    assert drift.colunas_informativas(cfg) == {"agent"}
 
 
 # --------------------------------------------------------------------------- PSI
@@ -231,3 +237,97 @@ def test_no_github_actions_gera_anotacao_e_resumo_do_job(tmp_path, capsys):
     assert "%25" in saida and "+6.0 p.p." in saida
     texto = arquivo_resumo.read_text(encoding="utf-8")
     assert "**ALERTA**" in texto and "| lead_time | numerica | 0.310 | alerta |" in texto
+
+
+# --------------------------------------------------------------------------- features informativas
+
+
+def _troca_agentes(bruto: pd.DataFrame, lote: str) -> pd.DataFrame:
+    """Só a carteira de agências muda (IDs novos), como acontece de um ano para o outro no dataset."""
+    b = bruto.copy()
+    com_agente = (b["lote_id"] == lote) & b["agent"].notna()   # quem não tinha agência continua sem
+    b.loc[com_agente, "agent"] = np.resize([301.0, 302.0, 303.0, 304.0], int(com_agente.sum()))
+    return b
+
+
+def test_troca_de_agencias_sozinha_nao_dispara_alerta(bruto_sazonal, cfg):
+    df, _ = limpar_e_engenhar(_troca_agentes(bruto_sazonal, "lote_2017-04"), cfg)
+    tabela, resumo = drift.monitorar_lote(df, "lote_2017-04", cfg)
+    linha = tabela.set_index("feature").loc["agent"]
+    assert linha["status"] == "alerta" and not linha["no_status"]   # o PSI continua calculado e visível
+    assert resumo["features_informativas_alerta"] == ["agent"]
+    assert "agent" not in resumo["features_alerta"] and resumo["n_features_alerta"] == 0
+    assert resumo["status"] != "alerta"
+    assert "fora do status: agent" in drift.mensagem_alerta(resumo)
+
+
+def test_sem_a_regra_o_mesmo_lote_alertaria(bruto_sazonal, cfg):
+    c = copy.deepcopy(cfg)
+    c["drift"]["informativas"] = []
+    df, _ = limpar_e_engenhar(_troca_agentes(bruto_sazonal, "lote_2017-04"), c)
+    _, resumo = drift.monitorar_lote(df, "lote_2017-04", c)
+    assert resumo["status"] == "alerta" and "agent" in resumo["features_alerta"]
+
+
+def test_informativa_nao_esconde_drift_do_alvo_nem_de_outras_features(bruto_sazonal, cfg):
+    bruto = _troca_agentes(bruto_sazonal, "lote_2017-04")
+    atual = bruto["lote_id"] == "lote_2017-04"
+    bruto.loc[atual, "lead_time"] += 300
+    bruto.loc[atual, "is_canceled"] = 1
+    df, _ = limpar_e_engenhar(bruto, cfg)
+    _, resumo = drift.monitorar_lote(df, "lote_2017-04", cfg)
+    assert resumo["status"] == "alerta" and "lead_time" in resumo["features_alerta"]
+
+
+def test_resumo_do_job_marca_a_feature_informativa():
+    tabela = pd.DataFrame([
+        {"feature": "agent", "tipo": "categorica", "psi": 0.9, "status": "alerta", "no_status": False},
+        {"feature": "adr", "tipo": "numerica", "psi": 0.05, "status": "ok", "no_status": True},
+    ])
+    resumo = {"lote_atual": "lote_2017-03", "referencia": {"tipo": "sazonal", "lotes": ["lote_2016-03"]},
+              "status": "ok", "alvo": None, "features_alerta": []}
+    texto = drift._resumo_markdown(resumo, tabela, {"cycle_id": "c1", "data_version": "dv1"})
+    assert "| agent | categorica | 0.900 | alerta (informativa, fora do status) |" in texto
+    assert "| adr | numerica | 0.050 | ok |" in texto
+
+
+# --------------------------------------------------------------------------- MLflow
+
+
+def test_drift_e_registrado_no_mlflow_com_o_ciclo(tmp_path, cfg, banco_modelo):
+    raiz = _projeto(tmp_path, {
+        "lote_2016-04": gerar_reservas(800, 2016, 4),
+        "lote_2016-05": gerar_reservas(800, 2016, 5),
+        "lote_2017-04": _deslocar(gerar_reservas(800, 2017, 4)),
+    })
+    estado = raiz / "mlflow_estado"
+    estado.mkdir()
+    shutil.copy(banco_modelo, estado / rastreio.NOME_BANCO)
+    manifesto = ingestao.carregar_manifesto(raiz / "data" / "raw" / "manifest.json")
+    ctx = {"cycle_id": "20260101T000000Z-local", "data_version": ingestao.calcular_data_version(manifesto)}
+    salvar_contexto(ctx, cfg, raiz)
+
+    r = drift.executar(cfg, raiz=raiz, ambiente={}, mlflow=True)
+
+    runs = rastreio.historico_ciclos(cfg, raiz, cycle_id=ctx["cycle_id"])
+    assert list(runs["etapa"]) == [drift.ETAPA_MLFLOW] and runs["run_id"].iloc[0] == r["run_id"]
+    assert runs["data_version"].iloc[0] == ctx["data_version"]
+    assert runs["metrics.alvo_diferenca_pp"].iloc[0] == pytest.approx(r["resumo"]["alvo"]["diferenca_pp"])
+    assert runs["metrics.psi_lead_time"].iloc[0] >= 0.25 and runs["metrics.alerta"].iloc[0] == 1.0
+    assert "metrics.psi_agent" in runs  # a informativa também é registrada
+
+    import mlflow
+    from mlflow.tracking import MlflowClient
+    run = MlflowClient().get_run(r["run_id"])
+    assert run.data.tags["drift_status"] == "alerta" and run.data.params["lote_atual"] == "lote_2017-04"
+    artefatos = {a.path for a in MlflowClient().list_artifacts(r["run_id"], "drift")}
+    assert f"drift/drift_{ctx['cycle_id']}.json" in artefatos
+    while mlflow.active_run():
+        mlflow.end_run()
+
+
+def test_metricas_do_lote_sem_referencia():
+    resumo = {"alvo": None, "n_features_alerta": 0, "n_features_atencao": 0, "status": "sem_referencia"}
+    assert drift.metricas_mlflow(pd.DataFrame(columns=drift.COLUNAS_TABELA), resumo) == {
+        "n_features_alerta": 0.0, "n_features_atencao": 0.0, "alerta": 0.0,
+    }

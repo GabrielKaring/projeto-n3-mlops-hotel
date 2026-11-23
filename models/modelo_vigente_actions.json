@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "vigente": {
+    "cycle_id": "20261123T021937Z-gha45099413735-1",
+    "data_version": "dv020-ef6bc6a5",
+    "modelo": "B",
+    "algoritmo": "random_forest",
+    "params": {
+      "n_estimators": 300,
+      "max_depth": 16,
+      "min_samples_leaf": 5,
+      "class_weight": "balanced_subsample",
+      "n_jobs": -1
+    },
+    "features": [
+      "razao_cancel_previo",
+      "deposit_type_No Deposit",
+      "deposit_type_Non Refund",
+      "required_car_parking_spaces",
+      "previous_cancellations",
+      "total_of_special_requests",
+      "lead_time",
+      "market_segment_Groups",
+      "hotel_City Hotel",
+      "distribution_channel_Direct",
+      "agent_1",
+      "agent_9",
+      "valor_estimado_estadia",
+      "total_noites",
+      "adr",
+      "customer_type_Transient",
+      "stays_in_week_nights"
+    ],
+    "arquivo": "modelo_20261123T021937Z-gha45099413735-1_B.joblib",
+    "metrica": "f1_macro",
+    "valor_teste_na_promocao": 0.7432560404884252,
+    "run_id_promocao": "af11ab357d164c78af5d99db1ef3ef5f",
+    "run_id_treino": "ab6f808cd9dd469cafe4624f36d0e54c",
+    "promovido_em": "2026-11-23T02:21:10Z"
+  },
+  "historico": [
+    {
+      "cycle_id": "20261123T004826Z-gha45090760506-1",
+      "data_version": "dv019-aa1a1287",
+      "decidido_em": "2026-11-23T00:50:23Z",
+      "decisao": "promovido",
+      "motivo": "primeiro ciclo sem vigente; f1_macro=0.7310 passa no piso 0.6",
+      "regra": {
+        "metrica": "f1_macro",
+        "direcao": "maximizar",
+        "min_melhoria_abs": 0.005,
+        "piso_metrica": 0.6
+      },
+      "valor_vencedor": 0.7310321995742781,
+      "valor_vigente": null,
+      "candidato": {
+        "modelo": "B",
+        "algoritmo": "random_forest",
+        "params": {
+          "n_estimators": 300,
+          "max_depth": 16,
+          "min_samples_leaf": 5,
+          "class_weight": "balanced_subsample",
+          "n_jobs": -1
+        },
+        "seed": 42,
+        "features": [
+          "razao_cancel_previo",
+          "deposit_type_No Deposit",
+          "deposit_type_Non Refund",
+          "required_car_parking_spaces",
+          "market_segment_Groups",
+          "lead_time",
+          "previous_cancellations",
+          "total_of_special_requests",
+          "hotel_City Hotel",
+          "agent_1",
+          "total_noites",
+          "distribution_channel_Direct",
+          "agent_9",
+          "arrival_date_week_number",
+          "valor_estimado_estadia",
+          "customer_type_Transient",
+          "adr",
+          "stays_in_week_nights"
+        ],
+        "metricas_cv": {
+          "f1_macro": 0.7904317390564571,
+          "balanced_accuracy": 0.7750017449633705,
+          "recall_cancelamento": 0.617835736242498,
+          "precision_cancelamento": 0.8323594975291218,
+          "roc_auc": 0.8525414392709993,
+          "pr_auc": 0.8209915976830146
+        },
+        "metricas_teste": {
+          "f1_macro": 0.7310321995742781,
+          "balanced_accuracy": 0.7173279131761741,
+          "recall_cancelamento": 0.4645901639344262,
+          "precision_cancelamento": 0.9013994910941476,
+          "roc_auc": 0.8409952098727909,
+          "pr_auc": 0.8046696923075054
+        },
+        "arquivo": "modelo_20261123T004826Z-gha45090760506-1_B.joblib",
+        "run_id_treino": "849a2a0630b745e79d9f1c346e9f1075"
+      },
+      "vigente_anterior": null,
+      "teste": {
+        "n": 16456,
+        "inicio": "2016-10-10",
+        "fim": "2017-01-31"
+      },
+      "run_id_promocao": "7a05f010729a4b07957fef53c23cc9f5"
+    },
+    {
+      "cycle_id": "20261123T021937Z-gha45099413735-1",
+      "data_version": "dv020-ef6bc6a5",
+      "decidido_em": "2026-11-23T02:21:10Z",
+      "decisao": "promovido",
+      "motivo": "f1_macro 0.7433 supera o vigente (0.7231) em 0.0202, acima da melhoria mínima 0.005",
+      "regra": {
+        "metrica": "f1_macro",
+        "direcao": "maximizar",
+        "min_melhoria_abs": 0.005,
+        "piso_metrica": 0.6
+      },
+      "valor_vencedor": 0.7432560404884252,
+      "valor_vigente": 0.7230637406984146,
+      "candidato": {
+        "modelo": "B",
+        "algoritmo": "random_forest",
+        "params": {
+          "n_estimators": 300,
+          "max_depth": 16,
+          "min_samples_leaf": 5,
+          "class_weight": "balanced_subsample",
+          "n_jobs": -1
+        },
+        "seed": 42,
+        "features": [
+          "razao_cancel_previo",
+          "deposit_type_No Deposit",
+          "deposit_type_Non Refund",
+          "required_car_parking_spaces",
+          "previous_cancellations",
+          "total_of_special_requests",
+          "lead_time",
+          "market_segment_Groups",
+          "hotel_City Hotel",
+          "distribution_channel_Direct",
+          "agent_1",
+          "agent_9",
+          "valor_estimado_estadia",
+          "total_noites",
+          "adr",
+          "customer_type_Transient",
+          "stays_in_week_nights"
+        ],
+        "metricas_cv": {
+          "f1_macro": 0.7868277272767796,
+          "balanced_accuracy": 0.76858880758639,
+          "recall_cancelamento": 0.5898142987572402,
+          "precision_cancelamento": 0.8613255880109532,
+          "roc_auc": 0.8491643788300064,
+          "pr_auc": 0.8192930734332013
+        },
+        "metricas_teste": {
+          "f1_macro": 0.7432560404884252,
+          "balanced_accuracy": 0.7274383835805804,
+          "recall_cancelamento": 0.5130618205419438,
+          "precision_cancelamento": 0.8286163522012578,
+          "roc_auc": 0.8516772981684406,
+          "pr_auc": 0.79910359565599
+        },
+        "arquivo": "modelo_20261123T021937Z-gha45099413735-1_B.joblib",
+        "run_id_treino": "ab6f808cd9dd469cafe4624f36d0e54c"
+      },
+      "vigente_anterior": {
+        "cycle_id": "20261123T004826Z-gha45090760506-1",
+        "modelo": "B",
+        "arquivo": "modelo_20261123T004826Z-gha45090760506-1_B.joblib",
+        "metricas_teste": {
+          "f1_macro": 0.7230637406984146,
+          "balanced_accuracy": 0.7078117574574013,
+          "recall_cancelamento": 0.4570825896478988,
+          "precision_cancelamento": 0.8580566554980201,
+          "roc_auc": 0.8428796101519631,
+          "pr_auc": 0.7886356370075315
+        }
+      },
+      "teste": {
+        "n": 17403,
+        "inicio": "2016-10-26",
+        "fim": "2017-02-28"
+      },
+      "run_id_promocao": "af11ab357d164c78af5d99db1ef3ef5f"
+    },
+    {
+      "cycle_id": "20261123T022405Z-gha45099857641-1",
+      "data_version": "dv021-ccc53eec",
+      "decidido_em": "2026-11-23T02:25:39Z",
+      "decisao": "mantido",
+      "motivo": "f1_macro 0.7366 contra 0.7415 do vigente: a diferença não alcança a melhoria mínima de 0.005 na direção 'maximizar'",
+      "regra": {
+        "metrica": "f1_macro",
+        "direcao": "maximizar",
+        "min_melhoria_abs": 0.005,
+        "piso_metrica": 0.6
+      },
+      "valor_vencedor": 0.7365563765837342,
+      "valor_vigente": 0.7415092148247725,
+      "candidato": {
+        "modelo": "B",
+        "algoritmo": "random_forest",
+        "params": {
+          "n_estimators": 300,
+          "max_depth": 16,
+          "min_samples_leaf": 5,
+          "class_weight": "balanced_subsample",
+          "n_jobs": -1
+        },
+        "seed": 42,
+        "features": [
+          "razao_cancel_previo",
+          "deposit_type_Non Refund",
+          "deposit_type_No Deposit",
+          "required_car_parking_spaces",
+          "total_of_special_requests",
+          "lead_time",
+          "previous_cancellations",
+          "agent_1",
+          "market_segment_Groups",
+          "hotel_City Hotel",
+          "mes_chegada",
+          "arrival_date_week_number",
+          "distribution_channel_Direct",
+          "agent_9",
+          "market_segment_Direct",
+          "total_noites",
+          "valor_estimado_estadia",
+          "customer_type_Transient",
+          "adr",
+          "stays_in_week_nights"
+        ],
+        "metricas_cv": {
+          "f1_macro": 0.7667283989334848,
+          "balanced_accuracy": 0.7544637925029476,
+          "recall_cancelamento": 0.5711970843883866,
+          "precision_cancelamento": 0.8447076924728244,
+          "roc_auc": 0.842225870105027,
+          "pr_auc": 0.8119454392377171
+        },
+        "metricas_teste": {
+          "f1_macro": 0.7365563765837342,
+          "balanced_accuracy": 0.7196263573973823,
+          "recall_cancelamento": 0.5025740025740025,
+          "precision_cancelamento": 0.8020539152759949,
+          "roc_auc": 0.8476989659490071,
+          "pr_auc": 0.7794007501457758
+        },
+        "arquivo": "modelo_20261123T022405Z-gha45099857641-1_B.joblib",
+        "run_id_treino": "06fbbb43cbf445b7b79f464f9663412e"
+      },
+      "vigente_anterior": {
+        "cycle_id": "20261123T021937Z-gha45099413735-1",
+        "modelo": "B",
+        "arquivo": "modelo_20261123T021937Z-gha45099413735-1_B.joblib",
+        "metricas_teste": {
+          "f1_macro": 0.7415092148247725,
+          "balanced_accuracy": 0.7248142113861562,
+          "recall_cancelamento": 0.5168918918918919,
+          "precision_cancelamento": 0.796875,
+          "roc_auc": 0.8479567216221291,
+          "pr_auc": 0.7821498641052476
+        }
+      },
+      "teste": {
+        "n": 18392,
+        "inicio": "2016-11-17",
+        "fim": "2017-03-31"
+      },
+      "run_id_promocao": "8834b7a20af8415f9ee2aa434a8dd42a"
+    },
+    {
+      "cycle_id": "20261123T101743Z-gha45154548830-1",
+      "data_version": "dv022-b2d8eb3a",
+      "decidido_em": "2026-11-23T10:19:58Z",
+      "decisao": "mantido",
+      "motivo": "f1_macro 0.7488 contra 0.7517 do vigente: a diferença não alcança a melhoria mínima de 0.005 na direção 'maximizar'",
+      "regra": {
+        "metrica": "f1_macro",
+        "direcao": "maximizar",
+        "min_melhoria_abs": 0.005,
+        "piso_metrica": 0.6
+      },
+      "valor_vencedor": 0.7487952382547844,
+      "valor_vigente": 0.7516581151098056,
+      "candidato": {
+        "modelo": "B",
+        "algoritmo": "random_forest",
+        "params": {
+          "n_estimators": 300,
+          "max_depth": 16,
+          "min_samples_leaf": 5,
+          "class_weight": "balanced_subsample",
+          "n_jobs": -1
+        },
+        "seed": 42,
+        "features": [
+          "razao_cancel_previo",
+          "deposit_type_Non Refund",
+          "deposit_type_No Deposit",
+          "required_car_parking_spaces",
+          "lead_time",
+          "total_of_special_requests",
+          "previous_cancellations",
+          "arrival_date_week_number",
+          "hotel_City Hotel",
+          "market_segment_Groups",
+          "agent_1",
+          "agent_9",
+          "adr",
+          "valor_estimado_estadia",
+          "total_noites",
+          "stays_in_week_nights"
+        ],
+        "metricas_cv": {
+          "f1_macro": 0.7440253251856318,
+          "balanced_accuracy": 0.7335381417274436,
+          "recall_cancelamento": 0.5318381673798485,
+          "precision_cancelamento": 0.8273275199618787,
+          "roc_auc": 0.8311704537035908,
+          "pr_auc": 0.7911732443908858
+        },
+        "metricas_teste": {
+          "f1_macro": 0.7487952382547844,
+          "balanced_accuracy": 0.7356837347917631,
+          "recall_cancelamento": 0.5463715326421967,
+          "precision_cancelamento": 0.8086253369272237,
+          "roc_auc": 0.8426924791224357,
+          "pr_auc": 0.7938046041739353
+        },
+        "arquivo": "modelo_20261123T101743Z-gha45154548830-1_B.joblib",
+        "run_id_treino": "f2315dbab26647508f0fb36d20b4fcba"
+      },
+      "vigente_anterior": {
+        "cycle_id": "20261123T021937Z-gha45099413735-1",
+        "modelo": "B",
+        "arquivo": "modelo_20261123T021937Z-gha45099413735-1_B.joblib",
+        "metricas_teste": {
+          "f1_macro": 0.7516581151098056,
+          "balanced_accuracy": 0.7387152956843418,
+          "recall_cancelamento": 0.5551975343233398,
+          "precision_cancelamento": 0.8054878048780488,
+          "roc_auc": 0.8531632454323775,
+          "pr_auc": 0.8081181475741985
+        }
+      },
+      "teste": {
+        "n": 19444,
+        "inicio": "2016-12-26",
+        "fim": "2017-04-30"
+      },
+      "run_id_promocao": "aa903bdade5447869052f132e10f707e"
+    }
+  ],
+  "atualizado_em": "2026-11-23T10:19:59Z"
+}

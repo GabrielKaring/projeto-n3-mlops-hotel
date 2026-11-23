@@ -18,7 +18,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.config import RAIZ, resolver
-from src.schema import ALVO, COLUNAS_BRUTAS, MESES, construir_data_chegada
+from src.schema import (
+    ALVO,
+    COLUNAS_BRUTAS,
+    COLUNAS_OPCIONAIS_RESERVA,
+    COLUNAS_POS_RESERVA,
+    COLUNAS_RESERVA,
+    MESES,
+    construir_data_chegada,
+)
 
 # --------------------------------------------------------------------------- utilidades de config
 
@@ -45,18 +53,48 @@ def _colunas_a_remover(cfg: dict) -> list[str]:
 # --------------------------------------------------------------------------- validação e diagnóstico
 
 
-def validar_dados_brutos(df: pd.DataFrame) -> None:
-    """Interrompe o fluxo se o lote não respeitar o esquema mínimo esperado."""
-    faltando = [c for c in COLUNAS_BRUTAS if c not in df.columns]
+def validar_dados_brutos(df: pd.DataFrame, inferencia: bool = False) -> None:
+    """Interrompe o fluxo se o lote não respeitar o esquema mínimo esperado.
+
+    Com ``inferencia=True`` (reserva nova, ainda sem desfecho), só exige as colunas conhecidas no ato da
+    reserva (``COLUNAS_RESERVA``) e não olha o alvo.
+    """
+    exigidas = COLUNAS_RESERVA if inferencia else COLUNAS_BRUTAS
+    faltando = [c for c in exigidas if c not in df.columns]
     if faltando:
         raise ValueError(f"Colunas ausentes no dado bruto: {faltando}")
+    if not inferencia:
+        _validar_alvo(df)
+    desconhecidos = set(df["arrival_date_month"].dropna().unique()) - set(MESES)
+    if desconhecidos:
+        raise ValueError(f"Meses de chegada inválidos: {sorted(desconhecidos)}")
+
+
+def _validar_alvo(df: pd.DataFrame) -> None:
     if not set(df[ALVO].dropna().unique()) <= {0, 1}:
         raise ValueError(f"A coluna alvo '{ALVO}' deve conter apenas 0 e 1")
     if df[ALVO].isna().any():
         raise ValueError(f"A coluna alvo '{ALVO}' possui valores ausentes")
-    desconhecidos = set(df["arrival_date_month"].dropna().unique()) - set(MESES)
-    if desconhecidos:
-        raise ValueError(f"Meses de chegada inválidos: {sorted(desconhecidos)}")
+
+
+def completar_reserva_nova(df: pd.DataFrame) -> pd.DataFrame:
+    """Prepara reservas novas para o mesmo ETL do treino (modo inferência).
+
+    Uma reserva recém-feita não tem desfecho (``is_canceled``) nem as colunas posteriores à reserva, e pode
+    não ter país, agente ou empresa. Essas colunas entram vazias: as posteriores e o alvo são descartados
+    pelo ETL antes do modelo, e os campos opcionais recebem a mesma imputação de domínio do treino. Um alvo
+    que venha junto é ignorado (apagado), para nunca influenciar a previsão.
+    """
+    validar_dados_brutos(df, inferencia=True)
+    df = df.copy()
+    for c in [ALVO, *COLUNAS_POS_RESERVA]:
+        df[c] = np.nan
+    for c in COLUNAS_OPCIONAIS_RESERVA:
+        if c not in df.columns:
+            df[c] = np.nan
+        elif c != "country":
+            df[c] = pd.to_numeric(df[c], errors="coerce")  # null do JSON vira NaN, como no CSV
+    return df
 
 
 def diagnosticar(df: pd.DataFrame, colunas_numericas: list[str] | None = None) -> dict:
@@ -106,21 +144,29 @@ def remover_duplicatas(df: pd.DataFrame, estrategia: str) -> pd.DataFrame:
     return df.loc[~repetida].copy()
 
 
-def limpar_e_engenhar(df_raw: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, dict]:
+def limpar_e_engenhar(df_raw: pd.DataFrame, cfg: dict, inferencia: bool = False) -> tuple[pd.DataFrame, dict]:
     """Aplica as regras de limpeza e cria os atributos derivados.
 
     Nada aqui depende de estatísticas globais do conjunto, então é seguro rodar antes da partição.
     Retorna ``(df_limpo, relatorio)``; o relatório conta cada linha removida e o motivo.
+
+    ``inferencia=True`` é o modo de uso do modelo com reservas novas (``src.prever``): aceita entradas sem
+    o alvo e sem as colunas posteriores à reserva (``completar_reserva_nova``), não remove duplicatas (cada
+    linha é uma reserva a prever), mantém a ordem da entrada e devolve a saída sem a coluna alvo.
+    As regras de domínio e os atributos derivados são exatamente os do treino.
     """
-    validar_dados_brutos(df_raw)
+    if inferencia:
+        df_raw = completar_reserva_nova(df_raw)
+    else:
+        validar_dados_brutos(df_raw)
     etl = cfg["etl"]
     rel: dict = {"n_entrada": int(len(df_raw))}
 
     # 1) Duplicatas. Não há ID de reserva; a estratégia (config) decide o que é "duplicado".
     rel["duplicatas_identicas_no_dado"] = int(df_raw.duplicated(subset=COLUNAS_BRUTAS).sum())  # informativo
-    df = remover_duplicatas(df_raw, etl["duplicatas"]["estrategia"])
+    df = df_raw.copy() if inferencia else remover_duplicatas(df_raw, etl["duplicatas"]["estrategia"])
     rel["duplicatas_removidas"] = rel["n_entrada"] - len(df)
-    rel["duplicatas_estrategia"] = etl["duplicatas"]["estrategia"]
+    rel["duplicatas_estrategia"] = "nenhuma (inferência)" if inferencia else etl["duplicatas"]["estrategia"]
 
     df["arrival_date"] = construir_data_chegada(df)
 
@@ -135,6 +181,8 @@ def limpar_e_engenhar(df_raw: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, di
         remover |= adr_negativo
     rel["regras_dominio"] = {"sem_hospedes": int(sem_hospedes.sum()), "adr_negativo": int(adr_negativo.sum())}
     rel["regras_dominio_removidas"] = int(remover.sum())
+    if inferencia:
+        rel["indices_removidos_dominio"] = [int(i) for i in df.index[remover]]
     df = df.loc[~remover].copy()
 
     # 3) Ausentes: imputação por constante de domínio (não aprende nada dos dados)
@@ -169,14 +217,16 @@ def limpar_e_engenhar(df_raw: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, di
         raise ValueError(f"Features previstas na config mas não geradas pelo ETL: {ausentes}")
     removidas = [c for c in _colunas_a_remover(cfg) if c in df.columns]
     rel["colunas_removidas"] = removidas
-    df = df[meta + ["arrival_date", ALVO] + features].copy()
+    alvo = [] if inferencia else [ALVO]
+    df = df[meta + ["arrival_date"] + alvo + features].copy()
 
     for c in cfg["features"]["categoricas"]:
         df[c] = df[c].astype(str)
 
-    # 6) Ordem cronológica estável (empate: lote e linha de origem)
-    ordenar = ["arrival_date"] + [c for c in ("lote_id", "linha_origem") if c in df.columns]
-    df = df.sort_values(ordenar, kind="mergesort").reset_index(drop=True)
+    # 6) Ordem cronológica estável (empate: lote e linha de origem). Na inferência, a ordem da entrada.
+    if not inferencia:
+        ordenar = ["arrival_date"] + [c for c in ("lote_id", "linha_origem") if c in df.columns]
+        df = df.sort_values(ordenar, kind="mergesort").reset_index(drop=True)
 
     rel["n_saida"] = int(len(df))
     rel["removidas_total"] = rel["n_entrada"] - rel["n_saida"]

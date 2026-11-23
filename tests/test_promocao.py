@@ -24,6 +24,7 @@ from src.promocao import (
     proximo_lote,
     salvar_previsoes,
     tabela_historico,
+    ultimas_previsoes,
     validar_resultados,
 )
 from tests.helpers import gerar_reservas
@@ -216,3 +217,14 @@ def test_previsao_no_proximo_lote_e_conferencia_quando_ele_chega(modelo, cfg_rap
     linha = conferencia.iloc[0]
     assert linha["lote_id"] == "lote_2016-07" and linha["vigente_cycle_id"] == "c0"
     assert linha["n"] == len(previsoes) and 0 <= linha["f1_macro"] <= 1
+
+
+def test_sem_lote_novo_mostra_as_ultimas_previsoes_feitas(tmp_path):
+    assert ultimas_previsoes(tmp_path) == (None, None)
+    pasta = tmp_path / "evidencias" / "previsoes"
+    pasta.mkdir(parents=True)
+    for cid in ("20261124T090000Z-gha2-1", "20261123T090000Z-gha1-1"):
+        pd.DataFrame({"cycle_id": [cid], "prob_cancelamento": [0.3]}).to_csv(pasta / f"previsoes_{cid}.csv", index=False)
+    pd.DataFrame({"x": [1]}).to_csv(pasta / "demonstracao_20261125T090000Z-gha3-1.csv", index=False)
+    caminho, df = ultimas_previsoes(tmp_path)
+    assert caminho.name == "previsoes_20261124T090000Z-gha2-1.csv" and df["cycle_id"].iloc[0] == "20261124T090000Z-gha2-1"

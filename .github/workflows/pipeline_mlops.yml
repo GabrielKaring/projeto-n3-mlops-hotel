@@ -41,9 +41,9 @@ jobs:
       BRANCH_ESTADO: estado-pipeline
       FALHAR_EM: ${{ inputs.falhar_em || 'nenhum' }}   # no schedule não há inputs: sempre "nenhum"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -203,7 +203,7 @@ jobs:
 
       - name: Publicar evidências
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidencias-${{ github.run_id }}
           path: |

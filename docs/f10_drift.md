@@ -28,7 +28,24 @@ Tudo está em `config.yaml`, seção `drift`. A regra foi commitada antes da pri
 - **Drift do alvo.** Variação absoluta da taxa de cancelamento: ≥ 3 p.p. = `atencao`, ≥ 5 p.p. = `alerta`.
 - **Colunas ignoradas.** Semana do ano, mês e dia da semana mudam por construção entre lotes mensais.
 - **Amostra mínima.** Com menos de 500 linhas, o status é `amostra_insuficiente` e não há alerta.
-- **Status geral.** É o mais grave entre as features e o alvo.
+- **Status geral.** É o mais grave entre o alvo e as features, exceto as informativas (abaixo).
+
+### Ajuste de 23/11/2026: `agent` passa a ser informativa
+
+Nas execuções do Actions, o alerta disparou em **todo** lote, e o `agent` estava sempre entre as features em alerta. O `agent` é o código da agência, com centenas de valores, e a carteira de agências se renova de um ano para o outro. Com a referência sazonal (mesmo mês do ano anterior), o PSI dele passou de 0,25 em todos os lotes de jul/2016 a abr/2017, inclusive em mar/2017, em que ele era a **única** feature em alerta. Um alarme que toca sempre deixa de ser lido.
+
+Testamos duas saídas com os dados reais:
+
+| Opção | Resultado |
+|---|---|
+| Agrupar o `agent` em top-N + "outros" | Não resolve: com top-5, o PSI ainda passa de 0,25 em 5 dos 8 lotes de 2017 (jan, fev, mai, jul e ago); com top-10, em 6 dos 8. |
+| Manter o PSI do `agent` calculado e registrado, mas fora do status geral | O alarme passa a refletir o alvo e as demais features. |
+
+Ficou a segunda (`drift.informativas: [agent]` no `config.yaml`, com a justificativa). O PSI do `agent` continua na tabela, no gráfico (em cinza), no resumo do job ("informativa, fora do status") e no MLflow. A mudança de canal que pesa no cancelamento continua no status por `tem_agente`, `market_segment` e `distribution_channel`. Os limiares não mudaram.
+
+Esta mudança foi feita **depois** de ver o resultado nos lotes reais, ao contrário do resto da regra. Por isso ela está registrada aqui, com o motivo e o teste das alternativas.
+
+Efeito nos 8 lotes de 2017 (execução local, mesmos dados do Actions): antes, todos davam alerta; agora são 5 alertas, cada um com outra causa (alvo ou outra feature), e 3 "atenção". A tabela lote a lote está na seção 9 do relatório.
 
 ## Ponto de integração
 
@@ -45,9 +62,20 @@ Um passo no workflow único, logo depois do notebook 01. Ele precisa vir depois 
         ...
 ```
 
-No Actions, o alerta aparece como `::warning` na página da execução e como tabela no resumo do job. Os arquivos ficam em `evidencias/drift/`, que o passo "Publicar evidências" já envia como artefato.
+No Actions, o alerta aparece como `::warning` na página da execução e como tabela no resumo do job. Os arquivos ficam em `evidencias/drift/`, que o passo "Publicar evidências" já envia como artefato. A cópia das execuções do Actions está em [`evidencias/actions/drift/`](../evidencias/actions/drift/).
 
 O passo já está no `.github/workflows/pipeline_mlops.yml`, entre o notebook 01 e o 02.
+
+### Registro no MLflow
+
+`python -m src.drift` também registra um run `01_drift` no experimento do pipeline, com as tags `cycle_id` e `data_version` do ciclo (as mesmas dos runs `02_votacao`, `03_modelo_*` e `04_promocao`):
+
+- parâmetros: lote avaliado, referência (tipo e lotes) e a regra (limiares, amostra mínima, features informativas);
+- métricas: `psi_<feature>` para cada feature monitorada, `alvo_taxa_referencia`, `alvo_taxa_atual`, `alvo_diferenca_pp`, `n_features_alerta`, `n_features_atencao` e `alerta` (1 ou 0);
+- tag `drift_status` (`ok`, `atencao`, `alerta`, `sem_referencia` ou `amostra_insuficiente`);
+- artefatos: os arquivos de `evidencias/drift/` do ciclo, na pasta `drift/`.
+
+Com `--sem-mlflow`, só gera os arquivos e o alerta.
 
 ## Como rodar localmente
 
@@ -68,19 +96,23 @@ Para ver o alerta nos lotes de 2017, libere lotes novos (`python -m src.ingestao
 | `drift_<cycle_id>.csv` / `.png` | Tabela e gráfico do PSI por feature |
 | `historico_<cycle_id>.csv` / `.png` | Um lote por linha, cada um contra a sua referência (com `--historico`) |
 
+Cada linha da tabela por feature tem a coluna `no_status`: `False` para as features informativas.
+
 ## Limitações
 
 - O PSI é univariado: não detecta mudança só na relação entre variáveis.
 - Na operação real, o cancelamento só é conhecido depois da data de chegada. Aqui os lotes já trazem o alvo, então o drift do alvo aparece no mesmo ciclo.
 - O monitoramento lê o lote mais recente, que cai na partição de teste do ciclo. Ele não ajusta nada nem altera decisões, então não há vazamento para a seleção, o treino ou a promoção.
 - O alerta não dispara retreino. A decisão continua sendo da regra de promoção (F8).
+- `adr` e `valor_estimado_estadia` também alertam com frequência: as diárias sobem de um ano para o outro. Diferente do `agent`, é uma mudança de preço que o modelo vê diretamente, então elas continuam no status geral.
 
 ## Situação
 
 - [x] Regra e justificativa registradas (`config.yaml` e este documento).
 - [x] `src/drift.py` e `tests/test_drift.py` escritos.
-- [ ] `python -m pytest -q` executado e passando.
-- [ ] Passo no workflow (depende da F7 na `main`).
-- [ ] Execução real com os lotes de 2017, evidências em `evidencias/drift/` e `LEIAME.md`.
-- [ ] Registro no MLflow (depende da F6 na `main`).
-- [ ] Seção no relatório: problema, justificativa, solução, ponto de integração e resultado.
+- [x] `python -m pytest -q` executado e passando (inclui `tests/test_drift.py`).
+- [x] Passo no workflow, logo depois do notebook 01.
+- [x] Execução real com os lotes de 2017 no Actions; cópia das evidências em [`evidencias/actions/drift/`](../evidencias/actions/drift/).
+- [x] Registro no MLflow: run `01_drift` com PSI por feature, variação do alvo e status (ajuste de 23/11/2026).
+- [x] `agent` fora do status geral, com justificativa (ajuste de 23/11/2026).
+- [x] Seção no relatório: problema, justificativa, solução, ponto de integração e resultado.
