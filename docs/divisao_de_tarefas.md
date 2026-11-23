@@ -16,12 +16,12 @@ Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica 
 | **F2** | 2 · ETL e engenharia de atributos | Gabriel Karing | `src/ingestao.py`, `src/preprocessamento.py`, `notebooks/01_etl.ipynb` | ✅ pronto |
 | **F3** | 3 · Três métodos de seleção | Gabriel Karing | `src/features.py`, seção F3 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
 | **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
-| **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ✅ pronto (falta o registro no MLflow, que depende da F6) |
-| **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), seção F6 do `notebooks/02_votacao_features.ipynb`, `docs/f6_mlflow.md` | 🟨 falta a persistência no Actions (com F7) |
-| **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml`, `scripts/executar_notebook.sh`, `docs/f7_workflow.md` | 🟨 implementado (falta rodar no Actions, depois do merge na `main`) |
-| **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | 🟨 pronto localmente (falta guardar os modelos na Release, com F7) |
-| **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
-| **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py`, `tests/test_drift.py`, `docs/f10_drift.md`, `evidencias/drift/` | 🟨 em andamento |
+| **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ✅ pronto |
+| **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), seção F6 do `notebooks/02_votacao_features.ipynb`, `docs/f6_mlflow.md` | ✅ pronto (histórico persistido na branch `estado-pipeline`) |
+| **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml`, `scripts/executar_notebook.sh`, `docs/f7_workflow.md` | 🟨 ciclos e falha simulada rodaram no Actions; falta o 1º disparo pelo `schedule` |
+| **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ✅ pronto (decisões em `models/modelo_vigente.json`, modelos na Release `modelos`) |
+| **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | ✅ pronto (`reports/relatorio_n3.pdf`) |
+| **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py`, `tests/test_drift.py`, `docs/f10_drift.md`, `evidencias/drift/` | ✅ pronto (passo no workflow logo depois do ETL) |
 
 Para trocar um dono: edite o campo `dono` em `config/equipe.yaml`, rode `python -m pytest tests/test_equipe.py` e faça um commit `[equipe] ...`. O nome em `integrantes` deve ser **igual ao nome dos seus commits no git** (ver `.mailmap`); é assim que o histórico por feature reconhece o seu trabalho.
 

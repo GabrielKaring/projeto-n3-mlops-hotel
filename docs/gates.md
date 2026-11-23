@@ -11,22 +11,22 @@ Um **gate** é o conjunto de condições verificáveis que uma feature precisa c
 
 ## Painel
 
-Situação conferida em 05/11/2026, na branch `f3-selecao` (PR #1 ainda aberto).
+Situação conferida em 22/11/2026, na `main`, depois das execuções no Actions.
 
 | Gate | O que cobre | Dono | Depende de | Situação | O que falta |
 |---|---|---|---|---|---|
-| G0 | Regras do grupo e do repositório | Todos | | 🔴 bloqueado | Grupo acima do limite e acesso ao repositório |
+| G0 | Regras do grupo e do repositório | Todos | | 🟡 parcial | Confirmar com o professor o grupo de 7 e dar acesso ao repositório |
 | G1 | Problema, dados e avaliação | Gabriel Karing | | ✅ passou | |
-| G2 | ETL e atributos | Gabriel Karing | G1 | ✅ passou | Refazer os dois ciclos no pipeline final |
-| G3 | Três métodos de seleção | Gabriel Karing | G2 | 🟡 parcial | Merge |
-| G4 | Votação | Gabriel Karing | G3 | 🟡 parcial | Merge |
-| G5 | Dois algoritmos | Gabriel Wendorff | G4 | ⬜ não iniciado | Tudo |
-| G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | 🟡 parcial | Persistência no Actions (com F7), runs de F5 e F8, captura da interface |
-| G7 | Workflow e agendamento | Diego | G6 | 🟡 parcial | Merge na `main`, permissão de escrita e execuções reais (incluindo pelo `schedule`) |
-| G8 | Promoção e previsões | Diego | G5, G6 | 🟡 parcial | Modelos na Release e execução no Actions (com F7) |
-| G9 | Repositório, relatório e evidências | Vinicius | todos | 🟡 parcial | Relatório e evidências oficiais |
-| G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | 🟡 em andamento | Rodar os testes, passo no workflow, execução real e relatório |
-| GF | Teste integrado final | Todos | todos | ⬜ não iniciado | Tudo |
+| G2 | ETL e atributos | Gabriel Karing | G1 | ✅ passou | |
+| G3 | Três métodos de seleção | Gabriel Karing | G2 | ✅ passou | |
+| G4 | Votação | Gabriel Karing | G3 | ✅ passou | |
+| G5 | Dois algoritmos | Gabriel Wendorff | G4 | ✅ passou | |
+| G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | ✅ passou | |
+| G7 | Workflow e agendamento | Diego | G6 | 🟡 quase | Ciclos e falha simulada rodaram no Actions (#2 a #5); falta o 1º disparo pelo `schedule`, que o GitHub ainda não fez |
+| G8 | Promoção e previsões | Diego | G5, G6 | ✅ passou | |
+| G9 | Repositório, relatório e evidências | Vinicius | todos | ✅ passou | |
+| G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | ✅ passou | Ajustar o `agent` para o alerta não disparar em todo lote (ver relatório) |
+| GF | Teste integrado final | Todos | todos | ⬜ a fazer | Teste do grupo: seguir o README e conferir o checklist abaixo |
 
 Ordem do trabalho: `G1 → G2 → G3 → G4 → G5 → G8 → G9 → GF`. G6 e G7 correm em paralelo desde o início, e G10 entra no fluxo pelo G7.
 
