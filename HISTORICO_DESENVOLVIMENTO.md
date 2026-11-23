@@ -6,14 +6,15 @@ _Gerado em 23/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. N�
 
 | Integrante | Commits | Primeiro | Último | Linhas + | Linhas − |
 |---|---:|---|---|---:|---:|
-| Gabriel Karing | 20 | 2026-11-04 | 2026-11-23 | 15,348 | 10,965 |
+| Gabriel Karing | 22 | 2026-11-04 | 2026-11-23 | 15,828 | 11,376 |
 | Vinicius | 15 | 2026-11-23 | 2026-11-23 | 1,440 | 198 |
 | Gabriel Wendorff | 3 | 2026-11-19 | 2026-11-19 | 1,497 | 39 |
+| Lucas | 3 | 2026-11-23 | 2026-11-23 | 2,311 | 4 |
 | Diego | 2 | 2026-11-19 | 2026-11-19 | 11,338 | 99 |
 | Guilherme | 2 | 2026-11-21 | 2026-11-21 | 840 | 5 |
 | José | 1 | 2026-11-19 | 2026-11-19 | 6,022 | 35 |
 
-Total: 43 commits de 6 integrante(s).
+Total: 48 commits de 7 integrante(s).
 
 ## Visão por feature
 
@@ -29,8 +30,8 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | F6 | MLflow e rastreabilidade | José | 1 | 2 | ✅ com commits do dono |
 | F7 | Workflow único e agendamento | Diego | 0 | 4 | ⬜ sem commits do dono |
 | F8 | Eleição, promoção e previsões | Diego | 0 | 1 | ⬜ sem commits do dono |
-| F9 | Repositório, relatório e evidências | Vinicius | 7 | 1 | ✅ com commits do dono |
-| F10 | Recurso adicional justificado (sugestão: monitoramento de drift com alerta) | Lucas, Guilherme | 2 | 2 | ✅ com commits do dono |
+| F9 | Repositório, relatório e evidências | Vinicius | 7 | 3 | ✅ com commits do dono |
+| F10 | Recurso adicional justificado (sugestão: monitoramento de drift com alerta) | Lucas, Guilherme | 5 | 2 | ✅ com commits do dono |
 
 ### Por integrante
 
@@ -41,7 +42,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | Gabriel Wendorff | F5 | 3 |
 | Guilherme | F10 | 2 |
 | José | F6 | 1 |
-| Lucas | F10 | 0 |
+| Lucas | F10 | 3 |
 | Vinicius | F9 | 7 |
 
 13 commit(s) sem tag de feature (docs, equipe, correções).
@@ -102,6 +103,8 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `0178de1` 2026-11-23 · Vinicius · [F9] relatório com o ciclo agendado
 - `73d525c` 2026-11-23 · Vinicius · [F9] regenera o histórico de desenvolvimento
 - `acd6f6f` 2026-11-23 · Gabriel Karing · [F9] relatório, README e evidências do Actions na main
+- `201b7c5` 2026-11-23 · Gabriel Karing · [F9] regenera o histórico de desenvolvimento
+- `75b71fb` 2026-11-23 · Gabriel Karing · [F9] introdução, título com as duas disciplinas e G0 resolvido
 
 #### F10 · Recurso adicional justificado (sugestão: monitoramento de drift com alerta)
 
@@ -109,6 +112,9 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `c48af1d` 2026-11-21 · Guilherme · [F10] implementa o monitoramento de drift com alerta, testes e documentação
 - `c01be7e` 2026-11-23 · Vinicius · [F10] liga o monitoramento de drift no workflow, logo depois do notebook 01
 - `89738e9` 2026-11-23 · Gabriel Karing · [F10] drift sem alarme por troca de agências e registrado no MLflow
+- `9412c30` 2026-11-23 · Lucas · [F10] teste que confere o passo do drift no workflow
+- `3848cc7` 2026-11-23 · Lucas · [F10] evidências do drift nos oito lotes de 2017 com a regra atual
+- `2f7af11` 2026-11-23 · Lucas · [F10] aponta o teste do workflow e as evidências locais no f10_drift.md
 
 ## Linha do tempo
 
@@ -157,6 +163,11 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | 2026-11-23 | `e443c57` | Gabriel Karing | [F2][F8] demonstração de uso com reserva nova e análise de erros | 13 |
 | 2026-11-23 | `89738e9` | Gabriel Karing | [F10] drift sem alarme por troca de agências e registrado no MLflow | 7 |
 | 2026-11-23 | `acd6f6f` | Gabriel Karing | [F9] relatório, README e evidências do Actions na main | 39 |
+| 2026-11-23 | `201b7c5` | Gabriel Karing | [F9] regenera o histórico de desenvolvimento | 1 |
+| 2026-11-23 | `75b71fb` | Gabriel Karing | [F9] introdução, título com as duas disciplinas e G0 resolvido | 5 |
+| 2026-11-23 | `9412c30` | Lucas | [F10] teste que confere o passo do drift no workflow | 1 |
+| 2026-11-23 | `3848cc7` | Lucas | [F10] evidências do drift nos oito lotes de 2017 com a regra atual | 27 |
+| 2026-11-23 | `2f7af11` | Lucas | [F10] aponta o teste do workflow e as evidências locais no f10_drift.md | 1 |
 
 ## Contribuições de Gabriel Karing
 
@@ -180,6 +191,8 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `e443c57` 2026-11-23 · [F2][F8] demonstração de uso com reserva nova e análise de erros
 - `89738e9` 2026-11-23 · [F10] drift sem alarme por troca de agências e registrado no MLflow
 - `acd6f6f` 2026-11-23 · [F9] relatório, README e evidências do Actions na main
+- `201b7c5` 2026-11-23 · [F9] regenera o histórico de desenvolvimento
+- `75b71fb` 2026-11-23 · [F9] introdução, título com as duas disciplinas e G0 resolvido
 
 ## Contribuições de Gabriel Wendorff
 
@@ -218,3 +231,9 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `0178de1` 2026-11-23 · [F9] relatório com o ciclo agendado
 - `0ff2b4c` 2026-11-23 · [docs] marca o G7 como passou
 - `73d525c` 2026-11-23 · [F9] regenera o histórico de desenvolvimento
+
+## Contribuições de Lucas
+
+- `9412c30` 2026-11-23 · [F10] teste que confere o passo do drift no workflow
+- `3848cc7` 2026-11-23 · [F10] evidências do drift nos oito lotes de 2017 com a regra atual
+- `2f7af11` 2026-11-23 · [F10] aponta o teste do workflow e as evidências locais no f10_drift.md
