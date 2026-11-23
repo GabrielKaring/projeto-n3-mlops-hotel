@@ -1,4 +1,4 @@
-"""F10: PSI, escolha da referência, drift do alvo, alerta e evidências em dados sintéticos."""
+"""F10: PSI, escolha da referência, drift do alvo, alerta e evidências em dados sintéticos, e o passo no workflow."""
 from __future__ import annotations
 
 import copy
@@ -10,9 +10,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+import yaml
 
 from src import drift, ingestao, rastreio
-from src.config import salvar_contexto
+from src.config import RAIZ, salvar_contexto
 from src.preprocessamento import limpar_e_engenhar, lista_features
 from tests.helpers import gerar_reservas
 
@@ -331,3 +332,27 @@ def test_metricas_do_lote_sem_referencia():
     assert drift.metricas_mlflow(pd.DataFrame(columns=drift.COLUNAS_TABELA), resumo) == {
         "n_features_alerta": 0.0, "n_features_atencao": 0.0, "alerta": 0.0,
     }
+
+
+# --------------------------------------------------------------------------- integração com o workflow (F7)
+
+
+def test_drift_roda_no_workflow_entre_o_01_e_o_02_e_vai_para_as_evidencias(cfg):
+    passos = yaml.safe_load((RAIZ / ".github" / "workflows" / "pipeline_mlops.yml").read_text(encoding="utf-8"))
+    passos = passos["jobs"]["pipeline"]["steps"]
+    comandos = [p.get("run", "") for p in passos]
+
+    def indice(trecho: str) -> int:
+        return next(i for i, c in enumerate(comandos) if trecho in c)
+
+    i_drift = indice("python -m src.drift")
+    # Depois do 01 para usar o cycle_id e a data_version do ciclo; antes do 02 para avisar antes do treino.
+    assert indice("executar_notebook.sh 01_etl") < i_drift < indice("executar_notebook.sh 02_votacao_features")
+    # O alerta avisa e não interrompe o ciclo; --historico gera a evidência de todos os lotes;
+    # sem --sem-mlflow, o passo grava o run 01_drift junto com os runs do ciclo.
+    comando = comandos[i_drift]
+    assert "--historico" in comando and "--falhar-em-alerta" not in comando and "--sem-mlflow" not in comando
+
+    publicar = next(p for p in passos if "upload-artifact" in p.get("uses", ""))
+    pastas = publicar["with"]["path"].split()
+    assert any(cfg["drift"]["dir_evidencias"].startswith(p.rstrip("/")) for p in pastas)
