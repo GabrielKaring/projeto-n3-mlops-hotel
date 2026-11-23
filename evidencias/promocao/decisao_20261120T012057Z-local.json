@@ -1,0 +1,71 @@
+{
+  "cycle_id": "20261120T012057Z-local",
+  "data_version": "dv018-f95c3940",
+  "decidido_em": "2026-11-20T01:22:03Z",
+  "decisao": "promovido",
+  "motivo": "primeiro ciclo sem vigente; f1_macro=0.6773 passa no piso 0.6",
+  "regra": {
+    "metrica": "f1_macro",
+    "direcao": "maximizar",
+    "min_melhoria_abs": 0.005,
+    "piso_metrica": 0.6
+  },
+  "valor_vencedor": 0.6772501004768572,
+  "valor_vigente": null,
+  "candidato": {
+    "modelo": "B",
+    "algoritmo": "random_forest",
+    "params": {
+      "n_estimators": 300,
+      "max_depth": 16,
+      "min_samples_leaf": 5,
+      "class_weight": "balanced_subsample",
+      "n_jobs": -1
+    },
+    "seed": 42,
+    "features": [
+      "razao_cancel_previo",
+      "deposit_type_No Deposit",
+      "deposit_type_Non Refund",
+      "required_car_parking_spaces",
+      "previous_cancellations",
+      "market_segment_Groups",
+      "lead_time",
+      "total_of_special_requests",
+      "hotel_City Hotel",
+      "agent_1",
+      "distribution_channel_Direct",
+      "arrival_date_week_number",
+      "valor_estimado_estadia",
+      "total_noites",
+      "adr",
+      "customer_type_Transient",
+      "stays_in_week_nights"
+    ],
+    "metricas_cv": {
+      "f1_macro": 0.7783173347865726,
+      "balanced_accuracy": 0.7632292239490137,
+      "recall_cancelamento": 0.6033101951342282,
+      "precision_cancelamento": 0.8096265906954851,
+      "roc_auc": 0.8484214724637738,
+      "pr_auc": 0.8121877446304856
+    },
+    "metricas_teste": {
+      "f1_macro": 0.6772501004768572,
+      "balanced_accuracy": 0.6758753512685702,
+      "recall_cancelamento": 0.3642056690837179,
+      "precision_cancelamento": 0.9480909480909481,
+      "roc_auc": 0.8039677190842098,
+      "pr_auc": 0.7737560144521745
+    },
+    "arquivo": "modelo_20261120T012057Z-local_B.joblib",
+    "run_id_treino": "6b0c7dd65ec044e19c74c79b674d7d0d"
+  },
+  "vigente_anterior": null,
+  "teste": {
+    "n": 15783,
+    "inicio": "2016-09-24",
+    "fim": "2016-12-31"
+  },
+  "run_id_promocao": "18b69869ea874379b362a3f484c63bf9"
+}

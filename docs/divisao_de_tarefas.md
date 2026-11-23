@@ -19,7 +19,7 @@ Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica 
 | **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ✅ pronto (falta o registro no MLflow, que depende da F6) |
 | **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), seção F6 do `notebooks/02_votacao_features.ipynb`, `docs/f6_mlflow.md` | 🟨 falta a persistência no Actions (com F7) |
 | **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml` | 🟨 esqueleto |
-| **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ⬜ a fazer |
+| **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | 🟨 pronto localmente (falta guardar os modelos na Release, com F7) |
 | **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | 🟨 README e histórico prontos; falta o relatório |
 | **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py`, `tests/test_drift.py`, `docs/f10_drift.md`, `evidencias/drift/` | 🟨 em andamento |
 

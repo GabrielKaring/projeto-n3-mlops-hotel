@@ -23,7 +23,7 @@ Situação conferida em 05/11/2026, na branch `f3-selecao` (PR #1 ainda aberto).
 | G5 | Dois algoritmos | Gabriel Wendorff | G4 | ⬜ não iniciado | Tudo |
 | G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | 🟡 parcial | Persistência no Actions (com F7), runs de F5 e F8, captura da interface |
 | G7 | Workflow e agendamento | Diego | G6 | 🟡 esqueleto | Agendamento, encadeamento, persistência |
-| G8 | Promoção e previsões | Diego | G5, G6 | ⬜ não iniciado | Tudo |
+| G8 | Promoção e previsões | Diego | G5, G6 | 🟡 parcial | Modelos na Release e execução no Actions (com F7) |
 | G9 | Repositório, relatório e evidências | Vinicius | todos | 🟡 parcial | Relatório e evidências oficiais |
 | G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | 🟡 em andamento | Rodar os testes, passo no workflow, execução real e relatório |
 | GF | Teste integrado final | Todos | todos | ⬜ não iniciado | Tudo |
@@ -122,17 +122,17 @@ Evidência esperada: YAML, logs e link da execução no Actions.
 
 ## G8 · Promoção e previsões
 
-Evidência esperada: `models/modelo_vigente.json`, previsões e decisões de 2 ciclos.
+Evidência: `evidencias/promocao/` e `evidencias/previsoes/` (2 ciclos locais). Os modelos ficam em `models/registro/`, fora do git.
 
-- [ ] Compara A e B automaticamente e elege o vencedor no notebook 04.
-- [ ] Confronta o vencedor com o vigente em protocolo compatível, nos mesmos dados, e não com uma métrica antiga guardada.
-- [ ] Limiar de melhoria e verificações de qualidade definidos antes, em `config.yaml`.
-- [ ] Mantém o vigente quando os critérios não são atendidos.
-- [ ] Manifesto traz identificação, versão dos dados, features, métrica, `run_id` e decisão.
-- [ ] Modelos anteriores preservados e recuperáveis.
-- [ ] Notebook 05 carrega o vigente com pré-processamento e features.
-- [ ] Previsões em registros não usados na escolha do modelo.
-- [ ] Testes de primeiro ciclo, melhora suficiente, melhora insuficiente e abaixo do piso.
+- [x] Compara A e B automaticamente e elege o vencedor no notebook 04: maior média de `f1_macro` no CV do dev; empate vai para o menor desvio.
+- [x] Confronta o vencedor com o vigente em protocolo compatível, nos mesmos dados, e não com uma métrica antiga guardada: os dois são avaliados no teste do ciclo atual.
+- [x] Limiar de melhoria e verificações de qualidade definidos antes, em `config.yaml` (melhoria mínima de 0,005 e piso de 0,60).
+- [x] Mantém o vigente quando os critérios não são atendidos. Coberto por teste; não aconteceu nos 2 ciclos locais (os dois promoveram).
+- [x] Manifesto traz identificação, versão dos dados, features, métrica, `run_id` e decisão, com o histórico de todos os ciclos.
+- [ ] Modelos anteriores preservados e recuperáveis. Localmente sim (`models/registro/`, nunca sobrescrito). **No Actions, depende da F7 enviar os arquivos para a Release do GitHub.**
+- [x] Notebook 05 carrega o vigente com pré-processamento e features (o `Pipeline` completo da F5).
+- [x] Previsões em registros não usados na escolha do modelo: o próximo lote de `data/incoming/`, conferido quando ele chega no ciclo seguinte.
+- [x] Testes de primeiro ciclo, melhora suficiente, melhora insuficiente e abaixo do piso (`tests/test_promocao.py`).
 
 ## G9 · Repositório, relatório e evidências
 

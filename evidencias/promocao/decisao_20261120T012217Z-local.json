@@ -1,0 +1,84 @@
+{
+  "cycle_id": "20261120T012217Z-local",
+  "data_version": "dv019-aa1a1287",
+  "decidido_em": "2026-11-20T01:23:26Z",
+  "decisao": "promovido",
+  "motivo": "f1_macro 0.7310 supera o vigente (0.6877) em 0.0433, acima da melhoria mínima 0.005",
+  "regra": {
+    "metrica": "f1_macro",
+    "direcao": "maximizar",
+    "min_melhoria_abs": 0.005,
+    "piso_metrica": 0.6
+  },
+  "valor_vencedor": 0.7310321995742781,
+  "valor_vigente": 0.6876846104132068,
+  "candidato": {
+    "modelo": "B",
+    "algoritmo": "random_forest",
+    "params": {
+      "n_estimators": 300,
+      "max_depth": 16,
+      "min_samples_leaf": 5,
+      "class_weight": "balanced_subsample",
+      "n_jobs": -1
+    },
+    "seed": 42,
+    "features": [
+      "razao_cancel_previo",
+      "deposit_type_No Deposit",
+      "deposit_type_Non Refund",
+      "required_car_parking_spaces",
+      "market_segment_Groups",
+      "lead_time",
+      "previous_cancellations",
+      "total_of_special_requests",
+      "hotel_City Hotel",
+      "agent_1",
+      "total_noites",
+      "distribution_channel_Direct",
+      "agent_9",
+      "arrival_date_week_number",
+      "valor_estimado_estadia",
+      "customer_type_Transient",
+      "adr",
+      "stays_in_week_nights"
+    ],
+    "metricas_cv": {
+      "f1_macro": 0.7904317390564571,
+      "balanced_accuracy": 0.7750017449633705,
+      "recall_cancelamento": 0.617835736242498,
+      "precision_cancelamento": 0.8323594975291218,
+      "roc_auc": 0.8525414392709993,
+      "pr_auc": 0.8209915976830146
+    },
+    "metricas_teste": {
+      "f1_macro": 0.7310321995742781,
+      "balanced_accuracy": 0.7173279131761741,
+      "recall_cancelamento": 0.4645901639344262,
+      "precision_cancelamento": 0.9013994910941476,
+      "roc_auc": 0.8409952098727909,
+      "pr_auc": 0.8046696923075054
+    },
+    "arquivo": "modelo_20261120T012217Z-local_B.joblib",
+    "run_id_treino": "2ce3d20779a448838a973cffa3e5fe3c"
+  },
+  "vigente_anterior": {
+    "cycle_id": "20261120T012057Z-local",
+    "modelo": "B",
+    "arquivo": "modelo_20261120T012057Z-local_B.joblib",
+    "metricas_teste": {
+      "f1_macro": 0.6876846104132068,
+      "balanced_accuracy": 0.6807513819501169,
+      "recall_cancelamento": 0.3840983606557377,
+      "precision_cancelamento": 0.9091967403958091,
+      "roc_auc": 0.8071822622824181,
+      "pr_auc": 0.7661293232674271
+    }
+  },
+  "teste": {
+    "n": 16456,
+    "inicio": "2016-10-10",
+    "fim": "2017-01-31"
+  },
+  "run_id_promocao": "bdbda4d2b03a4197b1f4cb8a74c4ba89"
+}
