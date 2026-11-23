@@ -44,7 +44,8 @@ def git_log() -> list[dict]:
     formato = MARCA + SEP.join(["%h", "%aN", "%ad", "%s"])
     saida = subprocess.run(
         ["git", "log", "--reverse", "--no-merges", "--date=short", f"--pretty=format:{formato}", "--shortstat"],
-        cwd=RAIZ, capture_output=True, text=True, check=True,
+        # O git escreve em UTF-8; sem encoding, o Windows lê em cp1252 e "José" vira "JosÃ©" (e some da contagem).
+        cwd=RAIZ, capture_output=True, text=True, encoding="utf-8", check=True,
     ).stdout
     commits = []
     for bloco in saida.split(MARCA)[1:]:
