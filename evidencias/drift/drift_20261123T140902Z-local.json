@@ -1,0 +1,249 @@
+{
+  "cycle_id": "20261123T140902Z-local",
+  "data_version": "dv019-aa1a1287",
+  "gerado_em": "2026-11-23T14:09:08Z",
+  "lote_atual": "lote_2017-01",
+  "referencia": {
+    "tipo": "sazonal",
+    "lotes": [
+      "lote_2016-01"
+    ]
+  },
+  "status": "alerta",
+  "n_linhas_referencia": 2248,
+  "n_linhas_atual": 3673,
+  "alvo": {
+    "taxa_referencia": 0.2478,
+    "taxa_atual": 0.34,
+    "diferenca_pp": 9.23,
+    "status": "alerta"
+  },
+  "n_features": 28,
+  "n_features_atencao": 3,
+  "n_features_alerta": 4,
+  "features_alerta": [
+    "days_in_waiting_list",
+    "market_segment",
+    "adr",
+    "valor_estimado_estadia"
+  ],
+  "features_informativas": [
+    "agent"
+  ],
+  "features_informativas_alerta": [
+    "agent"
+  ],
+  "maior_psi": {
+    "feature": "agent",
+    "psi": 0.6644
+  },
+  "limiares": {
+    "psi": {
+      "atencao": 0.1,
+      "alerta": 0.25
+    },
+    "alvo": {
+      "atencao_pp": 3.0,
+      "alerta_pp": 5.0
+    },
+    "min_linhas": 500
+  },
+  "features": [
+    {
+      "feature": "agent",
+      "tipo": "categorica",
+      "psi": 0.6644,
+      "status": "alerta",
+      "no_status": false
+    },
+    {
+      "feature": "days_in_waiting_list",
+      "tipo": "discreta",
+      "psi": 0.6377,
+      "status": "alerta",
+      "no_status": true
+    },
+    {
+      "feature": "market_segment",
+      "tipo": "categorica",
+      "psi": 0.306,
+      "status": "alerta",
+      "no_status": true
+    },
+    {
+      "feature": "adr",
+      "tipo": "numerica",
+      "psi": 0.2559,
+      "status": "alerta",
+      "no_status": true
+    },
+    {
+      "feature": "valor_estimado_estadia",
+      "tipo": "numerica",
+      "psi": 0.2501,
+      "status": "alerta",
+      "no_status": true
+    },
+    {
+      "feature": "previous_cancellations",
+      "tipo": "discreta",
+      "psi": 0.1948,
+      "status": "atencao",
+      "no_status": true
+    },
+    {
+      "feature": "razao_cancel_previo",
+      "tipo": "numerica",
+      "psi": 0.1835,
+      "status": "atencao",
+      "no_status": true
+    },
+    {
+      "feature": "lead_time",
+      "tipo": "numerica",
+      "psi": 0.1674,
+      "status": "atencao",
+      "no_status": true
+    },
+    {
+      "feature": "total_of_special_requests",
+      "tipo": "discreta",
+      "psi": 0.0689,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "stays_in_week_nights",
+      "tipo": "numerica",
+      "psi": 0.0673,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "total_noites",
+      "tipo": "numerica",
+      "psi": 0.0648,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "total_hospedes",
+      "tipo": "discreta",
+      "psi": 0.0551,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "reserved_room_type",
+      "tipo": "categorica",
+      "psi": 0.0538,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "meal",
+      "tipo": "categorica",
+      "psi": 0.0517,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "stays_in_weekend_nights",
+      "tipo": "numerica",
+      "psi": 0.0503,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "adults",
+      "tipo": "discreta",
+      "psi": 0.0353,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "customer_type",
+      "tipo": "categorica",
+      "psi": 0.031,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "distribution_channel",
+      "tipo": "categorica",
+      "psi": 0.0293,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "children",
+      "tipo": "discreta",
+      "psi": 0.0254,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "tem_criancas",
+      "tipo": "discreta",
+      "psi": 0.0174,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "tem_empresa",
+      "tipo": "discreta",
+      "psi": 0.0113,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "tem_agente",
+      "tipo": "discreta",
+      "psi": 0.0086,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "required_car_parking_spaces",
+      "tipo": "discreta",
+      "psi": 0.0079,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "deposit_type",
+      "tipo": "categorica",
+      "psi": 0.0078,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "hotel",
+      "tipo": "categorica",
+      "psi": 0.006,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "is_repeated_guest",
+      "tipo": "discreta",
+      "psi": 0.0002,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "babies",
+      "tipo": "discreta",
+      "psi": 0.0,
+      "status": "ok",
+      "no_status": true
+    },
+    {
+      "feature": "previous_bookings_not_canceled",
+      "tipo": "numerica",
+      "psi": 0.0,
+      "status": "ok",
+      "no_status": true
+    }
+  ]
+}
