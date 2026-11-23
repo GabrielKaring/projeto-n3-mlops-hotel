@@ -47,7 +47,7 @@ Um passo no workflow único, logo depois do notebook 01. Ele precisa vir depois 
 
 No Actions, o alerta aparece como `::warning` na página da execução e como tabela no resumo do job. Os arquivos ficam em `evidencias/drift/`, que o passo "Publicar evidências" já envia como artefato.
 
-> **Pendente:** o workflow completo está na branch `f7-workflow` (F7), que ainda não foi integrada à `main`. O passo acima entra quando ela for integrada.
+O passo já está no `.github/workflows/pipeline_mlops.yml`, entre o notebook 01 e o 02.
 
 ## Como rodar localmente
 

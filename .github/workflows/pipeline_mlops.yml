@@ -116,6 +116,11 @@ jobs:
       - name: 01 - ETL
         run: bash scripts/executar_notebook.sh 01_etl
 
+      - name: Monitoramento de drift (F10)
+        # Logo depois do 01, para usar o mesmo cycle_id e data_version do ciclo. Alerta vira ::warning e resumo do job;
+        # não interrompe o fluxo (ver docs/f10_drift.md). Saídas em evidencias/drift/, publicadas no fim.
+        run: python -m src.drift --historico
+
       - name: 02 - Seleção e votação de features
         run: bash scripts/executar_notebook.sh 02_votacao_features
 
