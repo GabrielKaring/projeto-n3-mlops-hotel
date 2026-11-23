@@ -1,0 +1,149 @@
+{
+  "cycle_id": "20261123T004826Z-gha45090760506-1",
+  "data_version": "dv019-aa1a1287",
+  "criado_em": "2026-11-23T00:48:28Z",
+  "n_lotes": 19,
+  "lotes_novos_vs_ciclo_anterior": [
+    "lote_2015-07",
+    "lote_2015-08",
+    "lote_2015-09",
+    "lote_2015-10",
+    "lote_2015-11",
+    "lote_2015-12",
+    "lote_2016-01",
+    "lote_2016-02",
+    "lote_2016-03",
+    "lote_2016-04",
+    "lote_2016-05",
+    "lote_2016-06",
+    "lote_2016-07",
+    "lote_2016-08",
+    "lote_2016-09",
+    "lote_2016-10",
+    "lote_2016-11",
+    "lote_2016-12",
+    "lote_2017-01"
+  ],
+  "periodo": {
+    "chegada_min": "2015-07-01",
+    "chegada_max": "2017-01-31"
+  },
+  "particao": {
+    "teste_fracao_pedida": 0.2,
+    "dev_n": 65807,
+    "teste_n": 16456,
+    "dev_fim": "2016-10-09",
+    "teste_inicio": "2016-10-10"
+  },
+  "artefatos": {
+    "dev": "data/processed/dev.parquet",
+    "teste": "data/processed/teste.parquet",
+    "diagnostico": "evidencias/etl/diagnostico_20261123T004826Z-gha45090760506-1.json"
+  },
+  "colunas": {
+    "alvo": "is_canceled",
+    "tempo": "arrival_date",
+    "features": [
+      "lead_time",
+      "adr",
+      "valor_estimado_estadia",
+      "total_noites",
+      "total_hospedes",
+      "stays_in_weekend_nights",
+      "stays_in_week_nights",
+      "adults",
+      "children",
+      "babies",
+      "days_in_waiting_list",
+      "previous_cancellations",
+      "previous_bookings_not_canceled",
+      "arrival_date_week_number",
+      "mes_chegada",
+      "dia_semana_chegada",
+      "razao_cancel_previo",
+      "required_car_parking_spaces",
+      "total_of_special_requests",
+      "hotel",
+      "meal",
+      "market_segment",
+      "distribution_channel",
+      "reserved_room_type",
+      "deposit_type",
+      "customer_type",
+      "agent",
+      "is_repeated_guest",
+      "tem_criancas",
+      "tem_agente",
+      "tem_empresa"
+    ],
+    "numericas_cauda_longa": [
+      "lead_time",
+      "adr",
+      "valor_estimado_estadia",
+      "total_noites",
+      "total_hospedes",
+      "stays_in_weekend_nights",
+      "stays_in_week_nights",
+      "adults",
+      "children",
+      "babies",
+      "days_in_waiting_list",
+      "previous_cancellations",
+      "previous_bookings_not_canceled"
+    ],
+    "numericas_simples": [
+      "arrival_date_week_number",
+      "mes_chegada",
+      "dia_semana_chegada",
+      "razao_cancel_previo",
+      "required_car_parking_spaces",
+      "total_of_special_requests"
+    ],
+    "categoricas": [
+      "hotel",
+      "meal",
+      "market_segment",
+      "distribution_channel",
+      "reserved_room_type",
+      "deposit_type",
+      "customer_type",
+      "agent"
+    ],
+    "binarias": [
+      "is_repeated_guest",
+      "tem_criancas",
+      "tem_agente",
+      "tem_empresa"
+    ]
+  },
+  "etl": {
+    "n_entrada": 82384,
+    "duplicatas_identicas_no_dado": 23836,
+    "duplicatas_removidas": 0,
+    "duplicatas_estrategia": "entre_lotes",
+    "regras_dominio": {
+      "sem_hospedes": 121,
+      "adr_negativo": 0
+    },
+    "regras_dominio_removidas": 121,
+    "imputados": {
+      "children": 4,
+      "country": 421,
+      "agent": 11540,
+      "company": 77418
+    },
+    "colunas_removidas": [
+      "reservation_status",
+      "reservation_status_date",
+      "assigned_room_type",
+      "booking_changes",
+      "country",
+      "arrival_date_year",
+      "arrival_date_month",
+      "arrival_date_day_of_month",
+      "company"
+    ],
+    "n_saida": 82263,
+    "removidas_total": 121
+  }
+}

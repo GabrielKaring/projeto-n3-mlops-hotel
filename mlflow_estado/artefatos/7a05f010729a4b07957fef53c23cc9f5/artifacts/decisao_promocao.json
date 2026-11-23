@@ -1,0 +1,71 @@
+{
+  "cycle_id": "20261123T004826Z-gha45090760506-1",
+  "data_version": "dv019-aa1a1287",
+  "decidido_em": "2026-11-23T00:50:23Z",
+  "decisao": "promovido",
+  "motivo": "primeiro ciclo sem vigente; f1_macro=0.7310 passa no piso 0.6",
+  "regra": {
+    "metrica": "f1_macro",
+    "direcao": "maximizar",
+    "min_melhoria_abs": 0.005,
+    "piso_metrica": 0.6
+  },
+  "valor_vencedor": 0.7310321995742781,
+  "valor_vigente": null,
+  "candidato": {
+    "modelo": "B",
+    "algoritmo": "random_forest",
+    "params": {
+      "n_estimators": 300,
+      "max_depth": 16,
+      "min_samples_leaf": 5,
+      "class_weight": "balanced_subsample",
+      "n_jobs": -1
+    },
+    "seed": 42,
+    "features": [
+      "razao_cancel_previo",
+      "deposit_type_No Deposit",
+      "deposit_type_Non Refund",
+      "required_car_parking_spaces",
+      "market_segment_Groups",
+      "lead_time",
+      "previous_cancellations",
+      "total_of_special_requests",
+      "hotel_City Hotel",
+      "agent_1",
+      "total_noites",
+      "distribution_channel_Direct",
+      "agent_9",
+      "arrival_date_week_number",
+      "valor_estimado_estadia",
+      "customer_type_Transient",
+      "adr",
+      "stays_in_week_nights"
+    ],
+    "metricas_cv": {
+      "f1_macro": 0.7904317390564571,
+      "balanced_accuracy": 0.7750017449633705,
+      "recall_cancelamento": 0.617835736242498,
+      "precision_cancelamento": 0.8323594975291218,
+      "roc_auc": 0.8525414392709993,
+      "pr_auc": 0.8209915976830146
+    },
+    "metricas_teste": {
+      "f1_macro": 0.7310321995742781,
+      "balanced_accuracy": 0.7173279131761741,
+      "recall_cancelamento": 0.4645901639344262,
+      "precision_cancelamento": 0.9013994910941476,
+      "roc_auc": 0.8409952098727909,
+      "pr_auc": 0.8046696923075054
+    },
+    "arquivo": "modelo_20261123T004826Z-gha45090760506-1_B.joblib",
+    "run_id_treino": "849a2a0630b745e79d9f1c346e9f1075"
+  },
+  "vigente_anterior": null,
+  "teste": {
+    "n": 16456,
+    "inicio": "2016-10-10",
+    "fim": "2017-01-31"
+  }
+}
