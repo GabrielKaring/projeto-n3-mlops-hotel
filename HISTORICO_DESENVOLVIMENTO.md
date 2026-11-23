@@ -6,7 +6,7 @@ _Gerado em 23/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. N�
 
 | Integrante | Commits | Primeiro | Último | Linhas + | Linhas − |
 |---|---:|---|---|---:|---:|
-| Gabriel Karing | 22 | 2026-11-04 | 2026-11-23 | 15,828 | 11,376 |
+| Gabriel Karing | 23 | 2026-11-04 | 2026-11-23 | 16,479 | 11,584 |
 | Vinicius | 15 | 2026-11-23 | 2026-11-23 | 1,440 | 198 |
 | Lucas | 4 | 2026-11-23 | 2026-11-23 | 2,335 | 9 |
 | Gabriel Wendorff | 3 | 2026-11-19 | 2026-11-19 | 1,497 | 39 |
@@ -14,7 +14,7 @@ _Gerado em 23/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. N�
 | Guilherme | 2 | 2026-11-21 | 2026-11-21 | 840 | 5 |
 | José | 1 | 2026-11-19 | 2026-11-19 | 6,022 | 35 |
 
-Total: 49 commits de 7 integrante(s).
+Total: 50 commits de 7 integrante(s).
 
 ## Visão por feature
 
@@ -45,7 +45,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | Lucas | F10 | 3 |
 | Vinicius | F9 | 7 |
 
-12 commit(s) sem tag de feature (docs, equipe, correções).
+13 commit(s) sem tag de feature (docs, equipe, correções).
 
 #### F1 · Problema, dados e avaliação
 
@@ -171,6 +171,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | 2026-11-23 | `3848cc7` | Lucas | [F10] evidências do drift nos oito lotes de 2017 com a regra atual | 27 |
 | 2026-11-23 | `2f7af11` | Lucas | [F10] aponta o teste do workflow e as evidências locais no f10_drift.md | 1 |
 | 2026-11-23 | `0b89602` | Lucas | [docs] regenera o histórico de desenvolvimento | 1 |
+| 2026-11-23 | `4be6246` | Gabriel Karing | [docs][F8][F10] ajustes do code review: uso do teste, validação da demonstração, drift sem travar no MLflow e versões fixas | 20 |
 
 ## Contribuições de Gabriel Karing
 
@@ -196,6 +197,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `acd6f6f` 2026-11-23 · [F9] relatório, README e evidências do Actions na main
 - `201b7c5` 2026-11-23 · [F9] regenera o histórico de desenvolvimento
 - `75b71fb` 2026-11-23 · [F9] introdução, título com as duas disciplinas e G0 resolvido
+- `4be6246` 2026-11-23 · [docs][F8][F10] ajustes do code review: uso do teste, validação da demonstração, drift sem travar no MLflow e versões fixas
 
 ## Contribuições de Gabriel Wendorff
 
