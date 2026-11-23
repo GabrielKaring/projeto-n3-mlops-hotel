@@ -70,7 +70,9 @@ def _tabela(linhas: list[str], largura: float) -> Table:
     celulas = [c for c in celulas if not all(re.fullmatch(r":?-+:?", x) for x in c)]
     dados = [[Paragraph(_inline(c), ESTILOS["celula"]) for c in linha] for linha in celulas]
     # Largura de cada coluna proporcional ao texto mais longo dela (com limites), para nome comprido não quebrar.
-    pesos = [min(max(max(len(linha[k]) for linha in celulas), 6), 40) for k in range(len(celulas[0]))]
+    def visivel(c: str) -> int:
+        return len(re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", c).replace("**", "").replace("`", ""))
+    pesos = [min(max(max(visivel(linha[k]) for linha in celulas), 9), 40) for k in range(len(celulas[0]))]
     t = Table(dados, colWidths=[largura * p / sum(pesos) for p in pesos], repeatRows=1)
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e8eef5")),
