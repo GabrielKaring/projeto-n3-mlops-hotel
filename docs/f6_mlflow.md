@@ -10,18 +10,20 @@ Um **experimento** (`n3-hotel-cancelamento`, em `config.yaml`) e um **run por et
 |---|---|---|
 | `cycle_id` | `20261119T181200Z-local` | Identifica a execução do pipeline (vem do notebook 01) |
 | `data_version` | `dv019-1a2b3c4d` | Identifica os lotes de dados usados |
-| `etapa` | `02_votacao`, `03_modelo_A`, `04_promocao` | Em que notebook o run foi aberto |
+| `etapa` | `01_drift`, `02_votacao`, `03_modelo_A`, `04_promocao` | Em que passo do ciclo o run foi aberto |
 | `origem` | `local` ou `github-actions` | Onde rodou |
 | `git_commit` | `57525a6...` | Versão do código |
 | `decisao` | `promovido` ou `mantido` | Só no run da promoção (F8) |
+| `drift_status` | `ok`, `atencao`, `alerta`, ... | Só no run do drift (F10) |
 
 Cada run também guarda `contexto/ciclo_atual.json`, o contexto completo do ciclo.
 
 | Etapa | Feature | Parâmetros | Métricas | Artefatos |
 |---|---|---|---|---|
+| `01_drift` | F10 (`src/drift.py`, passo logo depois do notebook 01) | lote avaliado, referência, limiares, features informativas | `psi_<feature>`, variação da taxa de cancelamento, nº de features em alerta | arquivos de `evidencias/drift/` do ciclo |
 | `02_votacao` | F3 + F4 (registro feito pela F6) | seção `selecao` inteira, seed, folds | nº de candidatas, nº de eleitas, features com 0/1/2/3 votos | rankings, rankings por fold, tabela de votos, `features_eleitas.json` |
 | `03_modelo_A/B` | F5 | `registrar_parametros(...)` | `registrar_metricas(...)` | `registrar_features`, `registrar_modelo` |
-| `04_promocao` | F8 | regra de promoção | métricas do vencedor e do vigente | `registrar_decisao(...)` |
+| `04_promocao` | F8 | regra de promoção | métricas do vencedor e do vigente; matriz de confusão do modelo em uso (`teste_em_uso_*`) | `registrar_decisao(...)`, análise de erros (`analise_erros/`) |
 
 As linhas de F5 e F8 são o contrato: as funções existem e têm teste, mas a chamada fica nos notebooks 03 e 04, dos respectivos donos.
 

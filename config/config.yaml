@@ -185,6 +185,13 @@ drift:
     atencao_pp: 3.0
     alerta_pp: 5.0
   min_linhas: 500                # abaixo disso o PSI é ruidoso: o lote é marcado "amostra_insuficiente" e não alerta
+  # Features monitoradas só como informação: o PSI é calculado, aparece nas tabelas e no MLflow, mas não entra no
+  # status geral. `agent` é o código da agência (centenas de IDs) e a carteira de agências se renova de um ano
+  # para o outro: com a referência sazonal (mesmo mês do ano anterior) o PSI dele passou de 0,25 em todos os
+  # lotes de 2016-07 a 2017-04, inclusive nos meses sem nenhuma outra mudança (ex.: 2017-03). Agrupar em top-N +
+  # "outros" não resolve (top-5 ainda passa de 0,25 em 5 dos 8 lotes de 2017). A mudança de canal que importa
+  # para o cancelamento continua no status por `tem_agente`, `market_segment` e `distribution_channel`.
+  informativas: [agent]
   # Calendário muda por construção entre lotes mensais (semana do ano, dia da semana): não é drift.
   ignorar: [arrival_date_week_number, mes_chegada, dia_semana_chegada]
   dir_evidencias: evidencias/drift
