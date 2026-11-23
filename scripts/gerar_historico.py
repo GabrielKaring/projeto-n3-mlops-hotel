@@ -8,7 +8,8 @@ Respeita o arquivo .mailmap (mesma pessoa com vários e-mails vira um integrante
 Não inventa nem edita nada: só reorganiza o que o git já registrou.
 
 Visão por feature: commits cuja mensagem começa com `[F3]` (ou `[F3][F4]`, `[F3,F4]`) são atribuídos
-àquela feature; o dono vem de config/equipe.yaml e precisa ter o mesmo nome do autor no git.
+àquela feature; o dono vem de config/equipe.yaml e precisa ter o mesmo nome do autor no git. Commits feitos
+sem a tag são atribuídos pelo hash em `features_por_commit` (config/equipe.yaml), sem reescrever o histórico.
 """
 from __future__ import annotations
 
@@ -58,6 +59,19 @@ def git_log() -> list[dict]:
     return commits
 
 
+def aplicar_features_por_commit(commits: list[dict], equipe: dict) -> list[dict]:
+    """Atribui feature aos commits sem tag listados em ``features_por_commit`` (hash curto ou completo)."""
+    mapa = {str(h): fs for h, fs in (equipe.get("features_por_commit") or {}).items()}
+    for c in commits:
+        if c["features"]:
+            continue
+        for h, fs in mapa.items():
+            if c["hash"].startswith(h) or h.startswith(c["hash"]):
+                c["features"] = list(fs)
+                c["atribuido"] = True
+    return commits
+
+
 def donos_da_feature(feature: dict) -> list[str]:
     """O campo ``dono`` é um nome ou, em feature dividida, uma lista de nomes."""
     return feature["dono"] if isinstance(feature["dono"], list) else [feature["dono"]]
@@ -69,7 +83,8 @@ def secao_por_feature(commits: list[dict], equipe: dict) -> list[str]:
     L = [
         "## Visão por feature", "",
         "Commits com a tag `[Fn]` no início da mensagem. \"Do dono\" conta commits cujo autor é o dono da feature em "
-        "`config/equipe.yaml`; \"de apoio\" são os de outras pessoas na mesma feature.", "",
+        "`config/equipe.yaml`; \"de apoio\" são os de outras pessoas na mesma feature. Commits sem a tag entram "
+        "pela lista `features_por_commit` do mesmo arquivo.", "",
         "| Feature | Título | Dono | Commits do dono | Commits de apoio | Situação |",
         "|---|---|---|---:|---:|---|",
     ]
@@ -94,7 +109,9 @@ def secao_por_feature(commits: list[dict], equipe: dict) -> list[str]:
         cs = [c for c in commits if fid in c["features"]]
         if cs:
             L += [f"#### {fid} · {equipe['features'][fid]['titulo']}", ""]
-            L += [f"- `{c['hash']}` {c['data']} · {c['autor']} · {c['assunto']}" for c in cs]
+            L += [f"- `{c['hash']}` {c['data']} · {c['autor']} · {c['assunto']}"
+                  + (" _(sem tag; feature atribuída em `config/equipe.yaml`)_" if c.get("atribuido") else "")
+                  for c in cs]
             L.append("")
     return L
 
@@ -138,7 +155,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--stdout", action="store_true")
     args = ap.parse_args()
-    texto = renderizar(git_log(), carregar_equipe())
+    equipe = carregar_equipe()
+    texto = renderizar(aplicar_features_por_commit(git_log(), equipe), equipe)
     if args.stdout:
         print(texto)
     else:

@@ -516,6 +516,28 @@ def registrar_mlflow(tabela: pd.DataFrame, resumo: dict, ctx: dict, cfg: dict, c
     return run.info.run_id
 
 
+def registrar_mlflow_sem_interromper(tabela: pd.DataFrame, resumo: dict, ctx: dict, cfg: dict,
+                                     caminhos: dict[str, Path], raiz: Path = RAIZ,
+                                     ambiente: dict | None = None) -> tuple[str | None, str | None]:
+    """``registrar_mlflow`` sem derrubar o ciclo. Devolve ``(run_id, aviso)``.
+
+    O drift é informativo (docs/f10_drift.md): uma falha ao gravar o run ``01_drift`` (banco SQLite, artefatos)
+    vira aviso no log (``::warning`` no Actions) e o ciclo segue para o notebook 02. As evidências em
+    ``evidencias/drift/`` já foram salvas antes, então o resultado do monitoramento não se perde.
+    """
+    try:
+        return registrar_mlflow(tabela, resumo, ctx, cfg, caminhos, raiz), None
+    except Exception as erro:   # qualquer falha do MLflow: o monitoramento não pode parar o ciclo
+        aviso = (f"o run {ETAPA_MLFLOW} não foi gravado no MLflow ({type(erro).__name__}: {erro}). "
+                 "As evidências do drift foram salvas em evidencias/drift/ e o ciclo continua.")
+        env = os.environ if ambiente is None else ambiente
+        if env.get("GITHUB_ACTIONS") == "true":
+            print(f"::warning title=Drift sem MLflow::{aviso.replace('%', '%25')}")
+        else:
+            print(f"AVISO: {aviso}")
+        return None, aviso
+
+
 # --------------------------------------------------------------------------- execução
 
 
@@ -523,7 +545,8 @@ def executar(cfg: dict, raiz: Path = RAIZ, lote: str | None = None, historico: b
              ambiente: dict | None = None, mlflow: bool = False) -> dict:
     """Fluxo completo: dados do ciclo -> drift do lote mais recente -> evidências -> alerta -> MLflow.
 
-    ``mlflow=True`` (padrão da linha de comando) registra o run ``01_drift``.
+    ``mlflow=True`` (padrão da linha de comando) registra o run ``01_drift``; se o registro falhar, o fluxo
+    segue com um aviso (``registrar_mlflow_sem_interromper``) e ``run_id`` fica ``None``.
     """
     df, manifesto = carregar_dados_monitorados(cfg, raiz)
     ctx = contexto_do_ciclo(cfg, manifesto, raiz, ambiente)
@@ -536,8 +559,10 @@ def executar(cfg: dict, raiz: Path = RAIZ, lote: str | None = None, historico: b
         hist = historico_drift(df, cfg, lotes)
         caminhos.update(salvar_historico(hist, ctx, cfg, raiz))
     emitir_alerta(resumo, tabela, ctx, ambiente)
-    run_id = registrar_mlflow(tabela, resumo, ctx, cfg, caminhos, raiz) if mlflow else None
-    return {"ctx": ctx, "resumo": resumo, "tabela": tabela, "historico": hist, "caminhos": caminhos, "run_id": run_id}
+    run_id, aviso_mlflow = (registrar_mlflow_sem_interromper(tabela, resumo, ctx, cfg, caminhos, raiz, ambiente)
+                            if mlflow else (None, None))
+    return {"ctx": ctx, "resumo": resumo, "tabela": tabela, "historico": hist, "caminhos": caminhos,
+            "run_id": run_id, "aviso_mlflow": aviso_mlflow}
 
 
 def main(argv: list[str] | None = None) -> int:

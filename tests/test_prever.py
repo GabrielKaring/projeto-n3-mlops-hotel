@@ -158,3 +158,67 @@ def test_demonstracao_e_gravada_fora_da_conferencia(modelo, cfg, tmp_path):
     caminho = prever.salvar_demonstracao(r, {"cycle_id": "c5", "data_version": "dv5"}, tmp_path)
     assert caminho.name == "demonstracao_c5.csv" and not caminho.name.startswith("previsoes_")
     assert len(pd.read_csv(caminho)) == 2
+
+
+# ------------------------------------------------------------------------------------- entrada inválida (demonstração)
+
+def _reserva_exemplo() -> dict:
+    return prever.ler_reservas(RAIZ / "exemplos" / "reserva_exemplo.json")[0]
+
+
+def test_numero_em_texto_e_convertido_e_texto_invalido_e_recusado(modelo, cfg):
+    base = prever.prever_reserva(_reserva_exemplo(), modelo, cfg=cfg)
+    como_texto = prever.prever_reserva(_reserva_exemplo() | {"adr": "110.5", "agent": "9"}, modelo, cfg=cfg)
+    assert como_texto["prob_cancelamento"].iloc[0] == pytest.approx(base["prob_cancelamento"].iloc[0])
+    with pytest.raises(ValueError, match=r"'adr' deve ser numérico.*posição \[1\].*'cento e dez'"):
+        prever.prever_reserva(_reserva_exemplo() | {"adr": "cento e dez"}, modelo, cfg=cfg)
+    with pytest.raises(ValueError, match="'agent' deve ser numérico"):     # opcional: null vale, texto não
+        prever.prever_reserva(_reserva_exemplo() | {"agent": "nove"}, modelo, cfg=cfg)
+
+
+def test_campo_obrigatorio_vazio_e_recusado(modelo, cfg):
+    with pytest.raises(ValueError, match=r"obrigatórios sem valor: \['lead_time'\]"):
+        prever.prever_reserva(_reserva_exemplo() | {"lead_time": None}, modelo, cfg=cfg)
+
+
+def test_data_impossivel_e_recusada_com_a_posicao(modelo, cfg):
+    reservas = [_reserva_exemplo(), _reserva_exemplo() | {"arrival_date_day_of_month": 31}]   # 31 de setembro
+    with pytest.raises(ValueError, match=r"Data de chegada impossível.*\[2\].*dia 31 de September de 2017"):
+        prever.prever_reserva(reservas, modelo, cfg=cfg)
+    with pytest.raises(ValueError, match="inteiros"):
+        prever.prever_reserva(_reserva_exemplo() | {"arrival_date_day_of_month": 15.5}, modelo, cfg=cfg)
+
+
+def test_categoria_desconhecida_em_campo_critico_e_recusada(modelo, cfg):
+    assert set(cfg["inferencia"]["recusar_desconhecida"]) == {"hotel", "deposit_type"}
+    with pytest.raises(ValueError, match=r"campo crítico.*'hotel' = 'Hotel Central'.*City Hotel, Resort Hotel"):
+        prever.prever_reserva(_reserva_exemplo() | {"hotel": "Hotel Central"}, modelo, cfg=cfg)
+    with pytest.raises(ValueError, match="'deposit_type' = 'XYZ'"):
+        prever.prever_reserva(_reserva_exemplo() | {"deposit_type": "XYZ"}, modelo, cfg=cfg)
+
+
+def test_categoria_desconhecida_nos_demais_campos_sai_com_aviso(modelo, cfg):
+    reservas = [_reserva_exemplo(), _reserva_exemplo() | {"meal": "Café", "customer_type": "VIP"}]
+    r = prever.prever_reserva(reservas, modelo, cfg=cfg)
+    assert r["aviso"].iloc[0] == ""
+    assert "'meal' = 'Café'" in r["aviso"].iloc[1] and "'customer_type' = 'VIP'" in r["aviso"].iloc[1]
+    assert "AVISO na reserva 2" in prever.descrever(r) and "AVISO na reserva 1" not in prever.descrever(r)
+
+
+def test_dominio_da_config_cobre_os_valores_do_treino(cfg):
+    """Os valores aceitos são os do dataset: nenhuma reserva sintética dos testes é recusada ou avisada."""
+    reservas = gerar_reservas(300, 2016, 5, seed=11)
+    assert set(cfg["inferencia"]["dominio_categorias"]) <= set(cfg["features"]["categoricas"])
+    assert prever.verificar_categorias(reservas, cfg) == [""] * len(reservas)
+
+
+def test_cli_entrada_invalida_da_mensagem_sem_traceback(modelo, cfg, tmp_path, capsys):
+    _projeto_com_vigente(tmp_path, modelo, cfg)
+    for alteracao, trecho in [({"adr": "abc"}, "deve ser numérico"),
+                              ({"arrival_date_day_of_month": 31}, "Data de chegada impossível"),
+                              ({"hotel": "Hotel Central"}, "campo crítico")]:
+        entrada = tmp_path / "invalida.json"
+        entrada.write_text(json.dumps(_reserva_exemplo() | alteracao))
+        assert prever.main(["--json", str(entrada)], raiz=tmp_path) == 1
+        erro = capsys.readouterr().err
+        assert erro.startswith("ERRO:") and trecho in erro and "Traceback" not in erro

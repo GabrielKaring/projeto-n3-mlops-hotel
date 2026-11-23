@@ -73,3 +73,7 @@ features:
     titulo: "Recurso adicional justificado (sugestão: monitoramento de drift com alerta)"
     dono: ["Lucas", "Guilherme"]
     artefatos: ["src/drift.py", "tests/test_drift.py", "docs/f10_drift.md", "evidencias/drift/"]
+
+features_por_commit:
+  db0c217: [F7]   # Diego · "Implementar workflow MLOps completo" (.github/workflows/pipeline_mlops.yml, docs/f7_workflow.md)
+  ab04e71: [F8]   # Diego · "Implementa promoção e previsões do modelo vigente" (src/promocao.py, notebooks 04 e 05)

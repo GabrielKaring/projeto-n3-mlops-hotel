@@ -6,19 +6,19 @@ _Gerado em 23/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. N�
 
 | Integrante | Commits | Primeiro | Último | Linhas + | Linhas − |
 |---|---:|---|---|---:|---:|
-| Gabriel Karing | 22 | 2026-11-04 | 2026-11-23 | 15,828 | 11,376 |
+| Gabriel Karing | 23 | 2026-11-04 | 2026-11-23 | 16,479 | 11,584 |
 | Vinicius | 15 | 2026-11-23 | 2026-11-23 | 1,440 | 198 |
+| Lucas | 4 | 2026-11-23 | 2026-11-23 | 2,335 | 9 |
 | Gabriel Wendorff | 3 | 2026-11-19 | 2026-11-19 | 1,497 | 39 |
-| Lucas | 3 | 2026-11-23 | 2026-11-23 | 2,311 | 4 |
 | Diego | 2 | 2026-11-19 | 2026-11-19 | 11,338 | 99 |
 | Guilherme | 2 | 2026-11-21 | 2026-11-21 | 840 | 5 |
 | José | 1 | 2026-11-19 | 2026-11-19 | 6,022 | 35 |
 
-Total: 48 commits de 7 integrante(s).
+Total: 50 commits de 7 integrante(s).
 
 ## Visão por feature
 
-Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo autor é o dono da feature em `config/equipe.yaml`; "de apoio" são os de outras pessoas na mesma feature.
+Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo autor é o dono da feature em `config/equipe.yaml`; "de apoio" são os de outras pessoas na mesma feature. Commits sem a tag entram pela lista `features_por_commit` do mesmo arquivo.
 
 | Feature | Título | Dono | Commits do dono | Commits de apoio | Situação |
 |---|---|---|---:|---:|---|
@@ -28,8 +28,8 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | F4 | Votação e eleição das features | Gabriel Karing | 2 | 0 | ✅ com commits do dono |
 | F5 | Treinamento dos dois algoritmos | Gabriel Wendorff | 3 | 1 | ✅ com commits do dono |
 | F6 | MLflow e rastreabilidade | José | 1 | 2 | ✅ com commits do dono |
-| F7 | Workflow único e agendamento | Diego | 0 | 4 | ⬜ sem commits do dono |
-| F8 | Eleição, promoção e previsões | Diego | 0 | 1 | ⬜ sem commits do dono |
+| F7 | Workflow único e agendamento | Diego | 1 | 4 | ✅ com commits do dono |
+| F8 | Eleição, promoção e previsões | Diego | 1 | 1 | ✅ com commits do dono |
 | F9 | Repositório, relatório e evidências | Vinicius | 7 | 3 | ✅ com commits do dono |
 | F10 | Recurso adicional justificado (sugestão: monitoramento de drift com alerta) | Lucas, Guilherme | 5 | 2 | ✅ com commits do dono |
 
@@ -38,7 +38,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | Integrante | Features | Commits nas próprias features |
 |---|---|---:|
 | Gabriel Karing | F1, F2, F3, F4 | 9 |
-| Diego | F7, F8 | 0 |
+| Diego | F7, F8 | 2 |
 | Gabriel Wendorff | F5 | 3 |
 | Guilherme | F10 | 2 |
 | José | F6 | 1 |
@@ -84,6 +84,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 
 #### F7 · Workflow único e agendamento
 
+- `db0c217` 2026-11-19 · Diego · Implementar workflow MLOps completo _(sem tag; feature atribuída em `config/equipe.yaml`)_
 - `bbf243f` 2026-11-23 · Vinicius · [F7] agendamento temporário de hora em hora para gerar os ciclos antes da entrega
 - `f983062` 2026-11-23 · Vinicius · [F7] corrige o tamanho do estado no doc depois da compressão
 - `67523ef` 2026-11-23 · Vinicius · [F7] agendamento temporário a cada 10 min
@@ -91,6 +92,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 
 #### F8 · Eleição, promoção e previsões
 
+- `ab04e71` 2026-11-19 · Diego · Implementa promoção e previsões do modelo vigente _(sem tag; feature atribuída em `config/equipe.yaml`)_
 - `e443c57` 2026-11-23 · Gabriel Karing · [F2][F8] demonstração de uso com reserva nova e análise de erros
 
 #### F9 · Repositório, relatório e evidências
@@ -168,6 +170,8 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | 2026-11-23 | `9412c30` | Lucas | [F10] teste que confere o passo do drift no workflow | 1 |
 | 2026-11-23 | `3848cc7` | Lucas | [F10] evidências do drift nos oito lotes de 2017 com a regra atual | 27 |
 | 2026-11-23 | `2f7af11` | Lucas | [F10] aponta o teste do workflow e as evidências locais no f10_drift.md | 1 |
+| 2026-11-23 | `0b89602` | Lucas | [docs] regenera o histórico de desenvolvimento | 1 |
+| 2026-11-23 | `4be6246` | Gabriel Karing | [docs][F8][F10] ajustes do code review: uso do teste, validação da demonstração, drift sem travar no MLflow e versões fixas | 20 |
 
 ## Contribuições de Gabriel Karing
 
@@ -193,6 +197,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `acd6f6f` 2026-11-23 · [F9] relatório, README e evidências do Actions na main
 - `201b7c5` 2026-11-23 · [F9] regenera o histórico de desenvolvimento
 - `75b71fb` 2026-11-23 · [F9] introdução, título com as duas disciplinas e G0 resolvido
+- `4be6246` 2026-11-23 · [docs][F8][F10] ajustes do code review: uso do teste, validação da demonstração, drift sem travar no MLflow e versões fixas
 
 ## Contribuições de Gabriel Wendorff
 
@@ -237,3 +242,4 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `9412c30` 2026-11-23 · [F10] teste que confere o passo do drift no workflow
 - `3848cc7` 2026-11-23 · [F10] evidências do drift nos oito lotes de 2017 com a regra atual
 - `2f7af11` 2026-11-23 · [F10] aponta o teste do workflow e as evidências locais no f10_drift.md
+- `0b89602` 2026-11-23 · [docs] regenera o histórico de desenvolvimento

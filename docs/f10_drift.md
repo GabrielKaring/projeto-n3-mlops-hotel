@@ -77,6 +77,8 @@ O passo já está no `.github/workflows/pipeline_mlops.yml`, entre o notebook 01
 
 Com `--sem-mlflow`, só gera os arquivos e o alerta.
 
+Se a gravação no MLflow falhar (banco SQLite travado, erro ao copiar artefato), o passo não para o ciclo: a falha vira `::warning` no Actions (ou `AVISO` no terminal), o `run_id` fica vazio e o fluxo segue para o notebook 02. As evidências de `evidencias/drift/` são gravadas antes, então o resultado do monitoramento não se perde. O teste `test_falha_no_mlflow_vira_aviso_e_nao_interrompe_o_ciclo` cobre esse caso.
+
 ## Como rodar localmente
 
 ```bash

@@ -24,7 +24,7 @@ Situação em 23/11/2026, na `main`.
 | G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | ✅ passou | |
 | G7 | Workflow e agendamento | Diego | G6 | ✅ passou | |
 | G8 | Promoção e previsões | Diego | G5, G6 | ✅ passou | |
-| G9 | Repositório, relatório e evidências | Vinicius | todos | ✅ passou | Regenerar o `HISTORICO_DESENVOLVIMENTO.md` depois do último commit |
+| G9 | Repositório, relatório e evidências | Vinicius | todos | ✅ passou | |
 | G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | ✅ passou | |
 | GF | Teste integrado final | Todos | todos | ✅ passou | |
 
@@ -37,7 +37,7 @@ Ordem do trabalho: `G1 → G2 → G3 → G4 → G5 → G8 → G9 → GF`. G6 e G
 - [x] Grupo com até 5 integrantes, ou exceção confirmada pelo professor: exceção confirmada, e o grupo segue com 7.
 - [x] Repositório acessível ao professor: é público.
 - [x] Todos os integrantes com acesso de escrita: 7 contas com escrita no repositório (o dono e 6 colaboradores), o mesmo número de integrantes. Conferido pela API do GitHub em 23/11/2026.
-- [x] Commits de cada pessoa com o nome de `config/equipe.yaml` ou com linha no `.mailmap`. O Lucas ainda não tem commit.
+- [x] Commits de cada pessoa com o nome de `config/equipe.yaml` ou com linha no `.mailmap`: os 7 integrantes têm commits no `HISTORICO_DESENVOLVIMENTO.md`. Os 2 commits do Diego sem a tag `[Fn]` (`db0c217` e `ab04e71`) entram em F7 e F8 pela lista `features_por_commit` do `config/equipe.yaml`.
 - [x] Sem tokens, senhas, ambientes virtuais ou dados restritos versionados.
 - [x] Dados públicos, com fonte e licença indicadas.
 
@@ -48,7 +48,7 @@ Evidência: `docs/etapa1_problema_dados_avaliacao.md`.
 - [x] Tipo de problema escolhido e justificado.
 - [x] Fonte, licença, unidade de observação, alvo, atributos e limitações descritos.
 - [x] Métrica principal e direção definidas antes de treinar qualquer modelo.
-- [x] Partição cronológica, com teste reservado à avaliação final.
+- [x] Partição cronológica. O teste não entra no treino nem na seleção (features e A × B usam só o `dev`, com CV temporal); só é usado na comparação final vencedor × vigente, com a regra fixada antes, e na análise de erros (notebook 04). A avaliação de produção é a conferência do lote futuro no notebook 05 (relatório, seção 7).
 - [x] Forma de chegada de novos registros explicada.
 
 ## G2 · ETL e engenharia de atributos
@@ -123,7 +123,7 @@ Como funciona: [`f7_workflow.md`](f7_workflow.md).
 - [x] Seguir o README em ambiente limpo funciona (GF).
 - [x] Relatório em PDF com integrantes, dados, ETL, votação, modelos, promoção, fluxo, evidências, limitações e conclusões.
 - [x] Evidências do `schedule` e histórico do MLflow na `main` (`evidencias/actions/`).
-- [ ] `HISTORICO_DESENVOLVIMENTO.md` regenerado depois do último commit (`python scripts/gerar_historico.py`).
+- [x] `HISTORICO_DESENVOLVIMENTO.md` regenerado (`python scripts/gerar_historico.py`). Como o commit que o grava não entra nele, rode de novo depois do último commit da entrega.
 
 ## G10 · Recurso adicional
 

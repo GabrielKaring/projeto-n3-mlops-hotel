@@ -55,6 +55,35 @@ def carregar_modelo_vigente(cfg: dict, raiz: Path = RAIZ, manifesto: str | Path 
     return modelo, vigente
 
 
+def verificar_categorias(entrada: pd.DataFrame, cfg: dict) -> list[str]:
+    """Compara as categóricas da entrada com os valores do dataset (``inferencia.dominio_categorias``).
+
+    Valor desconhecido num campo de ``inferencia.recusar_desconhecida`` interrompe com erro; nos demais, vira
+    um aviso. Devolve um texto por reserva, na ordem da entrada (vazio quando não há aviso). Não muda nada no
+    ETL nem no treino.
+    """
+    regras = cfg.get("inferencia", {})
+    criticos = set(regras.get("recusar_desconhecida", []))
+    erros: list[str] = []
+    avisos: list[list[str]] = [[] for _ in range(len(entrada))]
+    for campo, validos in regras.get("dominio_categorias", {}).items():
+        if campo not in entrada.columns:
+            continue
+        aceitos = {str(v) for v in validos}
+        for i, valor in enumerate(entrada[campo].astype(str)):
+            if valor in aceitos:
+                continue
+            if campo in criticos:
+                erros.append(f"'{campo}' = '{valor}' na posição {i + 1}")
+            else:
+                avisos[i].append(f"'{campo}' = '{valor}' não aparece nos dados de treino")
+    if erros:
+        campos = sorted({e.split("'")[1] for e in erros})
+        aceitos = "; ".join(f"{c}: {', '.join(map(str, regras['dominio_categorias'][c]))}" for c in campos)
+        raise ValueError(f"Valor desconhecido em campo crítico ({'; '.join(erros)}). Aceitos: {aceitos}")
+    return ["; ".join(a) for a in avisos]
+
+
 def rotulo_risco(probabilidade: float, limiar: float = promocao.LIMIAR_CLASSE) -> str:
     return RISCO_ALTO if probabilidade >= limiar else RISCO_BAIXO
 
@@ -64,7 +93,9 @@ def prever_reserva(reservas: dict | list[dict] | pd.DataFrame, modelo=None, vige
     """Probabilidade de cancelamento de uma ou mais reservas novas. Uma linha por reserva, na ordem da entrada.
 
     Sem ``modelo``, carrega o vigente (``carregar_modelo_vigente``). Uma reserva que o ETL descartaria
-    (sem hóspedes ou com diária negativa) interrompe com erro, em vez de sumir da resposta.
+    (sem hóspedes ou com diária negativa) interrompe com erro, em vez de sumir da resposta. Campo obrigatório
+    vazio, texto num campo numérico, data impossível e valor desconhecido num campo crítico também interrompem
+    com ``ValueError``; valor desconhecido nas demais categóricas sai na coluna ``aviso``.
     """
     cfg = cfg or carregar_config()
     if modelo is None:
@@ -77,7 +108,8 @@ def prever_reserva(reservas: dict | list[dict] | pd.DataFrame, modelo=None, vige
     if entrada.empty:
         raise ValueError("Nenhuma reserva para prever")
 
-    limpo, rel = limpar_e_engenhar(entrada, cfg, inferencia=True)
+    limpo, rel = limpar_e_engenhar(entrada, cfg, inferencia=True)   # recusa campo ausente, não numérico ou data impossível
+    avisos = verificar_categorias(entrada, cfg)
     if rel["regras_dominio_removidas"]:
         posicoes = [i + 1 for i in rel["indices_removidos_dominio"]]
         raise ValueError(
@@ -92,6 +124,7 @@ def prever_reserva(reservas: dict | list[dict] | pd.DataFrame, modelo=None, vige
     saida["risco"] = [rotulo_risco(p) for p in saida["prob_cancelamento"]]
     saida["vigente_cycle_id"] = vigente.get("cycle_id")
     saida["vigente_modelo"] = vigente.get("modelo")
+    saida["aviso"] = avisos
     return saida.reset_index(drop=True)
 
 
@@ -121,6 +154,9 @@ def descrever(resultado: pd.DataFrame) -> str:
     linhas.append(f"Limiar: {_pct(primeira['limiar'], 0)} (a partir dele, risco alto; o mesmo corte da avaliação do modelo)")
     if primeira["vigente_cycle_id"]:
         linhas.append(f"Modelo vigente: {primeira['vigente_modelo']} do ciclo {primeira['vigente_cycle_id']}")
+    for r in resultado.itertuples(index=False):
+        if getattr(r, "aviso", ""):
+            linhas.append(f"AVISO na reserva {r.reserva}: {r.aviso}. A probabilidade pode não ser confiável; confira o valor.")
     return "\n".join(linhas)
 
 

@@ -84,3 +84,12 @@ def test_vencedor_vai_para_a_release_entre_o_04_e_o_05(passos):
 def test_permissoes_e_concorrencia(wf):
     assert wf["permissions"]["contents"] == "write"
     assert wf["concurrency"]["cancel-in-progress"] is False
+
+
+def test_instala_com_as_versoes_fixas(passos):
+    """O runner instala as versões testadas (constraints.txt), não a última release de cada biblioteca."""
+    comando = passos[_indice(passos, "pip install")]["run"]
+    assert "-r requirements.txt" in comando and "-c constraints.txt" in comando
+    fixas = {l.split("==")[0].lower() for l in (RAIZ / "constraints.txt").read_text(encoding="utf-8").splitlines()
+             if "==" in l and not l.startswith("#")}
+    assert {"pandas", "numpy", "scikit-learn", "mlflow", "pyarrow", "joblib", "nbconvert", "pytest"} <= fixas

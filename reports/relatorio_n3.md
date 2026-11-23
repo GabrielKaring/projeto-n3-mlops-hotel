@@ -40,9 +40,9 @@ O objetivo é prever, no momento da reserva, se ela vai ser cancelada. Com isso 
 Usamos o *Hotel Booking Demand* (Antonio, Almeida & Nunes, 2019, *Data in Brief*, licença CC BY): 119.390 reservas de dois hotéis em Portugal, com chegadas de jul/2015 a ago/2017. O alvo é `is_canceled`, com 37% de positivos.
 
 - **Métrica principal: F1 macro.** Com 63% contra 37%, a acurácia premiaria um modelo que ignora o cancelamento. O F1 macro pesa as duas classes igual. Acompanhamos também ROC-AUC, PR-AUC, acurácia balanceada, recall e precisão do cancelamento.
-- **Partição cronológica.** O teste é formado pelos últimos 20% de cada ciclo por data de chegada e só é usado na promoção. No desenvolvimento, a seleção de features e a competição usam `TimeSeriesSplit` com 4 folds.
+- **Partição cronológica.** O teste é formado pelos últimos 20% de cada ciclo por data de chegada e não entra no treino nem na seleção: a seleção de features e a competição entre A e B usam só o desenvolvimento, com `TimeSeriesSplit` de 4 folds. O teste só é usado na comparação final vencedor × vigente e na análise de erros (seção 7, onde explicamos por que isso respeita a regra do enunciado).
 - **Sem vazamento.** Tudo o que aprende com os dados (limites de outlier, escala, categorias) fica dentro do Pipeline e é ajustado só no treino. Há teste automático para isso.
-- **Colunas descartadas** por só existirem depois da reserva: `reservation_status`, `assigned_room_type`, `booking_changes` e `country` (o próprio artigo do dataset avisa que a nacionalidade costuma ser corrigida no check-in).
+- **Colunas descartadas** por só existirem depois da reserva: `reservation_status` e `reservation_status_date` (revelam o desfecho), `assigned_room_type`, `booking_changes` e `country` (o próprio artigo do dataset avisa que a nacionalidade costuma ser corrigida no check-in).
 
 Todas essas decisões foram fixadas antes de treinar qualquer modelo e estão em `docs/etapa1_problema_dados_avaliacao.md` e `config/config.yaml`.
 
@@ -153,6 +153,13 @@ Todo vencedor, promovido ou não, vai para a Release `modelos`. O `models/modelo
 
 O notebook 05 carrega o vigente com o pré-processamento e prevê o **próximo lote**, que ainda não participou de nenhuma escolha. Quando esse lote chega no ciclo seguinte, o próprio notebook confere as previsões com o rótulo real.
 
+**Uso do conjunto de teste.** O enunciado pede que o teste fique reservado à avaliação final e que as decisões recorrentes usem validação apropriada. O desenho atende a isso por quatro motivos:
+
+- **As decisões de modelagem não veem o teste.** A eleição das features (seção 3) e a escolha entre A e B (seção 4) usam só o desenvolvimento, com validação cruzada temporal. O teste não entra no treino nem na seleção.
+- **O teste é um holdout fora do tempo.** São as reservas mais recentes do ciclo, posteriores a tudo o que o candidato viu. O candidato chega ao teste já fechado, e a comparação com o vigente é a avaliação final dele.
+- **A regra foi fixada antes.** Piso de 0,60 e melhoria mínima de 0,005 estão no `config.yaml` desde antes do primeiro treino; o resultado no teste não ajusta nada, só aplica a regra. A análise de erros roda depois da decisão e não a influencia.
+- **A avaliação de produção é o lote futuro.** O que mede o modelo em uso de verdade é a conferência do notebook 05, com dados que não existiam no ciclo em que a previsão foi feita. Conferindo as previsões gravadas no Actions com o rótulo real dos lotes seguintes (o mesmo cálculo do notebook 05), o F1 macro foi de 0,716 em fev/2017, 0,765 em mar/2017, 0,756 em abr/2017 e 0,749 em mai/2017, na mesma faixa do teste.
+
 **Quando os lotes acabam.** Com o `schedule` diário, o último lote de 2017 entra em 27/11. Daí em diante o notebook 05 avisa que não há lote novo, mostra as últimas previsões feitas e mantém a demonstração da seção 8; os ciclos rodam sobre os mesmos dados e a decisão esperada é manter o vigente. O agendamento não foi alterado, para não mudar a simulação de chegada de dados.
 
 ### Matriz de confusão e análise de erros
@@ -176,7 +183,7 @@ Isso aponta onde investir: um limiar ajustado ao custo de cada erro, ou atributo
 
 ## 8. Demonstração de uso
 
-O uso final do modelo é responder, para uma reserva que acabou de entrar, qual a chance de ela ser cancelada. A entrada tem só o que se sabe no ato da reserva: sem o desfecho (`is_canceled`) e sem `assigned_room_type`, `booking_changes` e `reservation_status`. O ETL ganhou um modo inferência que aceita essa entrada e aplica exatamente as mesmas regras e atributos derivados do treino. O modelo é o vigente, carregado como no notebook 05.
+O uso final do modelo é responder, para uma reserva que acabou de entrar, qual a chance de ela ser cancelada. A entrada tem só o que se sabe no ato da reserva: sem o desfecho (`is_canceled`) e sem `assigned_room_type`, `booking_changes`, `reservation_status` e `reservation_status_date`. O ETL ganhou um modo inferência que aceita essa entrada e aplica exatamente as mesmas regras e atributos derivados do treino. O modelo é o vigente, carregado como no notebook 05.
 
 ```
 python -m src.prever --json exemplos/reservas_exemplo.json
@@ -191,6 +198,8 @@ Modelo vigente: B do ciclo 20261123T021937Z-gha45099413735-1
 ```
 
 A saída é do vigente do Actions (B do ciclo dv020), baixado da Release. As três reservas de exemplo (`exemplos/reservas_exemplo.json`) têm perfis diferentes. A primeira é de agência online no City Hotel, com 120 dias de antecedência e sem pedidos especiais; no histórico, reservas com esse perfil cancelaram 62% das vezes, contra 37% no geral. A segunda é de grupo, com depósito não reembolsável e um cancelamento anterior (no histórico, 99% das reservas *Non Refund* foram canceladas, o padrão contraintuitivo citado na seção 3). A terceira é de um hóspede que já voltou outras vezes, reservou direto, com vaga de garagem e dois pedidos especiais. A probabilidade a partir de 50% vira "risco alto", o mesmo corte usado na avaliação. A mesma demonstração roda no fim do notebook 05 em todo ciclo e fica em `evidencias/previsoes/demonstracao_<cycle_id>.csv`. Um teste automático confirma que mudar o `is_canceled` da entrada não muda a probabilidade.
+
+Entradas inválidas são recusadas com uma mensagem clara: campo obrigatório vazio, texto num campo numérico, data que não existe (31 de setembro) e valor desconhecido em `hotel` ou `deposit_type`, os campos em que um erro de digitação mais distorceria a resposta. Nas outras categóricas, um valor que o modelo não viu no treino gera um aviso junto da previsão, porque o one-hot o trataria como categoria rara sem avisar ninguém. Os valores aceitos ficam no `config.yaml` (`inferencia`) e só valem para a demonstração; o treino não muda.
 
 ## 9. Recurso adicional: monitoramento de drift com alerta
 
@@ -249,9 +258,9 @@ O pipeline cumpre o ciclo completo sem ninguém mexer: chega um lote novo, o ETL
 | Tabelas de votação, competição, drift e decisões | `evidencias/` |
 | Decisões e vigente | `models/modelo_vigente.json` na `estado-pipeline`; cópia em `models/modelo_vigente_actions.json` |
 | Cópia das evidências do Actions | `evidencias/actions/` (votos, drift, diagnóstico, previsões e histórico do MLflow) |
-| Demonstração de uso | `python -m src.prever --json exemplos/reserva_exemplo.json` |
+| Demonstração de uso | `python -m src.prever --json exemplos/reserva_exemplo.json --manifesto models/modelo_vigente_actions.json`, com o vigente baixado da Release (`models/LEIAME.md`) |
 | Histórico de desenvolvimento | `HISTORICO_DESENVOLVIMENTO.md` |
-| Testes | `python -m pytest -q` (207 testes) |
+| Testes | `python -m pytest -q` (219 testes) |
 
 As tabelas das seções 3, 4 e 9 e a análise de erros da seção 7 vêm de uma execução local com o mesmo código e os mesmos dados. Como a seed é fixa, os números batem com o Actions (o F1 do 1º ciclo é 0,731032199574 nos dois).
 

@@ -49,7 +49,8 @@ jobs:
           cache: pip
 
       - name: Instalar dependências
-        run: python -m pip install -r requirements.txt
+        # constraints.txt fixa as versões testadas: o runner não pega uma release nova de mlflow/pandas/sklearn no meio da semana
+        run: python -m pip install -r requirements.txt -c constraints.txt
 
       - name: Testes
         run: python -m pytest -q
@@ -118,7 +119,8 @@ jobs:
 
       - name: Monitoramento de drift (F10)
         # Logo depois do 01, para usar o mesmo cycle_id e data_version do ciclo. Alerta vira ::warning e resumo do job;
-        # não interrompe o fluxo (ver docs/f10_drift.md). Saídas em evidencias/drift/, publicadas no fim.
+        # não interrompe o fluxo (ver docs/f10_drift.md). Falha ao gravar o run 01_drift no MLflow também só vira ::warning
+        # (src/drift.py, registrar_mlflow_sem_interromper). Saídas em evidencias/drift/, publicadas no fim.
         run: python -m src.drift --historico
 
       - name: 02 - Seleção e votação de features
