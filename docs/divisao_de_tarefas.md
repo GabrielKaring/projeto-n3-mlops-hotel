@@ -18,7 +18,7 @@ Os donos de F5 a F10 são uma proposta até serem confirmados. A parte crítica 
 | **F4** | 4 · Votação e eleição | Gabriel Karing | `src/votacao.py`, seção F4 do `notebooks/02_votacao_features.ipynb` | ✅ pronto |
 | **F5** | 5 · Dois algoritmos disputam | Gabriel Wendorff | `src/modelagem.py`, `notebooks/03_treino_competicao.ipynb` | ✅ pronto |
 | **F6** | 6 · MLflow e rastreabilidade | José | `src/rastreio.py`, `config.yaml` (mlflow), seção F6 do `notebooks/02_votacao_features.ipynb`, `docs/f6_mlflow.md` | ✅ pronto (histórico persistido na branch `estado-pipeline`) |
-| **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml`, `scripts/executar_notebook.sh`, `docs/f7_workflow.md` | 🟨 ciclos e falha simulada rodaram no Actions; falta o 1º disparo pelo `schedule` |
+| **F7** | 7 · Workflow único e agendamento | Diego | `.github/workflows/pipeline_mlops.yml`, `scripts/executar_notebook.sh`, `docs/f7_workflow.md` | ✅ pronto (ciclos agendados e falha simulada no Actions) |
 | **F8** | 8 · Eleição, promoção e previsões | Diego | `src/promocao.py`, `notebooks/04_*`, `notebooks/05_*` | ✅ pronto (decisões em `models/modelo_vigente.json`, modelos na Release `modelos`) |
 | **F9** | 9 · Repositório, relatório e evidências | Vinicius | `README.md`, `reports/relatorio_n3.pdf`, `evidencias/` | ✅ pronto (`reports/relatorio_n3.pdf`) |
 | **F10** | 10 · Recurso adicional | Lucas e Guilherme | `src/drift.py`, `tests/test_drift.py`, `docs/f10_drift.md`, `evidencias/drift/` | ✅ pronto (passo no workflow logo depois do ETL) |

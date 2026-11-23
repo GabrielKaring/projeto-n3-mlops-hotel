@@ -22,7 +22,7 @@ Situação conferida em 22/11/2026, na `main`, depois das execuções no Actions
 | G4 | Votação | Gabriel Karing | G3 | ✅ passou | |
 | G5 | Dois algoritmos | Gabriel Wendorff | G4 | ✅ passou | |
 | G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | ✅ passou | |
-| G7 | Workflow e agendamento | Diego | G6 | 🟡 quase | Ciclos e falha simulada rodaram no Actions (#2 a #5); falta o 1º disparo pelo `schedule`, que o GitHub ainda não fez |
+| G7 | Workflow e agendamento | Diego | G6 | ✅ passou | |
 | G8 | Promoção e previsões | Diego | G5, G6 | ✅ passou | |
 | G9 | Repositório, relatório e evidências | Vinicius | todos | ✅ passou | |
 | G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | ✅ passou | Ajustar o `agent` para o alerta não disparar em todo lote (ver relatório) |
