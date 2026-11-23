@@ -22,7 +22,7 @@ Situação conferida em 05/11/2026, na branch `f3-selecao` (PR #1 ainda aberto).
 | G4 | Votação | Gabriel Karing | G3 | 🟡 parcial | Merge |
 | G5 | Dois algoritmos | Gabriel Wendorff | G4 | ⬜ não iniciado | Tudo |
 | G6 | MLflow, incluindo o registro de seleção e votação | José | G3, G4 | 🟡 parcial | Persistência no Actions (com F7), runs de F5 e F8, captura da interface |
-| G7 | Workflow e agendamento | Diego | G6 | 🟡 esqueleto | Agendamento, encadeamento, persistência |
+| G7 | Workflow e agendamento | Diego | G6 | 🟡 parcial | Merge na `main`, permissão de escrita e execuções reais (incluindo pelo `schedule`) |
 | G8 | Promoção e previsões | Diego | G5, G6 | 🟡 parcial | Modelos na Release e execução no Actions (com F7) |
 | G9 | Repositório, relatório e evidências | Vinicius | todos | 🟡 parcial | Relatório e evidências oficiais |
 | G10 | Recurso adicional | Lucas e Guilherme | G2, G7 | 🟡 em andamento | Rodar os testes, passo no workflow, execução real e relatório |
@@ -108,17 +108,17 @@ Evidência: `evidencias/mlflow/` (2 ciclos locais com `run_id`s). Detalhes em [`
 
 ## G7 · Workflow único e agendamento
 
-Evidência esperada: YAML, logs e link da execução no Actions.
+Evidência esperada: YAML, logs e link da execução no Actions. Como funciona: [`f7_workflow.md`](f7_workflow.md).
 
-- [ ] Só existe `.github/workflows/pipeline_mlops.yml`, com `schedule` e `workflow_dispatch`. **Hoje o `schedule` está comentado.**
-- [ ] Instala dependências e obtém dados e estado persistente.
-- [ ] Executa 01→02→03→04 em sequência, sem `--allow-errors`; o 05 pode rodar ao final.
-- [ ] Falha interrompe o fluxo e impede promoção indevida, com um teste real de falha.
-- [ ] Manifesto, modelo vigente e histórico são recuperados de armazenamento persistente.
-- [ ] Publica o pacote completo de resultados.
+- [x] Só existe `.github/workflows/pipeline_mlops.yml`, com `schedule` (diário, 09:00 UTC) e `workflow_dispatch` (verificado em `tests/test_workflow.py`).
+- [ ] Instala dependências e obtém dados e estado persistente. Implementado; falta rodar no Actions.
+- [x] Executa 01→02→03→04→05 em sequência, um notebook por passo, sem `--allow-errors` (verificado em `tests/test_workflow.py`).
+- [ ] Falha interrompe o fluxo e impede promoção indevida, com um teste real de falha. Implementado (entrada `falhar_em` do `workflow_dispatch`); falta a execução no Actions.
+- [ ] Manifesto, modelo vigente e histórico são recuperados de armazenamento persistente (branch `estado-pipeline` e Release `modelos`). Lógica simulada localmente em 3 execuções; falta rodar no Actions.
+- [ ] Publica o pacote completo de resultados. Implementado; falta rodar no Actions.
 - [ ] **Execução real pelo gatilho `schedule`.** A manual não substitui. **Hoje há 0 execuções no Actions.**
 
-> O `schedule` só dispara a partir da branch padrão, então o workflow precisa estar na `main`. O GitHub também pode atrasar os agendamentos: deixem folga antes da entrega.
+> O `schedule` só dispara a partir da branch padrão, então o workflow precisa estar na `main`. O GitHub também pode atrasar os agendamentos: deixem folga antes da entrega. O repositório precisa de *Workflow permissions* = "Read and write".
 
 ## G8 · Promoção e previsões
 

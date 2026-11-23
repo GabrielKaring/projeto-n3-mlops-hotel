@@ -1,31 +1,45 @@
-# Workflow ÚNICO do pipeline (enunciado, seção 2 e Etapa 7).
+# Workflow ÚNICO do pipeline (enunciado, seção 2 e Etapa 7). Feature F7: ver docs/f7_workflow.md.
 #
-# STATUS: esqueleto mínimo. Roda testes e o notebook 01. Ainda NÃO foi executado no GitHub Actions.
-# Feature F7 (critério 7): dono em config/equipe.yaml; completar conforme docs/divisao_de_tarefas.md.
+# Cada execução é um ciclo:
+#   recupera o estado -> libera 1 lote novo -> notebooks 01 a 04 -> envia o vencedor para a Release
+#   -> notebook 05 -> guarda o estado -> publica as evidências.
 #
-# Pendências da F7:
-#   1. Ativar `schedule` (o enunciado exige evidência de execução pelo gatilho agendado;
-#      workflow_dispatch serve só para depuração).
-#   2. Encadear os notebooks 02 -> 03 -> 04 (-> 05) quando estiverem prontos. Falha em qualquer um
-#      deve interromper o fluxo (comportamento padrão dos steps).
-#   3. Persistir o estado entre execuções (o runner é efêmero): manifesto dos lotes, histórico do MLflow
-#      e models/modelo_vigente.json. Sem isso, todo ciclo recomeça do zero.
-#   4. Simular a chegada de dados: `python -m src.ingestao --liberar 1` antes do notebook 01,
-#      persistindo o manifesto atualizado (item 3).
+# O runner é apagado no fim, então o estado vive fora dele:
+#   * branch `estado-pipeline`: mlflow_estado/ (F6), data/raw/manifest.json (lotes já incorporados),
+#     models/modelo_vigente.json (F8), evidencias/previsoes/ e os diagnósticos do ETL;
+#   * Release `modelos`: o vencedor de cada ciclo (models/registro/*.joblib), nunca apagado nem substituído.
+#
+# Requisito no repositório: Settings -> Actions -> General -> Workflow permissions = "Read and write".
 
 name: pipeline-mlops
 
 on:
+  schedule:
+    - cron: "0 9 * * *"          # todo dia às 09:00 UTC (06:00 em Brasília). O GitHub pode atrasar o disparo.
   workflow_dispatch:
-  # schedule:
-  #   - cron: "0 9 * * 1"   # exemplo: segundas às 09:00 UTC; conferir permissões e atrasos do Actions
+    inputs:
+      falhar_em:
+        description: "Simula uma falha antes deste notebook (demonstra que o fluxo para e nada é promovido)"
+        type: choice
+        default: nenhum
+        options: [nenhum, 01_etl, 02_votacao_features, 03_treino_competicao, 04_selecao_promocao, 05_previsoes]
 
 permissions:
-  contents: read
+  contents: write                # gravar na branch estado-pipeline e criar/enviar assets da Release
+
+concurrency:                     # o MLflow usa SQLite (um escritor por vez): nunca dois ciclos juntos
+  group: pipeline-mlops
+  cancel-in-progress: false
 
 jobs:
   pipeline:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_MODELOS: modelos
+      BRANCH_ESTADO: estado-pipeline
+      FALHAR_EM: ${{ inputs.falhar_em || 'nenhum' }}   # no schedule não há inputs: sempre "nenhum"
     steps:
       - uses: actions/checkout@v4
 
@@ -40,12 +54,147 @@ jobs:
       - name: Testes
         run: python -m pytest -q
 
-      - name: 01 - ETL
-        run: >
-          jupyter nbconvert --to notebook --execute notebooks/01_etl.ipynb
-          --output 01_executado.ipynb --output-dir evidencias/execucao
+      # ------------------------------------------------------------------ estado persistente
+      - name: Recuperar estado persistente
+        id: restaurar
+        run: |
+          set -euo pipefail
+          # Evidências de execuções locais versionadas na main não entram na conta dos ciclos do Actions.
+          rm -f evidencias/previsoes/previsoes_*-local.csv evidencias/etl/diagnostico_*-local.json
 
-      # TODO(F7): 02_votacao_features -> 03_treino_competicao -> 04_selecao_promocao -> 05_previsoes
+          set +e
+          git ls-remote --exit-code --heads origin "$BRANCH_ESTADO" > /dev/null
+          rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
+            git fetch --depth=1 origin "$BRANCH_ESTADO"
+            git archive --format=tar FETCH_HEAD | tar -xf -   # sobrepõe só os arquivos que o estado tem
+            echo "existe=true" >> "$GITHUB_OUTPUT"
+            echo "Estado recuperado de $BRANCH_ESTADO ($(git rev-parse --short FETCH_HEAD))."
+          elif [ "$rc" -eq 2 ]; then
+            echo "existe=false" >> "$GITHUB_OUTPUT"
+            echo "Primeira execução: $BRANCH_ESTADO ainda não existe."
+          else
+            echo "::error::Não foi possível consultar $BRANCH_ESTADO (código $rc). Parando para não sobrescrever o histórico."
+            exit "$rc"
+          fi
+
+      - name: Reconstituir os lotes já incorporados
+        # O manifesto recuperado lista os lotes que ciclos anteriores já liberaram. O checkout traz esses
+        # arquivos ainda em data/incoming/, então eles voltam para data/raw/ (o sha256 é conferido no ETL).
+        shell: python
+        run: |
+          import json, shutil
+          from pathlib import Path
+          manifesto = json.loads(Path("data/raw/manifest.json").read_text(encoding="utf-8"))
+          for lote in manifesto["lotes"]:
+              raw, incoming = Path("data/raw") / lote["arquivo"], Path("data/incoming") / lote["arquivo"]
+              if not raw.exists() and incoming.exists():
+                  shutil.move(incoming, raw)
+                  print("reconstituído:", lote["arquivo"])
+
+      - name: Baixar o modelo vigente da Release
+        run: |
+          set -euo pipefail
+          if [ ! -f models/modelo_vigente.json ]; then
+            echo "Sem manifesto do vigente: primeiro ciclo."
+            exit 0
+          fi
+          arquivo=$(python -c "import json; print((json.load(open('models/modelo_vigente.json', encoding='utf-8'))['vigente'] or {}).get('arquivo', ''))")
+          if [ -z "$arquivo" ]; then
+            echo "Manifesto sem vigente."
+            exit 0
+          fi
+          mkdir -p models/registro
+          gh release download "$RELEASE_MODELOS" --pattern "$arquivo" --dir models/registro
+          echo "vigente baixado: $arquivo"
+
+      - name: Simular a chegada de um lote novo
+        run: python -m src.ingestao --liberar 1
+
+      # ------------------------------------------------------------------ notebooks (falha interrompe o fluxo)
+      - name: 01 - ETL
+        run: bash scripts/executar_notebook.sh 01_etl
+
+      - name: 02 - Seleção e votação de features
+        run: bash scripts/executar_notebook.sh 02_votacao_features
+
+      - name: 03 - Treino e competição
+        run: bash scripts/executar_notebook.sh 03_treino_competicao
+
+      - name: 04 - Eleição e promoção
+        run: bash scripts/executar_notebook.sh 04_selecao_promocao
+
+      - name: Enviar o vencedor do ciclo para a Release
+        id: release
+        run: |
+          set -euo pipefail
+          cycle_id=$(python -c "import json; print(json.load(open('data/processed/ciclo_atual.json', encoding='utf-8'))['cycle_id'])")
+          shopt -s nullglob
+          arquivos=(models/registro/modelo_"${cycle_id}"_*.joblib)
+          if [ "${#arquivos[@]}" -eq 0 ]; then
+            echo "::error::O notebook 04 não guardou o vencedor do ciclo $cycle_id em models/registro/."
+            exit 1
+          fi
+          if ! gh release view "$RELEASE_MODELOS" > /dev/null 2>&1; then
+            gh release create "$RELEASE_MODELOS" --target "$GITHUB_SHA" --title "Modelos do pipeline" \
+              --notes "Vencedor de cada ciclo (F8), enviado pelo workflow (F7). Nenhum arquivo é apagado ou substituído."
+          fi
+          gh release upload "$RELEASE_MODELOS" "${arquivos[@]}"   # falha se o asset já existe: nunca substitui
+          printf 'enviado: %s\n' "${arquivos[@]}"
+
+      - name: 05 - Previsões
+        id: previsoes
+        run: bash scripts/executar_notebook.sh 05_previsoes
+
+      # ------------------------------------------------------------------ registro e publicação
+      - name: Exportar o histórico do MLflow
+        if: always() && steps.restaurar.outcome == 'success'
+        run: python -m src.rastreio
+
+      - name: Guardar estado persistente
+        # always(): o MLflow guarda também os runs de ciclos que falharam. Lotes, vigente e diagnósticos só
+        # são gravados se o ciclo chegou até a Release; senão o próximo ciclo refaz este a partir do estado anterior.
+        if: always() && steps.restaurar.outcome == 'success'
+        env:
+          ESTADO_EXISTE: ${{ steps.restaurar.outputs.existe }}
+          CICLO_OK: ${{ steps.release.outcome == 'success' }}
+          PREVISOES_OK: ${{ steps.previsoes.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          E="$RUNNER_TEMP/estado-salvar"
+          if [ "$ESTADO_EXISTE" = "true" ]; then
+            git fetch --depth=1 origin "$BRANCH_ESTADO"
+            git worktree add --detach "$E" FETCH_HEAD
+          else
+            git worktree add --orphan -b "$BRANCH_ESTADO" "$E"
+          fi
+
+          if [ -d mlflow_estado ]; then
+            rm -rf "$E/mlflow_estado" && cp -a mlflow_estado "$E/"
+          fi
+          if [ "$CICLO_OK" = "true" ]; then
+            mkdir -p "$E/data/raw" "$E/models" "$E/evidencias/etl"
+            cp data/raw/manifest.json "$E/data/raw/"
+            cp models/modelo_vigente.json "$E/models/"
+            cp evidencias/etl/diagnostico_*.json "$E/evidencias/etl/"
+          fi
+          if [ "$PREVISOES_OK" = "true" ] && [ -d evidencias/previsoes ]; then
+            mkdir -p "$E/evidencias"
+            rm -rf "$E/evidencias/previsoes" && cp -a evidencias/previsoes "$E/evidencias/"
+          fi
+
+          cycle_id=$(python -c "import json; print(json.load(open('data/processed/ciclo_atual.json', encoding='utf-8'))['cycle_id'])" 2> /dev/null || echo sem-ciclo)
+          cd "$E"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "O estado não mudou."
+            exit 0
+          fi
+          git commit -m "[estado] ciclo $cycle_id (run $GITHUB_RUN_ID, ciclo completo: $CICLO_OK)"
+          git push origin "HEAD:refs/heads/$BRANCH_ESTADO"
 
       - name: Publicar evidências
         if: always()
@@ -55,4 +204,6 @@ jobs:
           path: |
             evidencias/
             data/processed/ciclo_atual.json
+            data/raw/manifest.json
+            models/modelo_vigente.json
           if-no-files-found: warn
