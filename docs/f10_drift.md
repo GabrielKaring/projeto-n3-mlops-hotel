@@ -45,7 +45,7 @@ Ficou a segunda (`drift.informativas: [agent]` no `config.yaml`, com a justifica
 
 Esta mudança foi feita **depois** de ver o resultado nos lotes reais, ao contrário do resto da regra. Por isso ela está registrada aqui, com o motivo e o teste das alternativas.
 
-Efeito nos 8 lotes de 2017 (execução local, mesmos dados do Actions): antes, todos davam alerta; agora são 5 alertas, cada um com outra causa (alvo ou outra feature), e 3 "atenção". A tabela lote a lote está na seção 9 do relatório.
+Efeito nos 8 lotes de 2017 (execução local, mesmos dados do Actions): antes, todos davam alerta; agora são 5 alertas, cada um com outra causa (alvo ou outra feature), e 3 "atenção". A tabela lote a lote está na seção 9 do relatório, e os arquivos de cada ciclo estão em [`evidencias/drift/`](../evidencias/drift/LEIAME.md).
 
 ## Ponto de integração
 
@@ -64,7 +64,7 @@ Um passo no workflow único, logo depois do notebook 01. Ele precisa vir depois 
 
 No Actions, o alerta aparece como `::warning` na página da execução e como tabela no resumo do job. Os arquivos ficam em `evidencias/drift/`, que o passo "Publicar evidências" já envia como artefato. A cópia das execuções do Actions está em [`evidencias/actions/drift/`](../evidencias/actions/drift/).
 
-O passo já está no `.github/workflows/pipeline_mlops.yml`, entre o notebook 01 e o 02.
+O passo já está no `.github/workflows/pipeline_mlops.yml`, entre o notebook 01 e o 02. O teste `test_drift_roda_no_workflow_entre_o_01_e_o_02_e_vai_para_as_evidencias` falha se ele sair desse lugar, parar o ciclo no alerta, deixar de gravar no MLflow ou deixar de ir para as evidências.
 
 ### Registro no MLflow
 
@@ -113,6 +113,7 @@ Cada linha da tabela por feature tem a coluna `no_status`: `False` para as featu
 - [x] `python -m pytest -q` executado e passando (inclui `tests/test_drift.py`).
 - [x] Passo no workflow, logo depois do notebook 01.
 - [x] Execução real com os lotes de 2017 no Actions; cópia das evidências em [`evidencias/actions/drift/`](../evidencias/actions/drift/).
+- [x] Execução local dos 8 lotes de 2017 com a regra atual, ciclo a ciclo, com o run `01_drift` no MLflow: [`evidencias/drift/`](../evidencias/drift/LEIAME.md).
 - [x] Registro no MLflow: run `01_drift` com PSI por feature, variação do alvo e status (ajuste de 23/11/2026).
 - [x] `agent` fora do status geral, com justificativa (ajuste de 23/11/2026).
 - [x] Seção no relatório: problema, justificativa, solução, ponto de integração e resultado.
