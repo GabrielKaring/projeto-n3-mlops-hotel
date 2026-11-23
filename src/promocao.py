@@ -21,7 +21,8 @@ Fluxo do notebook 05
   * Carrega o vigente pelo manifesto (o arquivo é o Pipeline completo da F5: pré-processamento,
     seleção das features eleitas e algoritmo).
   * Prevê o **próximo lote de** ``data/incoming``: reservas que ainda não entraram no pipeline e, por
-    isso, não participaram da escolha do modelo. Sem lote restante, o notebook só avisa e termina.
+    isso, não participaram da escolha do modelo. Sem lote restante, o notebook avisa e mostra as últimas
+    previsões feitas (``ultimas_previsoes``), sem gravar nada novo.
   * Confere as previsões de ciclos anteriores cujo lote já foi incorporado (o rótulo chegou).
 
 Falhas
@@ -310,6 +311,19 @@ def salvar_previsoes(previsoes: pd.DataFrame, ctx: dict, vigente: dict, raiz: Pa
         vigente_modelo=vigente["modelo"],
     ).to_csv(destino, index=False)
     return destino
+
+
+def ultimas_previsoes(raiz: Path = RAIZ) -> tuple[Path | None, pd.DataFrame | None]:
+    """As previsões gravadas pelo ciclo mais recente que ainda tinha lote futuro para prever.
+
+    Serve para o notebook 05 quando ``data/incoming`` já acabou: em vez de ficar sem nada para mostrar, ele
+    exibe (avisando) as últimas previsões feitas. O ``cycle_id`` começa pelo horário UTC, então a ordem
+    alfabética dos arquivos é a ordem cronológica.
+    """
+    arquivos = sorted(resolver(DIR_EVIDENCIAS_PREVISOES, raiz).glob("previsoes_*.csv"))
+    if not arquivos:
+        return None, None
+    return arquivos[-1], pd.read_csv(arquivos[-1])
 
 
 def conferir_previsoes_anteriores(cfg: dict, raiz: Path = RAIZ) -> pd.DataFrame:

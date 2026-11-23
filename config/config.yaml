@@ -141,6 +141,15 @@ promocao:
   piso_metrica: 0.60             # abaixo disso, nunca promove
   manifesto: models/modelo_vigente.json
 
+# Matriz de confusão e análise de erros no teste do ciclo (notebook 04, src/analise_erros.py).
+# Só descreve onde o modelo em uso erra; não entra na eleição nem na regra de promoção acima.
+analise_erros:
+  grupos: [hotel, market_segment, deposit_type, customer_type, distribution_channel]
+  faixas_lead_time: [0, 7, 30, 90, 180, 365]   # dias de antecedência; a última faixa é aberta (365+)
+  min_reservas_grupo: 100        # valores com menos reservas no teste viram "outros"
+  n_destaques: 5                 # grupos com maior taxa de erro listados no json e no notebook
+  dir_evidencias: evidencias/promocao
+
 # ---------------------------------------------------------------------------
 # Etapa 6 — MLflow e rastreabilidade (José, feature F6)
 # ---------------------------------------------------------------------------

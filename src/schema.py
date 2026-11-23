@@ -21,6 +21,19 @@ COLUNAS_BRUTAS = [
 
 ALVO = "is_canceled"
 
+# Colunas que só existem depois da reserva (alterações, check-in ou desfecho). O ETL as descarta antes do modelo,
+# então uma reserva nova, no modo inferência, pode chegar sem elas.
+COLUNAS_POS_RESERVA = ["assigned_room_type", "booking_changes", "reservation_status", "reservation_status_date"]
+
+# Campos que podem faltar numa reserva nova: o ETL já trata o ausente como "não informado"
+# (country -> "UNK", agent -> "SEM_AGENTE", company -> tem_empresa = 0, children -> 0).
+COLUNAS_OPCIONAIS_RESERVA = ["country", "agent", "company", "children"]
+
+# O que uma reserva nova precisa trazer no modo inferência: tudo o que se sabe no ato da reserva.
+COLUNAS_RESERVA = [
+    c for c in COLUNAS_BRUTAS if c not in (ALVO, *COLUNAS_POS_RESERVA, *COLUNAS_OPCIONAIS_RESERVA)
+]
+
 
 def construir_data_chegada(df: pd.DataFrame) -> pd.Series:
     """Monta a data de chegada a partir de ano, mês (nome em inglês) e dia.
