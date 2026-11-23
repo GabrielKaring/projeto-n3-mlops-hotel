@@ -126,8 +126,9 @@ Resultado nos ciclos executados no GitHub Actions (os valores são F1 macro no t
 | [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) | falha simulada | n/a | n/a | B do #2 | nada promovido; fluxo parou no 03 |
 | [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735) | dv020 (+ fev/2017) | 17.403 | B · 0,7433 | 0,7231 | **promovido** (+0,020) |
 | [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) | dv021 (+ mar/2017) | 18.392 | B · 0,7366 | 0,7415 | **mantido** (não supera o vigente) |
+| [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`) | dv022 (+ abr/2017) | 19.444 | B · 0,7488 | 0,7517 | **mantido** (não supera o vigente) |
 
-O vigente de cada ciclo foi baixado da Release e reavaliado no teste novo, por isso o valor dele muda de um ciclo para o outro. No #5 a regra funcionou como deveria: o candidato era bom, mas não melhor que o vigente, então o vigente ficou. Os `run_id` de cada decisão estão no `models/modelo_vigente.json` da `estado-pipeline` (por exemplo `af11ab357d164c78af5d99db1ef3ef5f` para a promoção do #4 e `8834b7a20af8415f9ee2aa434a8dd42a` para a manutenção do #5).
+O vigente de cada ciclo foi baixado da Release e reavaliado no teste novo, por isso o valor dele muda de um ciclo para o outro. No #5 e no #6 a regra funcionou como deveria: o candidato era bom, mas não melhor que o vigente, então o vigente ficou. A #6 foi disparada pelo `schedule`, sem ninguém mexer. Os `run_id` de cada decisão estão no `models/modelo_vigente.json` da `estado-pipeline` (por exemplo `af11ab357d164c78af5d99db1ef3ef5f` para a promoção do #4 e `8834b7a20af8415f9ee2aa434a8dd42a` para a manutenção do #5).
 
 Todo vencedor, promovido ou não, vai para a Release `modelos`. O `models/modelo_vigente.json` guarda o vigente e o histórico de decisões, com versão dos dados, features, métricas, `run_id` e motivo.
 
@@ -145,7 +146,7 @@ O notebook 05 carrega o vigente com o pré-processamento e prevê o **próximo l
 
 No Actions, o alerta aparece como `::warning` e como tabela no resumo do job. A regra foi fixada antes de rodar nos dados (`docs/f10_drift.md`).
 
-**Resultado:** no lote de jan/2017 a taxa de cancelamento subiu de 24,8% para 34,0% (+9,2 p.p.) em relação a jan/2016, e o alerta disparou.
+**Resultado:** no lote de jan/2017 a taxa de cancelamento subiu de 24,8% para 34,0% (+9,2 p.p.) em relação a jan/2016, e o alerta disparou. Na execução agendada [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830), o lote de abr/2017 veio com 43,5% contra 38,0% em abr/2016 (+5,5 p.p.), e o alerta apareceu como `::warning` e no resumo do job, junto com o PSI alto de `adr`, `agent` e `valor_estimado_estadia`.
 
 ![Taxa de cancelamento de cada lote contra a referência. Círculo vermelho = alerta.](img/drift_historico.png)
 
@@ -156,17 +157,17 @@ No Actions, o alerta aparece como `::warning` e como tabela no resumo do job. A 
 - **Recall do cancelamento.** No teste, o B acerta 90% quando diz "vai cancelar", mas só pega 46% dos cancelamentos, com o corte em 0,5. Ajustar o limiar ao custo de cada erro do hotel ficou fora do escopo.
 - **Teste fixo por ciclo.** A promoção usa o teste do ciclo atual. Com teste de poucos meses, diferenças de 0,005 podem ser ruído; por isso existe a melhoria mínima, mas ela não substitui um teste estatístico.
 - **Generalização.** São só dois hotéis, em um país, antes de 2018.
-- **Agendamento.** Os ciclos da tabela da seção 7 foram disparados pelo `workflow_dispatch`, que usa exatamente o mesmo workflow. O `schedule` está configurado (diário às 06:00 de Brasília), mas o GitHub não garante o horário dos disparos agendados, e no dia da preparação da entrega eles atrasaram várias horas. As execuções agendadas aparecem na aba Actions com o evento `schedule`.
+- **Agendamento.** O `schedule` roda todo dia às 06:00 de Brasília, mas o GitHub não garante o horário: no dia da preparação da entrega os disparos atrasaram várias horas. Por isso os ciclos #2 a #5 foram disparados à mão (`workflow_dispatch`, mesmo workflow), e a #6 já veio do `schedule`.
 
 ## 10. Conclusão
 
-O pipeline cumpre o ciclo completo sem ninguém mexer: chega um lote novo, o ETL é refeito, as features são eleitas de novo, os dois modelos competem, tudo é registrado no MLflow e um modelo novo só entra se ganhar do atual pelas regras definidas antes. Nos ciclos executados, a regra promoveu quando houve ganho e manteve quando não houve. A Random Forest venceu sempre, com F1 macro de 0,73 a 0,74 no teste. O monitoramento de drift confirmou a mudança de comportamento em 2017, mas precisa de ajuste fino para não alarmar à toa.
+O pipeline cumpre o ciclo completo sem ninguém mexer: chega um lote novo, o ETL é refeito, as features são eleitas de novo, os dois modelos competem, tudo é registrado no MLflow e um modelo novo só entra se ganhar do atual pelas regras definidas antes. Nos ciclos executados, a regra promoveu quando houve ganho e manteve quando não houve. A Random Forest venceu sempre, com F1 macro de 0,73 a 0,75 no teste. O monitoramento de drift confirmou a mudança de comportamento em 2017, mas precisa de ajuste fino para não alarmar à toa.
 
 ## Evidências
 
 | O quê | Onde |
 |---|---|
-| Execuções no Actions | [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506), [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) (falha simulada), [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735), [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) e as agendadas seguintes |
+| Execuções no Actions | [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506), [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) (falha simulada), [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735), [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641), [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (agendada) e as agendadas seguintes |
 | Estado entre ciclos | branch `estado-pipeline` |
 | Modelos de cada ciclo | Release `modelos` |
 | Evidências de cada execução | artefato `evidencias-<run_id>` de cada execução |
