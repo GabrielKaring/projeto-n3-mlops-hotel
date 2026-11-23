@@ -1,0 +1,3 @@
+cycle_id,data_version,etapa,run_id,status,inicio,origem,decisao,metrics.features_com_0_votos,metrics.features_com_1_votos,metrics.features_com_2_votos,metrics.features_com_3_votos,metrics.n_features_candidatas,metrics.n_features_eleitas
+20261119T182807Z-local,dv018-f95c3940,02_votacao,0aa32b5f87d044dfaa4fbef64b94fbeb,FINISHED,2026-11-19 18:29:03.849000+00:00,local,,36.0,23.0,13.0,4.0,76.0,17.0
+20261119T182922Z-local,dv019-aa1a1287,02_votacao,06391ee83b804ecb9d90ffee8b899e55,FINISHED,2026-11-19 18:30:08.577000+00:00,local,,39.0,20.0,13.0,5.0,77.0,18.0

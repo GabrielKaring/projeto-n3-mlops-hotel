@@ -16,7 +16,8 @@ env/
 data/processed/*
 !data/processed/.gitkeep
 
-# MLflow local (o histórico persistente é responsabilidade do critério 6)
+# MLflow (critério 6): o histórico fica em mlflow_estado/ e é persistido pelo workflow, não pela main
+mlflow_estado/
 mlruns/
 mlflow.db
 
