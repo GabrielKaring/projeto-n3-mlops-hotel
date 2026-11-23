@@ -45,6 +45,7 @@ ALGORITMOS = {
 NOME_RESULTADOS = "resultados_competicao.json"
 DIR_MODELOS = "models/candidatos"
 DIR_EVIDENCIAS = "evidencias/competicao"
+COMPRESSAO = 3
 
 
 class SeletorFeatures(TransformerMixin, BaseEstimator):
@@ -174,7 +175,9 @@ def salvar_modelos(pipelines: dict[str, Pipeline], ctx: dict, raiz: Path = RAIZ)
     caminhos = {}
     for nome, pipeline in pipelines.items():
         caminhos[nome] = destino / f"modelo_{nome}.joblib"
-        joblib.dump(pipeline, caminhos[nome])
+        # Comprimido (como em src.promocao): o B cai de ~50 MB para ~19 MB. O arquivo também vai para o MLflow,
+        # cujo histórico o workflow commita na branch de estado a cada ciclo, e o GitHub avisa acima de 50 MB por arquivo.
+        joblib.dump(pipeline, caminhos[nome], compress=COMPRESSAO)
     return caminhos
 
 
