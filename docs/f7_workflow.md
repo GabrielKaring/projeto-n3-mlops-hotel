@@ -50,7 +50,7 @@ O runner do Actions é apagado no fim de cada execução. O estado fica em dois 
 - As previsões só são gravadas se o notebook 05 terminou.
 - Na Release, nenhum asset é apagado ou substituído: o envio falha se o nome já existe.
 
-**Tamanho:** a decisão do grupo foi guardar `mlflow_estado/` inteiro, incluindo os `.joblib` que o notebook 03 anexa ao MLflow. O modelo B tem cerca de 51 MB sem compressão e cresce um pouco a cada lote, então a branch `estado-pipeline` aumenta cerca de 51 MB por ciclo. O GitHub avisa sobre arquivos acima de 50 MB e recusa acima de 100 MB.
+**Tamanho:** `mlflow_estado/` vai inteiro, incluindo os `.joblib` que o notebook 03 anexa ao MLflow. Os candidatos são salvos comprimidos (o B fica em uns 22 MB), então a branch `estado-pipeline` cresce perto de 22 MB por ciclo, abaixo do aviso de 50 MB por arquivo do GitHub.
 
 **Execuções locais:** as evidências `*-local` versionadas na `main` são ignoradas no runner, para não se misturarem com os ciclos do Actions.
 
