@@ -193,7 +193,93 @@
         "fim": "2017-02-28"
       },
       "run_id_promocao": "af11ab357d164c78af5d99db1ef3ef5f"
+    },
+    {
+      "cycle_id": "20261123T022405Z-gha45099857641-1",
+      "data_version": "dv021-ccc53eec",
+      "decidido_em": "2026-11-23T02:25:39Z",
+      "decisao": "mantido",
+      "motivo": "f1_macro 0.7366 contra 0.7415 do vigente: a diferença não alcança a melhoria mínima de 0.005 na direção 'maximizar'",
+      "regra": {
+        "metrica": "f1_macro",
+        "direcao": "maximizar",
+        "min_melhoria_abs": 0.005,
+        "piso_metrica": 0.6
+      },
+      "valor_vencedor": 0.7365563765837342,
+      "valor_vigente": 0.7415092148247725,
+      "candidato": {
+        "modelo": "B",
+        "algoritmo": "random_forest",
+        "params": {
+          "n_estimators": 300,
+          "max_depth": 16,
+          "min_samples_leaf": 5,
+          "class_weight": "balanced_subsample",
+          "n_jobs": -1
+        },
+        "seed": 42,
+        "features": [
+          "razao_cancel_previo",
+          "deposit_type_Non Refund",
+          "deposit_type_No Deposit",
+          "required_car_parking_spaces",
+          "total_of_special_requests",
+          "lead_time",
+          "previous_cancellations",
+          "agent_1",
+          "market_segment_Groups",
+          "hotel_City Hotel",
+          "mes_chegada",
+          "arrival_date_week_number",
+          "distribution_channel_Direct",
+          "agent_9",
+          "market_segment_Direct",
+          "total_noites",
+          "valor_estimado_estadia",
+          "customer_type_Transient",
+          "adr",
+          "stays_in_week_nights"
+        ],
+        "metricas_cv": {
+          "f1_macro": 0.7667283989334848,
+          "balanced_accuracy": 0.7544637925029476,
+          "recall_cancelamento": 0.5711970843883866,
+          "precision_cancelamento": 0.8447076924728244,
+          "roc_auc": 0.842225870105027,
+          "pr_auc": 0.8119454392377171
+        },
+        "metricas_teste": {
+          "f1_macro": 0.7365563765837342,
+          "balanced_accuracy": 0.7196263573973823,
+          "recall_cancelamento": 0.5025740025740025,
+          "precision_cancelamento": 0.8020539152759949,
+          "roc_auc": 0.8476989659490071,
+          "pr_auc": 0.7794007501457758
+        },
+        "arquivo": "modelo_20261123T022405Z-gha45099857641-1_B.joblib",
+        "run_id_treino": "06fbbb43cbf445b7b79f464f9663412e"
+      },
+      "vigente_anterior": {
+        "cycle_id": "20261123T021937Z-gha45099413735-1",
+        "modelo": "B",
+        "arquivo": "modelo_20261123T021937Z-gha45099413735-1_B.joblib",
+        "metricas_teste": {
+          "f1_macro": 0.7415092148247725,
+          "balanced_accuracy": 0.7248142113861562,
+          "recall_cancelamento": 0.5168918918918919,
+          "precision_cancelamento": 0.796875,
+          "roc_auc": 0.8479567216221291,
+          "pr_auc": 0.7821498641052476
+        }
+      },
+      "teste": {
+        "n": 18392,
+        "inicio": "2016-11-17",
+        "fim": "2017-03-31"
+      },
+      "run_id_promocao": "8834b7a20af8415f9ee2aa434a8dd42a"
     }
   ],
-  "atualizado_em": "2026-11-23T02:21:11Z"
+  "atualizado_em": "2026-11-23T02:25:39Z"
 }
