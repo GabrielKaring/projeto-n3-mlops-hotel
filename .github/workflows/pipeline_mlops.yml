@@ -16,6 +16,7 @@ name: pipeline-mlops
 on:
   schedule:
     - cron: "0 9 * * *"          # todo dia às 09:00 UTC (06:00 em Brasília). O GitHub pode atrasar o disparo.
+    - cron: "7 * * * *"           # TEMPORÁRIO (22/11): de hora em hora para gerar os 2 ciclos agendados antes da entrega. Remover depois.
   workflow_dispatch:
     inputs:
       falhar_em:
