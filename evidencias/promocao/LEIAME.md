@@ -7,6 +7,7 @@ Execução local em 19/11/2026: notebooks 01 → 05, liberação do lote `lote_2
 | `04_executado_ciclo1.ipynb` | Notebook 04 do ciclo 1 (primeiro ciclo, sem vigente) |
 | `04_executado_ciclo2.ipynb` | Notebook 04 do ciclo 2 (vencedor contra o vigente do ciclo 1) |
 | `decisao_<cycle_id>.json` | Decisão de cada ciclo: regra, métricas do vencedor e do vigente no teste, motivo, features, `run_id` |
+| `erros_<cycle_id>.json`, `erros_por_grupo_<cycle_id>.csv`, `matriz_confusao_<cycle_id>.png` | Matriz de confusão e análise de erros do modelo em uso, no teste do ciclo (gerados a partir de 23/11/2026; não existiam nesta execução de 19/11) |
 
 ## Regra
 
@@ -36,6 +37,6 @@ Os valores de vencedor e vigente são `f1_macro` no teste do ciclo.
 
 ## Limitações
 
-- Os dois ciclos rodaram localmente. A evidência oficial deve vir de ciclos agendados no Actions (gate GF).
+- Os dois ciclos rodaram localmente. As decisões dos ciclos do Actions, inclusive o agendado, estão no histórico de `models/modelo_vigente_actions.json`.
 - O teste do ciclo decide a promoção, então as previsões do notebook 05 são feitas no próximo lote de `data/incoming/`, que não participou da escolha. Ver `../previsoes/`.
 - O vigente é avaliado como foi salvo, sem retreino: no ciclo 2 ele tinha visto dados só até 23/09/2016, e o vencedor até 09/10/2016. Parte da vantagem do vencedor vem de ter visto dados mais recentes, o que é justamente o que a promoção deve premiar.

@@ -6,7 +6,6 @@ Mesma execução local de `../promocao/`, em 19/11/2026: dois ciclos, com a libe
 |---|---|
 | `05_executado_ciclo1.ipynb` | Notebook 05 do ciclo 1 |
 | `05_executado_ciclo2.ipynb` | Notebook 05 do ciclo 2, com a conferência das previsões do ciclo 1 |
-| `previsoes_<cycle_id>.csv` | Uma linha por reserva: `lote_id`, `linha_origem`, `arrival_date`, probabilidade de cancelamento, classe prevista, o ciclo e o vigente que previu |
 
 ## Onde as previsões são feitas
 
@@ -29,8 +28,16 @@ No ciclo 2, o `lote_2017-01` já tinha entrado no pipeline com o rótulo real, e
 |---|---|---|---|---|---|---|---|
 | ciclo 1 | `lote_2017-01` | 3.673 | 0,7514 | 0,8580 | 0,7977 | 0,5324 | 0,8110 |
 
+## Arquivos gerados a cada ciclo
+
+| Arquivo | Conteúdo |
+|---|---|
+| `previsoes_<cycle_id>.csv` | Previsões do próximo lote de `data/incoming/` |
+| `demonstracao_<cycle_id>.csv` | Demonstração de uso: as reservas novas de `exemplos/reservas_exemplo.json`, sem rótulo, com probabilidade e risco |
+
+Os CSVs de previsão desta execução local de 19/11 foram apagados: na pasta, a conferência do notebook 05 os confundiria com previsões do clone atual, e os números deles estão nas tabelas acima. As previsões dos ciclos do Actions estão em [`../actions/previsoes/`](../actions/previsoes/).
+
 ## Limitações
 
-- No último ciclo não sobra lote em `data/incoming/`. O notebook avisa e termina sem erro.
-- A conferência depende de as previsões anteriores estarem disponíveis. No Actions, `evidencias/previsoes/` precisa ser persistida entre execuções (F7).
-- Execução local. A evidência oficial deve vir de ciclos agendados no Actions (gate GF).
+- Depois de 8 ciclos não sobra lote em `data/incoming/`. O notebook avisa, mostra as últimas previsões feitas (com o ciclo que as gerou) e roda a demonstração com reservas novas; nada novo é gravado em `previsoes_*.csv`.
+- No Actions, `evidencias/previsoes/` é guardada na branch `estado-pipeline` entre execuções, para a conferência funcionar.

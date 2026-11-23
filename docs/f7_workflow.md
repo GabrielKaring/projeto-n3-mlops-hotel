@@ -11,7 +11,8 @@ Dono: Diego. Workflow em [`.github/workflows/pipeline_mlops.yml`](../.github/wor
 
 - O `schedule` só dispara a partir da branch padrão. O workflow precisa estar na `main`.
 - O GitHub pode atrasar ou pular disparos agendados em horários de pico. Deixem folga antes da entrega.
-- Cada execução libera 1 lote de `data/incoming/` (são 8, de jan a ago/2017). Com o disparo diário, os lotes acabam em cerca de 8 dias. Depois disso, os ciclos seguem rodando com os mesmos dados, e o notebook 05 avisa que não há lote para prever.
+- Cada execução libera 1 lote de `data/incoming/` (são 8, de jan a ago/2017). Com o disparo diário, o último lote (ago/2017) entra na execução de 27/11/2026, e a de 26/11 é a última com um lote futuro para prever. Depois disso, os ciclos seguem rodando com os mesmos dados; o notebook 05 avisa que não há lote novo, mostra as últimas previsões feitas e roda a demonstração com reservas novas (`src/prever.py`). A decisão esperada nesses ciclos é manter o vigente. O cron não foi alterado, para não mudar a simulação de chegada de dados; para mostrar um ciclo com lote novo depois de 27/11, rode um ciclo local (README, "Execução local").
+- As actions usam as versões com Node 24 (`actions/checkout@v7`, `actions/setup-python@v7`, `actions/upload-artifact@v7`), atualizadas em 23/11/2026 sem mudar a lógica dos passos.
 
 ## O que cada execução faz
 
