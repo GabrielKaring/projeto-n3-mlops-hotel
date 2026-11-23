@@ -7,13 +7,13 @@ _Gerado em 23/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. N�
 | Integrante | Commits | Primeiro | Último | Linhas + | Linhas − |
 |---|---:|---|---|---:|---:|
 | Gabriel Karing | 17 | 2026-11-04 | 2026-11-05 | 12,193 | 2,522 |
-| Vinicius | 10 | 2026-11-23 | 2026-11-23 | 1,112 | 39 |
+| Vinicius | 14 | 2026-11-23 | 2026-11-23 | 1,423 | 192 |
 | Gabriel Wendorff | 3 | 2026-11-19 | 2026-11-19 | 1,497 | 39 |
 | Diego | 2 | 2026-11-19 | 2026-11-19 | 11,338 | 99 |
 | Guilherme | 2 | 2026-11-21 | 2026-11-21 | 840 | 5 |
 | José | 1 | 2026-11-19 | 2026-11-19 | 6,022 | 35 |
 
-Total: 35 commits de 6 integrante(s).
+Total: 39 commits de 6 integrante(s).
 
 ## Visão por feature
 
@@ -27,9 +27,9 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | F4 | Votação e eleição das features | Gabriel Karing | 2 | 0 | ✅ com commits do dono |
 | F5 | Treinamento dos dois algoritmos | Gabriel Wendorff | 3 | 1 | ✅ com commits do dono |
 | F6 | MLflow e rastreabilidade | José | 1 | 2 | ✅ com commits do dono |
-| F7 | Workflow único e agendamento | Diego | 0 | 3 | ⬜ sem commits do dono |
+| F7 | Workflow único e agendamento | Diego | 0 | 4 | ⬜ sem commits do dono |
 | F8 | Eleição, promoção e previsões | Diego | 0 | 0 | ⬜ sem commits do dono |
-| F9 | Repositório, relatório e evidências | Vinicius | 4 | 0 | ✅ com commits do dono |
+| F9 | Repositório, relatório e evidências | Vinicius | 6 | 0 | ✅ com commits do dono |
 | F10 | Recurso adicional justificado (sugestão: monitoramento de drift com alerta) | Lucas, Guilherme | 2 | 1 | ✅ com commits do dono |
 
 ### Por integrante
@@ -42,9 +42,9 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | Guilherme | F10 | 2 |
 | José | F6 | 1 |
 | Lucas | F10 | 0 |
-| Vinicius | F9 | 4 |
+| Vinicius | F9 | 6 |
 
-12 commit(s) sem tag de feature (docs, equipe, correções).
+13 commit(s) sem tag de feature (docs, equipe, correções).
 
 #### F1 · Problema, dados e avaliação
 
@@ -85,6 +85,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `bbf243f` 2026-11-23 · Vinicius · [F7] agendamento temporário de hora em hora para gerar os ciclos antes da entrega
 - `f983062` 2026-11-23 · Vinicius · [F7] corrige o tamanho do estado no doc depois da compressão
 - `67523ef` 2026-11-23 · Vinicius · [F7] agendamento temporário a cada 10 min
+- `90272e1` 2026-11-23 · Vinicius · [F7] tira o agendamento temporário, fica só o diário
 
 #### F9 · Repositório, relatório e evidências
 
@@ -92,6 +93,8 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `5998018` 2026-11-23 · Vinicius · [F9] atualiza o README com agendamento, MLflow e previsões
 - `528715b` 2026-11-23 · Vinicius · [F9] script que gera o relatório em PDF a partir do markdown
 - `85e874c` 2026-11-23 · Vinicius · [F9] relatório final com os ciclos do Actions
+- `7b00b27` 2026-11-23 · Vinicius · [F9] regenera o histórico de desenvolvimento
+- `0178de1` 2026-11-23 · Vinicius · [F9] relatório com o ciclo agendado
 
 #### F10 · Recurso adicional justificado (sugestão: monitoramento de drift com alerta)
 
@@ -138,6 +141,10 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | 2026-11-23 | `67523ef` | Vinicius | [F7] agendamento temporário a cada 10 min | 1 |
 | 2026-11-23 | `85e874c` | Vinicius | [F9] relatório final com os ciclos do Actions | 5 |
 | 2026-11-23 | `e7a3b62` | Vinicius | [docs] atualiza o status das features e dos gates | 2 |
+| 2026-11-23 | `7b00b27` | Vinicius | [F9] regenera o histórico de desenvolvimento | 1 |
+| 2026-11-23 | `90272e1` | Vinicius | [F7] tira o agendamento temporário, fica só o diário | 1 |
+| 2026-11-23 | `0178de1` | Vinicius | [F9] relatório com o ciclo agendado | 2 |
+| 2026-11-23 | `0ff2b4c` | Vinicius | [docs] marca o G7 como passou | 2 |
 
 ## Contribuições de Gabriel Karing
 
@@ -191,3 +198,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `67523ef` 2026-11-23 · [F7] agendamento temporário a cada 10 min
 - `85e874c` 2026-11-23 · [F9] relatório final com os ciclos do Actions
 - `e7a3b62` 2026-11-23 · [docs] atualiza o status das features e dos gates
+- `7b00b27` 2026-11-23 · [F9] regenera o histórico de desenvolvimento
+- `90272e1` 2026-11-23 · [F7] tira o agendamento temporário, fica só o diário
+- `0178de1` 2026-11-23 · [F9] relatório com o ciclo agendado
+- `0ff2b4c` 2026-11-23 · [docs] marca o G7 como passou
