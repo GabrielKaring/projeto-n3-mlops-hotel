@@ -1,0 +1,93 @@
+{
+  "cycle_id": "20261123T204427Z-gha45262196574-1",
+  "data_version": "dv023-c0e59342",
+  "decidido_em": "2026-11-23T20:46:33Z",
+  "decisao": "mantido",
+  "motivo": "f1_macro 0.7546 contra 0.7512 do vigente: a diferen\u00e7a n\u00e3o alcan\u00e7a a melhoria m\u00ednima de 0.005 na dire\u00e7\u00e3o 'maximizar'",
+  "regra": {
+    "metrica": "f1_macro",
+    "direcao": "maximizar",
+    "min_melhoria_abs": 0.005,
+    "piso_metrica": 0.6
+  },
+  "valor_vencedor": 0.7546275204000943,
+  "valor_vigente": 0.7512290111975554,
+  "candidato": {
+    "modelo": "B",
+    "algoritmo": "random_forest",
+    "params": {
+      "n_estimators": 300,
+      "max_depth": 16,
+      "min_samples_leaf": 5,
+      "class_weight": "balanced_subsample",
+      "n_jobs": -1
+    },
+    "seed": 42,
+    "features": [
+      "razao_cancel_previo",
+      "deposit_type_Non Refund",
+      "deposit_type_No Deposit",
+      "required_car_parking_spaces",
+      "total_of_special_requests",
+      "lead_time",
+      "previous_cancellations",
+      "hotel_City Hotel",
+      "agent_1",
+      "market_segment_Groups",
+      "arrival_date_week_number",
+      "agent_9",
+      "adr",
+      "total_noites",
+      "customer_type_Transient",
+      "valor_estimado_estadia",
+      "stays_in_week_nights"
+    ],
+    "metricas_cv": {
+      "f1_macro": 0.7575257050218264,
+      "balanced_accuracy": 0.745421891438792,
+      "recall_cancelamento": 0.5663784781186982,
+      "precision_cancelamento": 0.807985521198347,
+      "roc_auc": 0.8427497339052217,
+      "pr_auc": 0.8051782300433135
+    },
+    "metricas_teste": {
+      "f1_macro": 0.7546275204000943,
+      "balanced_accuracy": 0.745620456184636,
+      "recall_cancelamento": 0.5922820860559733,
+      "precision_cancelamento": 0.7894823336072309,
+      "roc_auc": 0.8539908020963821,
+      "pr_auc": 0.8212784530123047
+    },
+    "arquivo": "modelo_20261123T204427Z-gha45262196574-1_B.joblib",
+    "run_id_treino": "0e9d23eb9cd84eb582cae3f7d7a3c250"
+  },
+  "vigente_anterior": {
+    "cycle_id": "20261123T021937Z-gha45099413735-1",
+    "modelo": "B",
+    "arquivo": "modelo_20261123T021937Z-gha45099413735-1_B.joblib",
+    "metricas_teste": {
+      "f1_macro": 0.7512290111975554,
+      "balanced_accuracy": 0.7414559782979607,
+      "recall_cancelamento": 0.5715694735544322,
+      "precision_cancelamento": 0.8048611111111111,
+      "roc_auc": 0.8506166335142957,
+      "pr_auc": 0.8192088152844896
+    }
+  },
+  "teste": {
+    "n": 20789,
+    "inicio": "2017-02-03",
+    "fim": "2017-05-31"
+  },
+  "analise_erros": {
+    "modelo_analisado": "vigente B do ciclo 20261123T021937Z-gha45099413735-1",
+    "n": 20789,
+    "verdadeiros_negativos": 11554,
+    "falsos_positivos": 1124,
+    "falsos_negativos": 3475,
+    "verdadeiros_positivos": 4636,
+    "taxa_erro": 0.22122276203761604,
+    "taxa_falso_positivo": 0.0886575169585108,
+    "taxa_falso_negativo": 0.4284305264455677
+  }
+}

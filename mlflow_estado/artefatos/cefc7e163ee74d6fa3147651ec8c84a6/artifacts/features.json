@@ -1,0 +1,21 @@
+{
+  "features": [
+    "razao_cancel_previo",
+    "deposit_type_Non Refund",
+    "deposit_type_No Deposit",
+    "required_car_parking_spaces",
+    "total_of_special_requests",
+    "lead_time",
+    "previous_cancellations",
+    "hotel_City Hotel",
+    "agent_1",
+    "market_segment_Groups",
+    "arrival_date_week_number",
+    "agent_9",
+    "adr",
+    "total_noites",
+    "customer_type_Transient",
+    "valor_estimado_estadia",
+    "stays_in_week_nights"
+  ]
+}
