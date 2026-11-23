@@ -4,7 +4,7 @@ Cada **feature** corresponde a um critério do enunciado (F1 = critério 1, ...,
 
 A fonte única de "quem é dono de quê" é [`config/equipe.yaml`](../config/equipe.yaml). O teste `tests/test_equipe.py` falha se alguma feature ficar sem dono ou se alguém passar de 4 (ou ficar com 0).
 
-> **Atenção:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. Com 7 pessoas, confirmem com o professor antes da entrega. Com 5 pessoas, basta remover dois integrantes de `equipe.yaml` e redistribuir.
+> **Tamanho do grupo:** o enunciado (capa) diz *"grupos de até 5 integrantes"*. A exceção foi confirmada com o professor, e o grupo segue com 7.
 
 ## Quem entrega o quê
 

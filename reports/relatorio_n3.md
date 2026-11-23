@@ -2,7 +2,21 @@
 
 **Trabalho N3 · Análise Preditiva** · Católica de Santa Catarina · Prof. Rodrigo Hagstrom · novembro de 2026
 
+**Projeto N3 · Aprendizagem de Máquina** · turma 8NA · novembro de 2026
+
 Repositório: [github.com/GabrielKaring/projeto-n3-mlops-hotel](https://github.com/GabrielKaring/projeto-n3-mlops-hotel)
+
+## Introdução
+
+Um hotel vende quartos sabendo que parte das reservas vai ser cancelada, mas não sabe quais. Se aceita reservas demais, recusa hóspede no balcão; se aceita de menos, fica com quarto vazio. Este trabalho constrói uma solução de aprendizagem de máquina que estima, no momento em que a reserva entra, a probabilidade de ela ser cancelada.
+
+**Objetivo.** Treinar e manter atualizado um classificador de cancelamento de reservas, a partir de um dataset público (*Hotel Booking Demand*), que possa ser usado com uma reserva nova e sem rótulo.
+
+**Quem usaria.** A gestão de receita e de reservas do hotel, para decidir o overbooking de cada data e quais reservas pedem depósito ou confirmação. A equipe de dados opera o pipeline e acompanha os ciclos.
+
+**Visão geral da solução.** Os dados chegam em lotes mensais. A cada ciclo, um workflow agendado no GitHub Actions refaz o ETL, elege as features pela votação de três métodos de seleção, faz uma regressão logística e uma Random Forest competirem, registra tudo no MLflow e só troca o modelo em uso se o novo ganhar dele por uma regra definida antes. Um monitoramento de drift avisa quando o perfil das reservas muda.
+
+**Organização do relatório.** A seção 1 define o problema, os dados e a avaliação; as seções 2 a 7 seguem o ciclo do pipeline (ETL, seleção e votação de features, algoritmos, MLflow, workflow, promoção e previsões, com a análise de erros); a 8 mostra o uso com uma reserva nova; a 9 traz o recurso adicional de drift; a 10 discute as limitações; e a 11 reúne a conclusão e as considerações finais.
 
 ## Integrantes e divisão
 
@@ -220,7 +234,7 @@ O `agent` continua com PSI acima de 0,25 nos oito lotes, agora marcado como info
 - **Agendamento.** O `schedule` roda todo dia às 06:00 de Brasília, mas o GitHub não garante o horário: no dia da preparação da entrega os disparos atrasaram várias horas. Por isso os ciclos #2 a #5 foram disparados à mão (`workflow_dispatch`, mesmo workflow), e a #6 já veio do `schedule`.
 - **Fim dos lotes simulados.** São só 8 lotes de 2017. Depois do último (27/11), os ciclos agendados rodam sem dado novo e sem lote futuro para prever (seção 7).
 
-## 11. Conclusão
+## 11. Conclusão e considerações finais
 
 O pipeline cumpre o ciclo completo sem ninguém mexer: chega um lote novo, o ETL é refeito, as features são eleitas de novo, os dois modelos competem, tudo é registrado no MLflow e um modelo novo só entra se ganhar do atual pelas regras definidas antes. Nos ciclos executados, a regra promoveu quando houve ganho e manteve quando não houve. A Random Forest venceu sempre, com F1 macro de 0,73 a 0,75 no teste. O monitoramento de drift confirmou a mudança de comportamento em 2017; depois de tirar o `agent` do status geral, o alerta deixou de disparar só por causa da troca de agências. Por fim, o modelo vigente pode ser usado com uma reserva nova, sem rótulo, pela linha de comando ou pelo notebook 05.
 

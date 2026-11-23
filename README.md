@@ -1,6 +1,11 @@
 # Projeto N3 · Pipeline MLOps para previsão de cancelamento de reservas
 
-Trabalho avaliativo N3 de **Análise Preditiva** (Católica de Santa Catarina, Eng. de Software e Eng. de IA, Prof. Rodrigo Hagstrom).
+O mesmo repositório é entregue para duas disciplinas:
+
+- **Análise Preditiva**, Trabalho avaliativo N3 (Católica de Santa Catarina, Eng. de Software e Eng. de IA, Prof. Rodrigo Hagstrom);
+- **Aprendizagem de Máquina**, projeto N3 da turma 8NA.
+
+**Objetivo:** prever, no momento em que a reserva entra, se ela vai ser cancelada, para que o hotel controle overbooking, peça depósito nas reservas de risco e planeje a ocupação real.
 
 Pipeline preditivo versionado e agendado que, a cada ciclo, incorpora dados novos, elege features por votação de três métodos, faz dois algoritmos competirem, registra tudo no MLflow e só promove um novo modelo se ele superar o vigente por uma regra definida antes.
 
