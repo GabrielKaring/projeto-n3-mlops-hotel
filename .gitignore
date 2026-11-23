@@ -24,3 +24,6 @@ mlflow.db
 evidencias/execucao/
 
 .DS_Store
+
+# Modelos treinados (o B passa de 50 MB). Onde eles persistem entre ciclos é decidido na F6/F7.
+models/candidatos/
