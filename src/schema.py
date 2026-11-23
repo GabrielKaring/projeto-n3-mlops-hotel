@@ -34,6 +34,15 @@ COLUNAS_RESERVA = [
     c for c in COLUNAS_BRUTAS if c not in (ALVO, *COLUNAS_POS_RESERVA, *COLUNAS_OPCIONAIS_RESERVA)
 ]
 
+# Campos de texto de uma reserva nova; todos os outros (inclusive agent, company e children) são numéricos.
+COLUNAS_TEXTO_RESERVA = [
+    "hotel", "arrival_date_month", "meal", "country", "market_segment", "distribution_channel",
+    "reserved_room_type", "deposit_type", "customer_type",
+]
+COLUNAS_NUMERICAS_RESERVA = [
+    c for c in COLUNAS_RESERVA + COLUNAS_OPCIONAIS_RESERVA if c not in COLUNAS_TEXTO_RESERVA
+]
+
 
 def construir_data_chegada(df: pd.DataFrame) -> pd.Series:
     """Monta a data de chegada a partir de ano, mês (nome em inglês) e dia.

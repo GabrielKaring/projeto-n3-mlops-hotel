@@ -327,6 +327,27 @@ def test_drift_e_registrado_no_mlflow_com_o_ciclo(tmp_path, cfg, banco_modelo):
         mlflow.end_run()
 
 
+def test_falha_no_mlflow_vira_aviso_e_nao_interrompe_o_ciclo(tmp_path, cfg, monkeypatch, capsys):
+    """O drift é informativo: se o run 01_drift não puder ser gravado, o passo termina e o ciclo segue."""
+    raiz = _projeto(tmp_path, {
+        "lote_2016-04": gerar_reservas(800, 2016, 4),
+        "lote_2017-04": gerar_reservas(800, 2017, 4),
+    })
+    manifesto = ingestao.carregar_manifesto(raiz / "data" / "raw" / "manifest.json")
+    salvar_contexto({"cycle_id": "20260101T000000Z-gha1-1", "data_version": ingestao.calcular_data_version(manifesto)},
+                    cfg, raiz)
+
+    def banco_travado(*args, **kwargs):
+        raise RuntimeError("database is locked")
+
+    monkeypatch.setattr(drift, "registrar_mlflow", banco_travado)
+    r = drift.executar(cfg, raiz=raiz, ambiente={"GITHUB_ACTIONS": "true"}, mlflow=True)
+
+    assert r["run_id"] is None and "database is locked" in r["aviso_mlflow"]
+    assert all(Path(c).is_file() for c in r["caminhos"].values())   # as evidências foram salvas antes
+    assert "::warning title=Drift sem MLflow::" in capsys.readouterr().out
+
+
 def test_metricas_do_lote_sem_referencia():
     resumo = {"alvo": None, "n_features_alerta": 0, "n_features_atencao": 0, "status": "sem_referencia"}
     assert drift.metricas_mlflow(pd.DataFrame(columns=drift.COLUNAS_TABELA), resumo) == {

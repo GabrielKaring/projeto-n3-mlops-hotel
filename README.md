@@ -53,7 +53,7 @@ Cada feature é um critério do enunciado e tem um dono, ou dois quando dividida
 | F5 | 5 · Dois algoritmos disputam | Gabriel Wendorff | ✅ pronto (testes + evidência em `evidencias/competicao/`) |
 | F6 | 6 · MLflow e rastreabilidade | José | ✅ pronto (histórico persistido entre execuções na branch `estado-pipeline`) |
 | F7 | 7 · Workflow único e agendamento | Diego | ✅ pronto (`schedule` + `workflow_dispatch`, ver [`docs/f7_workflow.md`](docs/f7_workflow.md)) |
-| F8 | 8 · Eleição, promoção e previsões | Diego | ✅ pronto (testes + decisões em `models/modelo_vigente.json`) |
+| F8 | 8 · Eleição, promoção e previsões | Diego | ✅ pronto (testes + decisões em `models/modelo_vigente.json`, gerado a cada ciclo; o do Actions está copiado em [`models/modelo_vigente_actions.json`](models/modelo_vigente_actions.json), ver [`models/LEIAME.md`](models/LEIAME.md)) |
 | F9 | 9 · Repositório, relatório e evidências | Vinicius | ✅ pronto ([`reports/relatorio_n3.pdf`](reports/relatorio_n3.pdf)) |
 | F10 | 10 · Recurso adicional (drift com alerta) | Lucas e Guilherme | ✅ pronto (passo do workflow logo depois do ETL, ver [`docs/f10_drift.md`](docs/f10_drift.md)) |
 
@@ -63,10 +63,10 @@ Definição de pronto, evidência e teste de cada feature: [`docs/divisao_de_tar
 
 ```bash
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements.txt -c constraints.txt
 ```
 
-Testado com Python 3.13, pandas 2.3, scikit-learn 1.9 e mlflow 3.18 (o que o `requirements.txt` instala em ambiente novo). O pandas está limitado a `<3` porque o mlflow 3.x exige isso; sem o teto o `pip install` trava. O workflow usa Python 3.12.
+O `constraints.txt` fixa as versões em que os testes e o pipeline passaram (Python 3.12, pandas 2.3.3, scikit-learn 1.9.1, mlflow 3.18.0, numpy 2.5.5), geradas com `pip freeze`. O workflow instala do mesmo jeito, então uma versão nova de alguma biblioteca não muda o resultado nem quebra o modelo salvo (o `joblib` do scikit-learn depende da versão). O `requirements.txt` continua com as faixas aceitas; o pandas está limitado a `<3` porque o mlflow 3.x exige isso.
 
 ## Execução local
 
@@ -75,7 +75,7 @@ python -m pytest -q                      # testes (ingestão, ETL, seleção de 
 python -m src.ingestao                   # registra lotes novos em data/raw e mostra data_version
 python -m src.ingestao --liberar 1       # simula a chegada do próximo lote mensal (data/incoming -> data/raw)
 python -m src.drift --historico          # drift do lote mais recente contra a referência (F10), saídas em evidencias/drift/ e run 01_drift no MLflow
-python -m src.prever --json exemplos/reserva_exemplo.json   # demonstração: uma reserva nova (precisa de um vigente, ver abaixo)
+python -m src.prever --json exemplos/reserva_exemplo.json   # demonstração: uma reserva nova (precisa de um vigente; num clone novo, ver 'Demonstração de uso')
 ```
 
 Um ciclo completo, na mesma ordem do workflow (os notebooks executados vão para `evidencias/execucao/`):
@@ -101,9 +101,15 @@ Os dados já estão no repositório, divididos em lotes mensais. Para regerá-lo
 
 O uso final do modelo é responder, para uma reserva que acabou de entrar, qual a chance de ela ser cancelada. A entrada é um JSON com os campos do dataset conhecidos no ato da reserva, **sem** o desfecho (`is_canceled`) e sem as colunas que só existem depois (`assigned_room_type`, `booking_changes`, `reservation_status`, `reservation_status_date`). `country`, `agent`, `company` e `children` são opcionais. Exemplos: [`exemplos/reserva_exemplo.json`](exemplos/reserva_exemplo.json) (uma reserva) e [`exemplos/reservas_exemplo.json`](exemplos/reservas_exemplo.json) (três).
 
+Num clone novo ainda não há vigente local. Para usar o do Actions, baixe o arquivo dele da Release `modelos` (precisa do [GitHub CLI](https://cli.github.com/) autenticado) e aponte o manifesto copiado:
+
 ```bash
-python -m src.prever --json exemplos/reservas_exemplo.json
+arquivo=$(python -c "import json; print(json.load(open('models/modelo_vigente_actions.json'))['vigente']['arquivo'])")
+gh release download modelos --pattern "$arquivo" --dir models/registro
+python -m src.prever --json exemplos/reservas_exemplo.json --manifesto models/modelo_vigente_actions.json
 ```
+
+Depois de rodar um ciclo local (seção anterior), o vigente local é usado sem `--manifesto`: `python -m src.prever --json exemplos/reservas_exemplo.json`.
 
 ```
 Reserva 1 (City Hotel, chegada 15/09/2017): chance de cancelamento 83,9% -> risco alto
@@ -115,7 +121,9 @@ Modelo vigente: B do ciclo 20261123T021937Z-gha45099413735-1
 
 A saída acima é do vigente do Actions (B do ciclo dv020). A reserva passa pelo mesmo ETL do treino, no modo inferência, e pelo vigente, carregado como no notebook 05 (`models/modelo_vigente.json` + o `Pipeline` completo em `models/registro/`). Em Python: `from src.prever import prever_reserva`.
 
-O vigente existe depois de um ciclo local (seção anterior). Para usar o vigente do Actions sem rodar um ciclo, siga [`models/LEIAME.md`](models/LEIAME.md). O notebook 05 também faz essa demonstração em todo ciclo e grava `evidencias/previsoes/demonstracao_<cycle_id>.csv`.
+Entradas inválidas são recusadas com uma mensagem, sem traceback: campo obrigatório vazio, texto num campo numérico (`"adr": "cento e dez"`; um número entre aspas, como `"110.5"`, é aceito), data que não existe (31 de setembro) e valor desconhecido em `hotel` ou `deposit_type` (`"hotel": "Hotel Central"`). Valor desconhecido nas outras categóricas (`meal`, `market_segment`, `customer_type` etc.) não interrompe, mas a reserva sai com um `AVISO`, porque o modelo não viu esse valor no treino. Os valores aceitos estão em `inferencia` no `config/config.yaml`.
+
+Mais detalhes sobre os manifestos em [`models/LEIAME.md`](models/LEIAME.md). O notebook 05 também faz essa demonstração em todo ciclo e grava `evidencias/previsoes/demonstracao_<cycle_id>.csv`.
 
 ## Estrutura
 
@@ -123,6 +131,7 @@ O vigente existe depois de um ciclo local (seção anterior). Para usar o vigent
 .github/workflows/pipeline_mlops.yml   workflow único (schedule + workflow_dispatch)
 config/config.yaml                     métrica, partição, ETL, votação, modelos, promoção, MLflow
 config/equipe.yaml                     dono de cada feature (F1..F10), validado por tests/test_equipe.py
+requirements.txt, constraints.txt      dependências e as versões fixas em que tudo foi testado
 data/raw/                              lotes incorporados (*.csv.gz) + manifest.json
 data/incoming/                         lotes futuros, liberados um a um para simular dados novos
 data/processed/                        saídas intermediárias do ciclo (não versionadas)
@@ -145,7 +154,7 @@ scripts/                               preparar_lotes.py, gerar_historico.py, ex
 
 ## Contrato entre notebooks
 
-O notebook 01 grava `data/processed/ciclo_atual.json` (com `cycle_id`, `data_version`, caminhos e colunas), `dev.parquet` e `teste.parquet`. Os demais apenas leem, via `src.config.carregar_contexto`. O conjunto de teste só é aberto na avaliação final. Cada ciclo carrega o mesmo `cycle_id` e `data_version` do começo ao fim.
+O notebook 01 grava `data/processed/ciclo_atual.json` (com `cycle_id`, `data_version`, caminhos e colunas), `dev.parquet` e `teste.parquet`. Os demais apenas leem, via `src.config.carregar_contexto`. O conjunto de teste não entra no treino nem na seleção (features e A × B usam só o `dev`, com validação cruzada temporal): ele só é usado no notebook 04, na comparação final vencedor × vigente, com a regra fixada antes no `config.yaml`, e na análise de erros. A avaliação de produção é a conferência das previsões do lote futuro no notebook 05 (relatório, seção 7). Cada ciclo carrega o mesmo `cycle_id` e `data_version` do começo ao fim.
 
 ## MLflow
 

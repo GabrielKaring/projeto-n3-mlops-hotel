@@ -150,6 +150,23 @@ analise_erros:
   n_destaques: 5                 # grupos com maior taxa de erro listados no json e no notebook
   dir_evidencias: evidencias/promocao
 
+# Demonstração de uso (src/prever.py): valores aceitos nas categóricas de uma reserva nova, os mesmos que
+# aparecem no dataset inteiro (2015-2017). Só valida a entrada da demonstração: não muda o ETL, o treino nem a
+# promoção. O one-hot do modelo aceita qualquer valor (vira "infrequent"), então um erro de digitação daria uma
+# probabilidade plausível e errada. Valor fora da lista: recusado nos campos críticos (o hotel define a
+# operação e o tipo de depósito é o atributo que mais muda a probabilidade); nos demais, a previsão sai com aviso.
+# `agent` fica de fora: são centenas de códigos e a carteira de agências se renova (ver drift.informativas).
+inferencia:
+  dominio_categorias:
+    hotel: [City Hotel, Resort Hotel]
+    meal: [BB, HB, FB, SC, Undefined]
+    market_segment: [Online TA, Offline TA/TO, Groups, Direct, Corporate, Complementary, Aviation, Undefined]
+    distribution_channel: [TA/TO, Direct, Corporate, GDS, Undefined]
+    reserved_room_type: [A, B, C, D, E, F, G, H, L, P]
+    deposit_type: [No Deposit, Non Refund, Refundable]
+    customer_type: [Transient, Transient-Party, Contract, Group]
+  recusar_desconhecida: [hotel, deposit_type]
+
 # ---------------------------------------------------------------------------
 # Etapa 6 — MLflow e rastreabilidade (José, feature F6)
 # ---------------------------------------------------------------------------

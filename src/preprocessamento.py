@@ -21,6 +21,7 @@ from src.config import RAIZ, resolver
 from src.schema import (
     ALVO,
     COLUNAS_BRUTAS,
+    COLUNAS_NUMERICAS_RESERVA,
     COLUNAS_OPCIONAIS_RESERVA,
     COLUNAS_POS_RESERVA,
     COLUNAS_RESERVA,
@@ -92,9 +93,57 @@ def completar_reserva_nova(df: pd.DataFrame) -> pd.DataFrame:
     for c in COLUNAS_OPCIONAIS_RESERVA:
         if c not in df.columns:
             df[c] = np.nan
-        elif c != "country":
-            df[c] = pd.to_numeric(df[c], errors="coerce")  # null do JSON vira NaN, como no CSV
+    vazios = [c for c in COLUNAS_RESERVA if df[c].isna().any()]
+    if vazios:
+        raise ValueError(f"Campos obrigatórios sem valor: {vazios}")
+    for c in COLUNAS_NUMERICAS_RESERVA:
+        df[c] = _converter_numerica(df[c])   # "110.5" vira 110.5; null do JSON nos opcionais vira NaN, como no CSV
+    _validar_data_chegada(df)
     return df
+
+
+def _posicoes(mascara: pd.Series) -> list[int]:
+    """Posições (a partir de 1) das reservas marcadas, na ordem da entrada."""
+    return [i + 1 for i, marcada in enumerate(mascara.to_numpy()) if marcada]
+
+
+def _converter_numerica(serie: pd.Series) -> pd.Series:
+    """Converte um campo numérico de reserva nova; texto que não é número interrompe com o campo e a posição."""
+    convertida = pd.to_numeric(serie, errors="coerce")
+    invalidas = convertida.isna() & serie.notna()
+    if invalidas.any():
+        exemplo = serie[invalidas].iloc[0]
+        raise ValueError(
+            f"O campo '{serie.name}' deve ser numérico (reserva(s) na posição {_posicoes(invalidas)}, "
+            f"valor recebido: {exemplo!r})"
+        )
+    return convertida
+
+
+def _validar_data_chegada(df: pd.DataFrame) -> None:
+    """Ano e dia inteiros e uma data que existe no calendário (31 de setembro, por exemplo, é recusado)."""
+    partes = df[["arrival_date_year", "arrival_date_day_of_month"]]
+    nao_inteiras = (partes % 1 != 0).any(axis=1)
+    if nao_inteiras.any():
+        raise ValueError(
+            f"Ano e dia da chegada devem ser números inteiros (reserva(s) na posição {_posicoes(nao_inteiras)})"
+        )
+    datas = pd.to_datetime(
+        pd.DataFrame({
+            "year": df["arrival_date_year"].to_numpy(),
+            "month": df["arrival_date_month"].map(MESES).to_numpy(),
+            "day": df["arrival_date_day_of_month"].to_numpy(),
+        }),
+        errors="coerce",
+    )
+    impossiveis = pd.Series(datas.isna().to_numpy())
+    if impossiveis.any():
+        i = impossiveis.to_numpy().argmax()
+        linha = df.iloc[i]
+        raise ValueError(
+            f"Data de chegada impossível na(s) posição(ões) {_posicoes(impossiveis)}: dia "
+            f"{linha['arrival_date_day_of_month']:g} de {linha['arrival_date_month']} de {linha['arrival_date_year']:g}"
+        )
 
 
 def diagnosticar(df: pd.DataFrame, colunas_numericas: list[str] | None = None) -> dict:
@@ -240,7 +289,7 @@ def dividir_temporal(df: pd.DataFrame, teste_fracao: float, coluna_tempo: str = 
     """Separa desenvolvimento (passado) e teste (futuro) cortando em uma data.
 
     O corte cai sempre na fronteira de um dia: nenhuma data aparece nos dois lados. Por isso a fração
-    de teste obtida é aproximada. O teste só deve ser usado na avaliação final do ciclo.
+    de teste obtida é aproximada. O teste não entra no treino nem na seleção; só na avaliação final do ciclo.
     """
     if not 0 < teste_fracao < 1:
         raise ValueError("teste_fracao deve estar entre 0 e 1")
@@ -268,7 +317,7 @@ def salvar_particoes(dev: pd.DataFrame, teste: pd.DataFrame, cfg: dict, raiz: Pa
 
 
 def carregar_particao(nome: str, cfg: dict, raiz: Path = RAIZ) -> pd.DataFrame:
-    """Lê ``dev`` ou ``teste``. O teste é reservado à avaliação final (notebooks 04 e 05)."""
+    """Lê ``dev`` ou ``teste``. O teste só é lido no notebook 04 (vencedor × vigente e análise de erros)."""
     if nome not in ("dev", "teste"):
         raise ValueError("nome deve ser 'dev' ou 'teste'")
     return pd.read_parquet(caminhos_particoes(cfg, raiz)[nome])
