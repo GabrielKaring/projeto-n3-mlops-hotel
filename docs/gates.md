@@ -15,7 +15,7 @@ Situação em 23/11/2026, na `main`.
 
 | Gate | O que cobre | Dono | Depende de | Situação | O que falta |
 |---|---|---|---|---|---|
-| G0 | Regras do grupo e do repositório | Todos | | 🟡 parcial | Confirmar com o professor o grupo de 7 e dar acesso ao repositório |
+| G0 | Regras do grupo e do repositório | Todos | | ✅ passou | |
 | G1 | Problema, dados e avaliação | Gabriel Karing | | ✅ passou | |
 | G2 | ETL e atributos | Gabriel Karing | G1 | ✅ passou | |
 | G3 | Três métodos de seleção | Gabriel Karing | G2 | ✅ passou | |
@@ -34,9 +34,9 @@ Ordem do trabalho: `G1 → G2 → G3 → G4 → G5 → G8 → G9 → GF`. G6 e G
 
 ## G0 · Regras do grupo e do repositório
 
-- [ ] Grupo com até 5 integrantes, ou exceção confirmada pelo professor. **Hoje são 7.**
-- [ ] Repositório acessível ao professor. **Hoje é privado.**
-- [ ] Todos os integrantes com acesso de escrita. **Hoje só há 2 colaboradores.**
+- [x] Grupo com até 5 integrantes, ou exceção confirmada pelo professor: exceção confirmada, e o grupo segue com 7.
+- [x] Repositório acessível ao professor: é público.
+- [x] Todos os integrantes com acesso de escrita: 7 contas com escrita no repositório (o dono e 6 colaboradores), o mesmo número de integrantes. Conferido pela API do GitHub em 23/11/2026.
 - [x] Commits de cada pessoa com o nome de `config/equipe.yaml` ou com linha no `.mailmap`. O Lucas ainda não tem commit.
 - [x] Sem tokens, senhas, ambientes virtuais ou dados restritos versionados.
 - [x] Dados públicos, com fonte e licença indicadas.
