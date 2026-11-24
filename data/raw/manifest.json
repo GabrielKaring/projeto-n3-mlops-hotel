@@ -207,6 +207,15 @@
       "chegada_min": "2017-05-01",
       "chegada_max": "2017-05-31",
       "incorporado_em": "2026-11-23T20:44:23Z"
+    },
+    {
+      "lote_id": "lote_2017-06",
+      "arquivo": "lote_2017-06.csv.gz",
+      "sha256": "a20c6e35b99052d7458fb8d3f758467fca87cb10fa2c3c3b7ac54da9c5be10a7",
+      "n_linhas": 5647,
+      "chegada_min": "2017-06-01",
+      "chegada_max": "2017-06-30",
+      "incorporado_em": "2026-11-24T19:49:25Z"
     }
   ]
 }
