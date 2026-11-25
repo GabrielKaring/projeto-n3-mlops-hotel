@@ -1,0 +1,81 @@
+{
+  "cycle_id": "20261125T185612Z-gha45679932790-1",
+  "data_version": "dv025-ac9d46fc",
+  "modelo_analisado": "vencedor B do ciclo 20261125T185612Z-gha45679932790-1",
+  "limiar": 0.5,
+  "matriz_confusao": {
+    "não cancelou": {
+      "não cancelou": 11445,
+      "cancelou": 1820
+    },
+    "cancelou": {
+      "não cancelou": 3639,
+      "cancelou": 6003
+    }
+  },
+  "n": 22907,
+  "verdadeiros_negativos": 11445,
+  "falsos_positivos": 1820,
+  "falsos_negativos": 3639,
+  "verdadeiros_positivos": 6003,
+  "taxa_erro": 0.23831143318636225,
+  "taxa_falso_positivo": 0.13720316622691292,
+  "taxa_falso_negativo": 0.3774113254511512,
+  "maiores_taxas_erro": [
+    {
+      "grupo": "market_segment",
+      "valor": "Online TA",
+      "n": 12849,
+      "taxa_cancelamento_real": 0.42532492800996186,
+      "taxa_cancelamento_prevista": 0.3692894388668379,
+      "falsos_positivos": 1639,
+      "falsos_negativos": 2359,
+      "taxa_erro": 0.3111526188808468,
+      "parcela_dos_erros": 0.7323685656713684
+    },
+    {
+      "grupo": "faixa_lead_time",
+      "valor": "180-364",
+      "n": 4894,
+      "taxa_cancelamento_real": 0.5259501430322844,
+      "taxa_cancelamento_prevista": 0.4070290151205558,
+      "falsos_positivos": 384,
+      "falsos_negativos": 966,
+      "taxa_erro": 0.2758479771148345,
+      "parcela_dos_erros": 0.24729803993405386
+    },
+    {
+      "grupo": "faixa_lead_time",
+      "valor": "30-89",
+      "n": 4565,
+      "taxa_cancelamento_real": 0.4039430449069003,
+      "taxa_cancelamento_prevista": 0.33997809419496167,
+      "falsos_positivos": 483,
+      "falsos_negativos": 775,
+      "taxa_erro": 0.2755750273822563,
+      "parcela_dos_erros": 0.2304451364718813
+    },
+    {
+      "grupo": "faixa_lead_time",
+      "valor": "7-29",
+      "n": 2988,
+      "taxa_cancelamento_real": 0.29484605087014726,
+      "taxa_cancelamento_prevista": 0.14156626506024098,
+      "falsos_positivos": 180,
+      "falsos_negativos": 638,
+      "taxa_erro": 0.2737617135207497,
+      "parcela_dos_erros": 0.1498442938267082
+    },
+    {
+      "grupo": "deposit_type",
+      "valor": "No Deposit",
+      "n": 20133,
+      "taxa_cancelamento_real": 0.34123081507971986,
+      "taxa_cancelamento_prevista": 0.25152734316793324,
+      "falsos_positivos": 1820,
+      "falsos_negativos": 3626,
+      "taxa_erro": 0.27050116723786816,
+      "parcela_dos_erros": 0.9976186114673017
+    }
+  ]
+}

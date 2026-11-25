@@ -1,0 +1,23 @@
+{
+  "features_eleitas": [
+    "deposit_type_Non Refund",
+    "deposit_type_No Deposit",
+    "razao_cancel_previo",
+    "required_car_parking_spaces",
+    "total_of_special_requests",
+    "lead_time",
+    "previous_cancellations",
+    "hotel_City Hotel",
+    "market_segment_Groups",
+    "customer_type_Transient",
+    "agent_1",
+    "distribution_channel_Direct",
+    "adr",
+    "agent_9",
+    "arrival_date_week_number",
+    "valor_estimado_estadia",
+    "stays_in_week_nights",
+    "total_noites",
+    "market_segment_Offline TA/TO"
+  ]
+}
