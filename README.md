@@ -125,6 +125,29 @@ Entradas inválidas são recusadas com uma mensagem, sem traceback: campo obriga
 
 Mais detalhes sobre os manifestos em [`models/LEIAME.md`](models/LEIAME.md). O notebook 05 também faz essa demonstração em todo ciclo e grava `evidencias/previsoes/demonstracao_<cycle_id>.csv`.
 
+## Interface de demonstração (Streamlit)
+
+Uma interface para apresentar o projeto funcionando, sem abrir notebooks:
+
+```bash
+pip install -r requirements-app.txt -c constraints.txt
+gh release download modelos --pattern "$(python -c "import json; print(json.load(open('models/modelo_vigente_actions.json'))['vigente']['arquivo'])")" --dir models/registro
+streamlit run app/streamlit_app.py
+```
+
+O segundo comando baixa o vigente do Actions (a interface também tem um botão para isso na barra lateral). Páginas:
+
+| Página | O que mostra |
+|---|---|
+| Visão geral | Problema, fluxo de um ciclo, números do Actions e divisão por feature |
+| Simular uma reserva | Formulário com uma reserva nova, chance de cancelamento pelo vigente (`src.prever`) e gráfico "e se…" variando antecedência, diária, depósito ou pedidos especiais |
+| Prever um lote futuro | O vigente prevê um lote de `data/incoming` e compara com o desfecho real: F1, ROC-AUC, matriz de confusão, previsto × real por semana e onde o modelo erra |
+| Ciclos e promoção | Decisões do manifesto, competição A × B na CV e vencedor × vigente no teste (cópia do MLflow do Actions) |
+| Seleção de features | Votos dos três métodos em cada ciclo e as features eleitas |
+| Monitoramento de drift | PSI por feature e variação da taxa de cancelamento de qualquer lote, calculados na hora (`src.drift`), e o histórico do Actions |
+
+A interface só lê: não move lotes, não treina e não grava nada versionado.
+
 ## Estrutura
 
 ```
@@ -148,6 +171,7 @@ mlflow_estado/                         histórico do MLflow: mlflow.db + artefat
 evidencias/                            diagnósticos, notebooks executados, drift, decisões, análise de erros e previsões
 evidencias/actions/                    cópia das evidências das execuções no GitHub Actions
 reports/relatorio_n3.pdf               relatório final
+app/streamlit_app.py                   interface de demonstração (Streamlit)
 scripts/                               preparar_lotes.py, gerar_historico.py, executar_notebook.sh, gerar_relatorio.py,
                                        copiar_evidencias_actions.py
 ```
