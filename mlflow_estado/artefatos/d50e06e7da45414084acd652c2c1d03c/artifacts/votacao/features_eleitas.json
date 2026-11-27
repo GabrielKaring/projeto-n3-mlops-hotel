@@ -1,0 +1,32 @@
+{
+  "cycle_id": "20261127T183646Z-gha46050568994-1",
+  "data_version": "dv026-707ae968",
+  "features_eleitas": [
+    "deposit_type_Non Refund",
+    "deposit_type_No Deposit",
+    "razao_cancel_previo",
+    "required_car_parking_spaces",
+    "total_of_special_requests",
+    "lead_time",
+    "previous_cancellations",
+    "market_segment_Groups",
+    "hotel_City Hotel",
+    "customer_type_Transient",
+    "agent_1",
+    "agent_9",
+    "distribution_channel_Direct",
+    "adr",
+    "arrival_date_week_number",
+    "valor_estimado_estadia",
+    "distribution_channel_TA/TO",
+    "total_noites",
+    "market_segment_Offline TA/TO"
+  ],
+  "n_features": 19,
+  "k_top": 20,
+  "regra_votacao": {
+    "min_votos": 2,
+    "desempate": "ranking_medio",
+    "min_features": 10
+  }
+}
