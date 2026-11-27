@@ -11,8 +11,8 @@ usam as mesmas funções do pipeline (``src.prever`` e ``src.promocao``).
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
+import urllib.request
 from datetime import date
 from pathlib import Path
 
@@ -34,6 +34,9 @@ from src.prever import prever_reserva  # noqa: E402
 from src.schema import MESES  # noqa: E402
 
 MANIFESTO = RAIZ / "models" / "modelo_vigente_actions.json"
+# A Release `modelos` é pública: o arquivo do vigente é baixado daqui quando não está em models/registro/
+# (num clone novo ou no Streamlit Community Cloud, já que models/registro/ não é versionado).
+URL_RELEASE = "https://github.com/GabrielKaring/projeto-n3-mlops-hotel/releases/download/modelos/"
 EVID = RAIZ / "evidencias" / "actions"
 MESES_NOME = {v: k for k, v in MESES.items()}
 MESES_PT = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
@@ -78,9 +81,17 @@ def ler_manifesto() -> dict:
     return json.loads(MANIFESTO.read_text(encoding="utf-8"))
 
 
-@st.cache_resource(show_spinner="Carregando o modelo…")
+@st.cache_resource(show_spinner="Carregando o modelo (na primeira vez, baixa uns 20 MB da Release do GitHub)…")
 def carregar_modelo():
-    return promocao.carregar_vigente(ler_manifesto(), RAIZ)
+    manifesto = ler_manifesto()
+    arquivo = (manifesto.get("vigente") or {}).get("arquivo")
+    destino = RAIZ / promocao.DIR_REGISTRO / arquivo if arquivo else None
+    if destino is not None and not destino.is_file():
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        temporario = destino.with_suffix(".parcial")
+        urllib.request.urlretrieve(URL_RELEASE + arquivo, temporario)
+        temporario.replace(destino)
+    return promocao.carregar_vigente(manifesto, RAIZ)
 
 
 @st.cache_data(show_spinner="Lendo as reservas…")
@@ -155,10 +166,11 @@ def taxa_por(df: pd.DataFrame, coluna: pd.Series | str, min_n: int = 200) -> pd.
 manifesto = ler_manifesto()
 vigente = manifesto.get("vigente") or {}
 modelo = None
+erro_modelo = ""
 try:
     modelo, vigente = carregar_modelo()
-except FileNotFoundError:
-    pass
+except (FileNotFoundError, OSError) as erro:  # sem internet ou arquivo ausente na Release
+    erro_modelo = str(erro)
 
 st.sidebar.title("Projeto N3")
 st.sidebar.caption("Quais reservas de hotel vão ser canceladas?")
@@ -178,26 +190,17 @@ with st.sidebar.container(border=True):
     st.markdown("**Modelo em uso**")
     st.caption(f"Random Forest, escolhido automaticamente em {data_br}, com dados até ago/2017.")
     if modelo is None:
-        st.error("Falta o arquivo do modelo.")
-        if st.button("Baixar o modelo", width="stretch"):
-            with st.spinner("Baixando da Release `modelos`…"):
-                r = subprocess.run(
-                    ["gh", "release", "download", "modelos", "--pattern", vigente["arquivo"],
-                     "--dir", str(RAIZ / "models" / "registro"), "--skip-existing"],
-                    capture_output=True, text=True, cwd=RAIZ,
-                )
-            if r.returncode == 0:
-                carregar_modelo.clear()
-                st.rerun()
-            else:
-                st.code(r.stderr or r.stdout)
+        st.error("Não foi possível baixar o modelo.")
+        if st.button("Tentar de novo", width="stretch"):
+            carregar_modelo.clear()
+            st.rerun()
 st.sidebar.caption("github.com/GabrielKaring/projeto-n3-mlops-hotel")
 
 
 def exigir_modelo() -> None:
     if modelo is None:
-        st.warning("Esta página precisa do arquivo do modelo. Use o botão **Baixar o modelo** na barra lateral, "
-                   "ou rode na raiz do projeto:")
+        st.warning(f"Esta página precisa do arquivo do modelo, que não pôde ser baixado ({erro_modelo}). "
+                   "Confira a internet e use **Tentar de novo** na barra lateral, ou rode na raiz do projeto:")
         st.code(f"gh release download modelos --pattern {vigente.get('arquivo')} --dir models/registro")
         st.stop()
 

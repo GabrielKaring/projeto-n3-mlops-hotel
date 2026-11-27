@@ -1,0 +1,11 @@
+# Dependências só da interface, para o Streamlit Community Cloud (ele usa este arquivo, ao lado do app, em vez do
+# requirements.txt da raiz, que instala também mlflow e o executor de notebooks). As versões são as do
+# constraints.txt: o modelo salvo com joblib só carrega com o mesmo scikit-learn com que foi treinado.
+streamlit==1.67.0
+altair==6.3.0
+pandas==2.3.3
+numpy==2.5.5
+scikit-learn==1.9.1
+scipy==1.18.1
+joblib==1.6.0
+PyYAML==6.0.4

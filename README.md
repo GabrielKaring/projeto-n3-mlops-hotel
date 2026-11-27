@@ -140,7 +140,7 @@ gh release download modelos --pattern "$(python -c "import json; print(json.load
 streamlit run app/streamlit_app.py
 ```
 
-O segundo comando baixa o vigente do Actions (a interface também tem um botão para isso na barra lateral). Páginas:
+O segundo comando baixa o vigente do Actions. Ele é opcional: se o arquivo não estiver em `models/registro/`, a interface baixa sozinha da Release pública `modelos` na primeira vez que abre. Páginas:
 
 | Página | O que mostra |
 |---|---|
@@ -152,6 +152,8 @@ O segundo comando baixa o vigente do Actions (a interface também tem um botão 
 | Alerta de mudança | Cancelamento de cada mês contra o mesmo mês do ano anterior, com os alertas; o PSI por variável fica em "Detalhes técnicos" |
 
 Cada página mostra poucos números, um gráfico e uma frase de conclusão; o que é técnico fica recolhido em "Detalhes técnicos". O tema claro e o modo headless vêm de `.streamlit/config.toml`.
+
+**Publicar no Streamlit Community Cloud** (gratuito, o app fica num link público): em [share.streamlit.io](https://share.streamlit.io), entre com a conta do GitHub, clique em *Create app* → *Deploy a public app from GitHub* e preencha repositório `GabrielKaring/projeto-n3-mlops-hotel`, branch `main` e arquivo `app/streamlit_app.py`. Em *Advanced settings*, escolha **Python 3.12**. O Cloud instala só o `app/requirements.txt` (sem mlflow nem o executor de notebooks), e o app baixa o modelo da Release na primeira visita.
 
 A interface só lê: não move lotes, não treina e não grava nada versionado. Para a apresentação, o [`docs/roteiro_apresentacao.md`](docs/roteiro_apresentacao.md) tem quem fala em cada slide, o checklist do dia com o plano B e as perguntas prováveis.
 
