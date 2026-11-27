@@ -17,7 +17,9 @@ Cada um deve conseguir explicar, sem o slide: o que a sua parte faz, por que foi
 
 ## Checklist do dia
 
-Na véspera, no computador que vai ser usado:
+A interface está publicada em **https://n3-cancelamento-hotel.streamlit.app**. É o jeito mais simples de apresentar: abre em qualquer navegador, sem instalar nada. Abra o link uns minutos antes, porque o Streamlit Cloud põe o app para dormir quando ninguém usa e ele leva um tempo para acordar.
+
+Para ter também a versão local como reserva, rode na véspera, no computador que vai ser usado:
 
 ```bash
 git pull                                              # main atualizada
@@ -34,7 +36,7 @@ streamlit run app/streamlit_app.py
 - Abra uma vez cada página da interface antes de apresentar: "Os dados", "O modelo acertou?" e "Alerta de mudança" leem todos os lotes na primeira vez (alguns segundos) e depois ficam em cache.
 - Com o modelo baixado, a interface não precisa de internet.
 
-**Plano B**, se a interface não abrir: rodar o `python -m src.prever` acima no terminal (é a mesma previsão). Se nem o Python funcionar, o slide 13 tem o print da interface e os resultados dos três exemplos.
+**Plano B**, se o link não abrir (internet ruim, por exemplo): rodar a interface local (`streamlit run app/streamlit_app.py`) ou o `python -m src.prever` acima no terminal, que dá a mesma previsão. Se nem o Python funcionar, o slide 13 tem o print da interface e os resultados dos três exemplos.
 
 ## Perguntas prováveis
 
