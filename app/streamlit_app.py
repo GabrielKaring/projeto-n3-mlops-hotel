@@ -39,10 +39,10 @@ MESES_NOME = {v: k for k, v in MESES.items()}
 MESES_PT = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
 VERMELHO, AZUL, VERDE, LARANJA = "#c62839", "#5c6bc0", "#2e7d32", "#ef6c00"
 
-st.set_page_config(page_title="N3 · Cancelamento de reservas", page_icon="🏨", layout="wide")
+st.set_page_config(page_title="N3 · Cancelamento de reservas", layout="wide")
 st.markdown("""<style>
 [data-testid="stMetricValue"] { font-size: 2.6rem; }
-.frase { font-size: 1.15rem; padding: .6rem 0 .2rem 0; }
+.frase { font-size: 1.2rem; font-weight: 600; padding: .6rem 0 .2rem 0; }
 </style>""", unsafe_allow_html=True)
 
 
@@ -65,7 +65,7 @@ def mes_pt(lote: str) -> str:
 
 def frase(texto: str) -> None:
     """A conclusão de cada gráfico, em destaque."""
-    st.markdown(f'<div class="frase">👉 {texto}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="frase">{texto}</div>', unsafe_allow_html=True)
 
 
 @st.cache_data
@@ -160,15 +160,15 @@ try:
 except FileNotFoundError:
     pass
 
-st.sidebar.title("🏨 Projeto N3")
+st.sidebar.title("Projeto N3")
 st.sidebar.caption("Quais reservas de hotel vão ser canceladas?")
 PAGINAS = {
-    "🏨 O projeto": "projeto",
-    "📊 Os dados": "dados",
-    "🔮 Testar uma reserva": "testar",
-    "✅ O modelo acertou?": "acertou",
-    "🔁 Como o modelo é escolhido": "escolha",
-    "🚨 Alerta de mudança": "alerta",
+    "O projeto": "projeto",
+    "Os dados": "dados",
+    "Testar uma reserva": "testar",
+    "O modelo acertou?": "acertou",
+    "Como o modelo é escolhido": "escolha",
+    "Alerta de mudança": "alerta",
 }
 pagina = PAGINAS[st.sidebar.radio("Navegação", list(PAGINAS), label_visibility="collapsed")]
 
@@ -219,15 +219,16 @@ def pagina_projeto() -> None:
               help="O modelo só é trocado quando o novo é melhor")
 
     st.subheader("Como funciona, todo dia, sem ninguém mexer")
-    etapas = [("📥", "Chegam dados novos", "Um mês de reservas por vez"),
-              ("🧹", "Preparação", "Tira o que só se sabe depois da reserva"),
-              ("🥊", "Dois modelos competem", "Regressão logística × Random Forest"),
-              ("🏆", "Só troca se melhorar", "Regra definida antes de treinar"),
-              ("🔮", "Previsões", "Para as reservas do mês seguinte")]
+    etapas = [("1", "Chegam dados novos", "Um mês de reservas por vez"),
+              ("2", "Preparação", "Tira o que só se sabe depois da reserva"),
+              ("3", "Dois modelos competem", "Regressão logística × Random Forest"),
+              ("4", "Só troca se melhorar", "Regra definida antes de treinar"),
+              ("5", "Previsões", "Para as reservas do mês seguinte")]
     cols = st.columns(len(etapas))
-    for col, (icone, titulo, texto) in zip(cols, etapas):
+    for col, (passo, titulo, texto) in zip(cols, etapas):
         with col.container(border=True):
-            st.markdown(f"### {icone}")
+            st.markdown(f'<div style="font-size:1.8rem;font-weight:700;color:#8A1F3A">{passo}</div>',
+                        unsafe_allow_html=True)
             st.markdown(f"**{titulo}**")
             st.caption(texto)
 
@@ -299,7 +300,7 @@ def pagina_dados() -> None:
         st.dataframe(vaz, width="content")
 
 
-EXEMPLOS = [("🌐 Reserva online, 120 dias antes", 0), ("👥 Grupo sem reembolso", 1), ("⭐ Hóspede fiel, reserva direta", 2)]
+EXEMPLOS = [("Reserva online, 120 dias antes", 0), ("Grupo sem reembolso", 1), ("Hóspede fiel, reserva direta", 2)]
 
 
 def pagina_testar() -> None:
@@ -507,7 +508,7 @@ def pagina_escolha() -> None:
         n = int(h["data_version"][2:5])
         linhas.append({"Mês novo": mes_pt(lotes[n - 1]), "Novo modelo": h.get("valor_vencedor"),
                        "Modelo em uso": h.get("valor_vigente"),
-                       "Decisão": "✅ trocou" if h["decisao"] == "promovido" else "⏸️ manteve"})
+                       "Decisão": "trocou" if h["decisao"] == "promovido" else "manteve"})
     tab = pd.DataFrame(linhas)
     tabela_vis = tab.assign(**{c_: tab[c_].map(lambda v: "—" if pd.isna(v) else num(v, 3))
                                for c_ in ["Novo modelo", "Modelo em uso"]})

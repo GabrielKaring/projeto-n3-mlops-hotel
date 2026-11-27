@@ -4,20 +4,14 @@ Apoio para a socialização: quem fala em cada slide, o que mostrar na interface
 
 ## Quem fala e o que mostra
 
-A nota da socialização é individual: cada um apresenta e responde pela parte que fez. A coluna "Na interface" diz qual página abrir se a professora pedir para ver funcionando (`streamlit run app/streamlit_app.py`).
+A nota da socialização é individual. Apresentam quatro integrantes, com 3 ou 4 slides cada, seguindo a ordem do pipeline; quem fala por uma parte feita por outro integrante cita o autor. A coluna "Na interface" diz qual página abrir se a professora pedir para ver funcionando (`streamlit run app/streamlit_app.py`).
 
-| Slide | Assunto | Quem | Na interface |
-|---|---|---|---|
-| 1 e 2 | Título e divisão do trabalho | Vinicius | O projeto ("Quem fez o quê") |
-| 3 a 5 | Problema, dados e exploração | Gabriel Karing | O projeto; Os dados |
-| 6 | Fluxo automático, agendamento e MLflow | Diego e José | O projeto ("Como funciona"); José pode abrir `mlflow ui` ou rodar `python -m src.rastreio` |
-| 7 | Votação das variáveis | Gabriel Karing | Como o modelo é escolhido ("Detalhes técnicos") |
-| 8 | Competição A × B | Gabriel Wendorff | Como o modelo é escolhido ("Detalhes técnicos") |
-| 9 | Promoção | Diego | Como o modelo é escolhido |
-| 10 e 11 | Resultados e erros | Gabriel Wendorff | O modelo acertou? (com "E se o corte fosse outro?") |
-| 12 | Drift | Guilherme e Lucas | Alerta de mudança |
-| 13 | Demonstração | Diego | Testar uma reserva |
-| 14 | Considerações finais e referências | Vinicius | — |
+| Quem | Slides | Na interface |
+|---|---|---|
+| José | 1 Capa · 2 Quem fez o quê · 6 Fluxo automático e MLflow · 14 O que entregamos | O projeto; José pode abrir `mlflow ui` ou rodar `python -m src.rastreio` |
+| Gabriel Karing | 3 O problema · 4 Os dados · 5 O que separa quem cancela · 7 Votação das variáveis | O projeto; Os dados; Como o modelo é escolhido ("Detalhes técnicos") |
+| Gabriel Wendorff | 8 Competição A × B · 10 Resultados · 11 Onde o modelo erra | Como o modelo é escolhido ("Detalhes técnicos"); O modelo acertou? (com "E se o corte fosse outro?") |
+| Diego | 9 Promoção · 12 Alerta de drift (feito por Guilherme e Lucas) · 13 Demonstração | Como o modelo é escolhido; Alerta de mudança; Testar uma reserva |
 
 Cada um deve conseguir explicar, sem o slide: o que a sua parte faz, por que foi feita assim e onde está a evidência no repositório (a feature e os arquivos estão em `config/equipe.yaml`).
 
