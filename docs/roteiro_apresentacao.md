@@ -10,15 +10,14 @@ A nota da socialização é individual: cada um apresenta e responde pela parte 
 |---|---|---|---|
 | 1 e 2 | Título e divisão do trabalho | Vinicius | O projeto ("Quem fez o quê") |
 | 3 a 5 | Problema, dados e exploração | Gabriel Karing | O projeto; Os dados |
-| 6 | Fluxo automático | Diego | O projeto ("Como funciona") |
+| 6 | Fluxo automático, agendamento e MLflow | Diego e José | O projeto ("Como funciona"); José pode abrir `mlflow ui` ou rodar `python -m src.rastreio` |
 | 7 | Votação das variáveis | Gabriel Karing | Como o modelo é escolhido ("Detalhes técnicos") |
 | 8 | Competição A × B | Gabriel Wendorff | Como o modelo é escolhido ("Detalhes técnicos") |
 | 9 | Promoção | Diego | Como o modelo é escolhido |
-| 10 | Automação e MLflow | Diego e José | José pode abrir `mlflow ui` ou rodar `python -m src.rastreio` |
-| 11 e 12 | Resultados e erros | Gabriel Wendorff | O modelo acertou? (com "E se o corte fosse outro?") |
-| 13 | Drift | Guilherme e Lucas | Alerta de mudança |
-| 14 e 15 | Demonstração e interface | Diego | Testar uma reserva |
-| 16 | Considerações finais | Vinicius | — |
+| 10 e 11 | Resultados e erros | Gabriel Wendorff | O modelo acertou? (com "E se o corte fosse outro?") |
+| 12 | Drift | Guilherme e Lucas | Alerta de mudança |
+| 13 | Demonstração | Diego | Testar uma reserva |
+| 14 | Considerações finais e referências | Vinicius | — |
 
 Cada um deve conseguir explicar, sem o slide: o que a sua parte faz, por que foi feita assim e onde está a evidência no repositório (a feature e os arquivos estão em `config/equipe.yaml`).
 
@@ -41,7 +40,7 @@ streamlit run app/streamlit_app.py
 - Abra uma vez cada página da interface antes de apresentar: "Os dados", "O modelo acertou?" e "Alerta de mudança" leem todos os lotes na primeira vez (alguns segundos) e depois ficam em cache.
 - Com o modelo baixado, a interface não precisa de internet.
 
-**Plano B**, se a interface não abrir: rodar o `python -m src.prever` acima no terminal (é a mesma previsão) e usar o print do slide 15. Se nem o Python funcionar, o slide 14 tem o resultado da demonstração.
+**Plano B**, se a interface não abrir: rodar o `python -m src.prever` acima no terminal (é a mesma previsão). Se nem o Python funcionar, o slide 13 tem o print da interface e os resultados dos três exemplos.
 
 ## Perguntas prováveis
 
