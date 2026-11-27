@@ -96,23 +96,30 @@ def todos_os_lotes() -> pd.DataFrame:
     return limpo
 
 
-@st.cache_data(show_spinner="Prevendo o lote com o vigente…")
-def prever_lote(arquivo: str, caminho_manifesto: str) -> pd.DataFrame:
-    modelo, _ = carregar_modelo(caminho_manifesto)
-    df, _ = promocao.preparar_lote(Path(arquivo), cfg())
-    saida = promocao.prever(modelo, df, cfg())
-    for col in ["is_canceled", "hotel", "market_segment", "deposit_type", "customer_type",
-                "distribution_channel", "lead_time", "adr"]:
-        saida[col] = df[col].to_numpy()
+COLS_CONFERENCIA = ["is_canceled", "hotel", "market_segment", "deposit_type", "customer_type",
+                     "distribution_channel", "lead_time", "adr"]
+
+
+@st.cache_data(show_spinner="Lendo as previsões gravadas pelo Actions…")
+def previsoes_actions() -> dict[str, Path]:
+    """Lote previsto -> arquivo de previsões do ciclo que o previu (cada ciclo prevê o lote seguinte)."""
+    saida = {}
+    for arq in sorted((EVID / "previsoes").glob("previsoes_*.csv.gz")):
+        lote = pd.read_csv(arq, usecols=["lote_id"], nrows=1).iloc[0, 0]
+        saida[lote] = arq
     return saida
 
 
-def lotes_no_treino(data_version: str) -> int:
-    """``dv020`` = 20 lotes incorporados quando o modelo foi treinado."""
-    try:
-        return int(dv_curto(data_version).removeprefix("dv"))
-    except ValueError:
-        return 0
+@st.cache_data(show_spinner="Conferindo as previsões com o desfecho real…")
+def conferir_previsoes(arquivo: str) -> pd.DataFrame:
+    """Previsões gravadas no Actions + rótulo real e atributos do lote (o mesmo cálculo do notebook 05)."""
+    prev = pd.read_csv(arquivo)
+    lote = prev["lote_id"].iloc[0]
+    c = cfg()
+    origem = next(p for d in (c["dados"]["dir_incoming"], c["dados"]["dir_raw"])
+                  if (p := RAIZ / d / f"{lote}.csv.gz").exists())
+    df, _ = promocao.preparar_lote(origem, c)
+    return prev.merge(df[["lote_id", "linha_origem", *COLS_CONFERENCIA]], on=["lote_id", "linha_origem"])
 
 
 # --------------------------------------------------------------------------- barra lateral
@@ -122,8 +129,9 @@ st.sidebar.caption("Pipeline MLOps · previsão de cancelamento de reservas")
 
 PAGINAS = [
     "Visão geral",
+    "Exploração dos dados",
     "Simular uma reserva",
-    "Prever um lote futuro",
+    "Previsões × realidade",
     "Ciclos e promoção",
     "Seleção de features",
     "Monitoramento de drift",
@@ -387,32 +395,41 @@ def pagina_simular() -> None:
 
 
 def pagina_lote() -> None:
-    st.title("Prever um lote futuro e conferir com o que aconteceu")
+    st.title("Previsões × realidade")
     st.markdown(
-        "Os lotes de `data/incoming` simulam reservas que **ainda não entraram** no pipeline. O vigente prevê "
-        "cada reserva e, como o dataset é histórico, dá para comparar com o desfecho real: é o que o notebook 05 "
-        "faz quando o rótulo chega."
+        "Em cada ciclo do GitHub Actions, o modelo em uso previu o **lote do mês seguinte**, que ainda não tinha "
+        "entrado no pipeline (notebook 05). Como o dataset é histórico, dá para conferir essas previsões com o que "
+        "aconteceu de verdade. É a avaliação mais honesta do modelo: dados que não existiam quando ele foi treinado."
     )
-    exigir_modelo()
+    arquivos = previsoes_actions()
+    if not arquivos:
+        st.warning("Nenhuma previsão do Actions em `evidencias/actions/previsoes/`.")
+        return
     c = cfg()
-    arquivos = sorted((RAIZ / c["dados"]["dir_incoming"]).glob("lote_*.csv.gz"))
-    arquivos = sorted((RAIZ / c["dados"]["dir_raw"]).glob("lote_2016-1*.csv.gz")) + arquivos
-    n_treino = lotes_no_treino(vigente.get("data_version", ""))
-    todos = sorted((RAIZ / c["dados"]["dir_raw"]).glob("lote_*.csv.gz")) + sorted(
-        (RAIZ / c["dados"]["dir_incoming"]).glob("lote_*.csv.gz"))
-    vistos = {a.name for a in todos[:n_treino]}
 
-    def rotulo(a: Path) -> str:
-        nome = a.name.removesuffix(".csv.gz")
-        return f"{nome}  ·  {'já usado no treino do vigente' if a.name in vistos else 'nunca visto pelo vigente'}"
+    resumo = []
+    for lote, arq in arquivos.items():
+        p = conferir_previsoes(str(arq))
+        m = metricas_classificacao(p["is_canceled"], p["previsao"], p["prob_cancelamento"])
+        resumo.append({"lote": lote.removeprefix("lote_"), "F1 macro": m["f1_macro"], "ROC-AUC": m["roc_auc"],
+                       "modelo": f"B · {dv_curto(p['data_version'].iloc[0])}"})
+    resumo = pd.DataFrame(resumo)
+    st.subheader("F1 macro de cada previsão, mês a mês")
+    base = alt.Chart(resumo).encode(x=alt.X("lote:N", title="Mês previsto", axis=alt.Axis(labelAngle=0)))
+    st.altair_chart(
+        (base.mark_line(point=alt.OverlayMarkDef(size=80)).encode(
+            y=alt.Y("F1 macro:Q", scale=alt.Scale(domain=[0.6, 0.8])),
+            tooltip=["lote", "modelo", alt.Tooltip("F1 macro:Q", format=".3f"), alt.Tooltip("ROC-AUC:Q", format=".3f")])
+         + base.mark_text(dy=-14).encode(y="F1 macro:Q", text=alt.Text("F1 macro:Q", format=".3f")))
+        .properties(height=260), width="stretch")
+    st.caption("Cada ponto é a previsão feita pelo modelo em uso no ciclo anterior. A queda em jul-ago/2017 "
+               "acompanha a mudança no perfil das reservas apontada pelo monitoramento de drift.")
 
-    padrao = next((i for i, a in enumerate(arquivos) if a.name not in vistos), 0)
-    escolhido = st.selectbox("Lote", arquivos, index=padrao, format_func=rotulo)
-    if escolhido.name in vistos:
-        st.info("Este lote entrou no treino do vigente: o resultado é otimista. Escolha um lote 'nunca visto' para "
-                "uma avaliação honesta.")
-
-    prev = prever_lote(str(escolhido), caminho_manifesto)
+    st.divider()
+    lotes = list(arquivos)
+    escolhido = st.selectbox("Detalhar o mês", lotes, index=len(lotes) - 1,
+                             format_func=lambda l: f"{l.removeprefix('lote_')}  ·  previsto pelo {resumo.loc[lotes.index(l), 'modelo']}")
+    prev = conferir_previsoes(str(arquivos[escolhido]))
     y, p = prev["is_canceled"].to_numpy(), prev["previsao"].to_numpy()
     m = metricas_classificacao(y, p, prev["prob_cancelamento"].to_numpy())
     r = resumo_confusao(y, p)
@@ -422,13 +439,15 @@ def pagina_lote() -> None:
     k[1].metric("F1 macro", num(m["f1_macro"]))
     k[2].metric("ROC-AUC", num(m["roc_auc"]))
     k[3].metric("Cancelamentos reais", pct(y.mean()))
-    k[4].metric("Cancelamentos previstos", pct(p.mean()))
+    k[4].metric("Cancelamentos previstos", pct(prev["prob_cancelamento"].mean()),
+                help="Média das probabilidades: a estimativa de quartos que vão ficar livres.")
 
     e1, e2 = st.columns([1, 1])
     with e1:
         st.subheader("Matriz de confusão")
         mat = matriz_confusao(y, p).reset_index().melt(id_vars="real", var_name="previsto", value_name="n")
-        base = alt.Chart(mat).encode(x=alt.X("previsto:N", title="Previsto", axis=alt.Axis(labelAngle=0)), y=alt.Y("real:N", title="Real"))
+        base = alt.Chart(mat).encode(x=alt.X("previsto:N", title="Previsto", axis=alt.Axis(labelAngle=0)),
+                                     y=alt.Y("real:N", title="Real"))
         st.altair_chart(
             (base.mark_rect().encode(color=alt.Color("n:Q", scale=alt.Scale(scheme="blues"), legend=None))
              + base.mark_text(fontSize=22).encode(text="n:Q", color=alt.condition(alt.datum.n > mat["n"].max() / 2,
@@ -465,6 +484,114 @@ def pagina_lote() -> None:
 
     with st.expander("Reservas do lote com a probabilidade prevista"):
         st.dataframe(prev.sort_values("prob_cancelamento", ascending=False), hide_index=True, width="stretch")
+
+
+@st.cache_data(show_spinner="Lendo os lotes brutos…")
+def dados_brutos() -> pd.DataFrame:
+    c = cfg()
+    arquivos = sorted((RAIZ / c["dados"]["dir_raw"]).glob("lote_*.csv.gz"))
+    arquivos += sorted((RAIZ / c["dados"]["dir_incoming"]).glob("lote_*.csv.gz"))
+    return pd.concat([pd.read_csv(a) for a in arquivos], ignore_index=True)
+
+
+def grafico_taxa(df: pd.DataFrame, coluna: str, titulo: str, ordem: list | None = None, min_n: int = 200):
+    t = df.groupby(coluna, observed=True)["is_canceled"].agg(taxa="mean", n="size").reset_index()
+    t = t[t["n"] >= min_n]
+    t[coluna] = t[coluna].astype(str)
+    media = df["is_canceled"].mean()
+    barras = alt.Chart(t).mark_bar().encode(
+        y=alt.Y(f"{coluna}:N", sort=ordem or "-x", title=None),
+        x=alt.X("taxa:Q", axis=alt.Axis(format="%"), title="Taxa de cancelamento", scale=alt.Scale(domain=[0, 1])),
+        color=alt.condition(alt.datum.taxa >= media, alt.value("#e53935"), alt.value("#5c6bc0")),
+        tooltip=[alt.Tooltip(f"{coluna}:N", title=titulo), alt.Tooltip("taxa:Q", format=".1%"), alt.Tooltip("n:Q", title="reservas")])
+    rotulos = barras.mark_text(align="left", dx=4).encode(text=alt.Text("taxa:Q", format=".0%"), color=alt.value("gray"))
+    linha = alt.Chart(pd.DataFrame({"x": [media]})).mark_rule(strokeDash=[4, 4]).encode(x="x:Q")
+    return (barras + rotulos + linha).properties(height=max(140, 30 * len(t)), title=titulo)
+
+
+def pagina_exploracao() -> None:
+    st.title("Exploração dos dados")
+    st.markdown(
+        "*Hotel Booking Demand* (Antonio, Almeida & Nunes, 2019): reservas reais de dois hotéis em Portugal, "
+        "com chegadas de jul/2015 a ago/2017, divididas em 26 lotes mensais. A linha tracejada nos gráficos é a "
+        "taxa média de cancelamento; barras vermelhas ficam acima dela."
+    )
+    bruto = dados_brutos()
+    df = todos_os_lotes()
+
+    k = st.columns(4)
+    k[0].metric("Reservas (brutas)", f"{len(bruto):,}".replace(",", "."))
+    k[1].metric("Após o ETL", f"{len(df):,}".replace(",", "."), help="Remove reservas sem hóspedes e duplicatas reentregues entre lotes.")
+    k[2].metric("Taxa de cancelamento", pct(bruto["is_canceled"].mean()))
+    k[3].metric("Colunas originais", bruto.shape[1])
+
+    st.subheader("Classes desbalanceadas, e por isso o F1 macro")
+    c1, c2 = st.columns([1, 2])
+    with c1:
+        cls = bruto["is_canceled"].map({0: "não cancelou", 1: "cancelou"}).value_counts().reset_index()
+        cls.columns = ["classe", "n"]
+        st.altair_chart(alt.Chart(cls).mark_arc(innerRadius=55).encode(
+            theta="n:Q", color=alt.Color("classe:N", scale=alt.Scale(range=["#e53935", "#5c6bc0"]),
+                                          legend=alt.Legend(orient="bottom", title=None)),
+            tooltip=["classe", "n"]).properties(height=240), width="stretch")
+    with c2:
+        st.markdown(
+            "- 63% das reservas vieram e 37% cancelaram. Um modelo que dissesse sempre \"vai vir\" teria 63% de "
+            "acurácia sem servir para nada.\n"
+            "- O **F1 macro** dá o mesmo peso às duas classes, então só sobe se o modelo acertar também os cancelamentos.\n"
+            "- Os dois algoritmos usam `class_weight` balanceado pelo mesmo motivo.")
+
+    st.subheader("Cancelamento ao longo do tempo")
+    tempo = df.assign(mes=pd.to_datetime(df["arrival_date"]).dt.to_period("M").dt.start_time)
+    tempo = tempo.groupby(["mes", "hotel"])["is_canceled"].mean().reset_index()
+    st.altair_chart(alt.Chart(tempo).mark_line(point=True).encode(
+        x=alt.X("mes:T", title="Mês de chegada"), y=alt.Y("is_canceled:Q", axis=alt.Axis(format="%"), title="Taxa de cancelamento"),
+        color=alt.Color("hotel:N", legend=alt.Legend(orient="top", title=None)),
+        tooltip=[alt.Tooltip("mes:T", format="%m/%Y"), "hotel", alt.Tooltip("is_canceled:Q", format=".1%")],
+    ).properties(height=300), width="stretch")
+    st.caption("O City Hotel cancela bem mais que o Resort, e a taxa sobe em 2017. Por isso a partição é "
+               "cronológica (treina no passado, testa no mais recente) e o drift compara com o mesmo mês do ano anterior.")
+
+    st.subheader("O que separa quem cancela de quem vem")
+    g1, g2 = st.columns(2)
+    with g1:
+        st.altair_chart(grafico_taxa(df, "deposit_type", "Tipo de depósito"), width="stretch")
+        st.caption("Contraintuitivo: *Non Refund* cancela quase sempre. É o atributo mais votado na seleção.")
+        st.altair_chart(grafico_taxa(df, "market_segment", "Segmento de mercado"), width="stretch")
+    with g2:
+        faixas = faixa_lead_time(df["lead_time"], cfg()["analise_erros"]["faixas_lead_time"])
+        ordem = ["0-6", "7-29", "30-89", "90-179", "180-364", "365+"]
+        st.altair_chart(grafico_taxa(df.assign(antecedencia=faixas), "antecedencia",
+                                     "Antecedência (dias)", ordem=ordem), width="stretch")
+        st.caption("Quanto mais cedo a reserva é feita, mais chance de ser cancelada.")
+        pedidos = df.assign(pedidos=df["total_of_special_requests"].clip(upper=3).astype(int).astype(str).replace("3", "3+"))
+        st.altair_chart(grafico_taxa(pedidos, "pedidos", "Pedidos especiais", ordem=["0", "1", "2", "3+"]), width="stretch")
+        st.caption("Quem faz pedidos especiais está comprometido com a viagem e cancela menos.")
+
+    st.subheader("Colunas que vazariam a resposta")
+    st.markdown(
+        "Algumas colunas só são preenchidas **depois** da reserva. Se entrassem no modelo, ele \"colaria\" a "
+        "resposta e não funcionaria no momento em que a reserva chega. Por isso o ETL as remove.")
+    vaz = pd.crosstab(bruto["reservation_status"], bruto["is_canceled"].map({0: "não cancelou", 1: "cancelou"}))
+    v1, v2 = st.columns([1, 1])
+    v1.dataframe(vaz, width="stretch")
+    v2.markdown(
+        "- `reservation_status`: *Canceled* e *No-Show* **são** o cancelamento.\n"
+        "- `reservation_status_date`: a data do desfecho.\n"
+        "- `assigned_room_type` e `booking_changes`: só existem no check-in ou depois de alterações.\n"
+        "- `country`: o artigo do dataset avisa que costuma ser corrigido no check-in.")
+
+    st.subheader("Valores ausentes e duplicatas")
+    falt = bruto.isna().mean().loc[lambda s: s > 0].sort_values(ascending=False).reset_index()
+    falt.columns = ["coluna", "ausentes"]
+    d1, d2 = st.columns(2)
+    d1.dataframe(falt, hide_index=True, width="stretch",
+                 column_config={"ausentes": st.column_config.ProgressColumn(format="percent", min_value=0, max_value=1)})
+    d2.markdown(
+        "- `company` e `agent` ausentes significam \"sem empresa\" e \"sem agência\": viram os atributos "
+        "`tem_empresa` e `tem_agente`, não são descartados.\n"
+        f"- {pct(bruto.duplicated().mean(), 0)} das linhas são idênticas a outra. A maioria é de reservas de grupo "
+        "canceladas juntas (comportamento real), então só sai a linha reentregue em outro lote.")
 
 
 def pagina_ciclos() -> None:
@@ -626,7 +753,8 @@ def pagina_drift() -> None:
 {
     "Visão geral": pagina_visao_geral,
     "Simular uma reserva": pagina_simular,
-    "Prever um lote futuro": pagina_lote,
+    "Exploração dos dados": pagina_exploracao,
+    "Previsões × realidade": pagina_lote,
     "Ciclos e promoção": pagina_ciclos,
     "Seleção de features": pagina_features,
     "Monitoramento de drift": pagina_drift,

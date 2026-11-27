@@ -23,7 +23,7 @@ Quem opera o pipeline (a equipe de dados) acompanha os ciclos no MLflow e o aler
 
 ## Principais resultados
 
-Execuções do pipeline no GitHub Actions até 23/11/2026 (F1 macro no **teste do ciclo**, vencedor e vigente avaliados nos mesmos registros). Cópia das evidências em [`evidencias/actions/`](evidencias/actions/) e do manifesto em [`models/modelo_vigente_actions.json`](models/modelo_vigente_actions.json).
+Execuções do pipeline no GitHub Actions até 26/11/2026 (F1 macro no **teste do ciclo**, vencedor e vigente avaliados nos mesmos registros). Cópia das evidências em [`evidencias/actions/`](evidencias/actions/) e do manifesto em [`models/modelo_vigente_actions.json`](models/modelo_vigente_actions.json).
 
 | Execução | Dados (lote novo) | A · F1 CV | B · F1 CV | Vencedor no teste | Vigente no teste | Decisão |
 |---|---|---|---|---|---|---|
@@ -31,11 +31,16 @@ Execuções do pipeline no GitHub Actions até 23/11/2026 (F1 macro no **teste d
 | [45099413735](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735) | dv020 (fev/2017) | 0,769 | 0,787 | B · 0,743 | 0,723 | promovido (+0,020) |
 | [45099857641](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) | dv021 (mar/2017) | 0,731 | 0,767 | B · 0,737 | 0,742 | mantido |
 | [45154548830](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`) | dv022 (abr/2017) | 0,711 | 0,744 | B · 0,749 | 0,752 | mantido |
+| [45262196574](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45262196574) (`schedule`) | dv023 (mai/2017) | 0,707 | 0,758 | B · 0,755 | 0,751 | mantido (+0,003) |
+| [45474058813](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45474058813) (`schedule`) | dv024 (jun/2017) | 0,695 | 0,753 | B · 0,755 | 0,749 | promovido (+0,006) |
+| [45679932790](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45679932790) (`schedule`) | dv025 (jul/2017) | 0,695 | 0,764 | B · 0,747 | 0,735 | promovido (+0,012) |
+| [45878188588](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45878188588) (`schedule`) | dv026 (ago/2017) | 0,701 | 0,761 | B · 0,742 | 0,735 | promovido (+0,007) |
 
-- **O Random Forest (B) venceu a regressão logística (A) em todos os ciclos**, no CV e na ROC-AUC (~0,85 contra ~0,83). No teste, o F1 macro ficou entre **0,73 e 0,75**.
-- **A regra de promoção funcionou nos dois sentidos:** promoveu quando o ganho passou de 0,005 e manteve o vigente quando o candidato não era melhor. O vigente atual é o B do ciclo dv020.
-- **O agendamento roda sozinho:** a execução 45154548830 veio do `schedule`, com todos os passos verdes. A falha simulada (45091260105) parou o fluxo antes da promoção.
-- **Onde o modelo erra:** com o vigente atual no teste do último ciclo agendado (dv022; medido numa execução local com o mesmo código, dados e seed, que reproduz o Actions), o erro total é de 21%. O erro que mais aparece é deixar passar cancelamento: 44,5% das reservas canceladas não foram previstas, contra 7,8% de alarme falso entre as que vieram. Quase todos os erros são de reservas sem depósito, e 73% deles vêm de agências online (*Online TA*); a faixa de 180 a 364 dias de antecedência tem a maior taxa de erro (35%). Detalhes e matriz de confusão na seção 7 do relatório.
+- **O Random Forest (B) venceu a regressão logística (A) em todos os ciclos**, no CV e na ROC-AUC (~0,85 contra ~0,83). No teste, o F1 macro ficou entre **0,73 e 0,76**.
+- **A regra de promoção funcionou nos dois sentidos:** promoveu quando o ganho passou de 0,005 e manteve o vigente quando o candidato não era melhor (no dv023 ganhou por 0,003 e mesmo assim ficou o vigente). O vigente atual é o B do ciclo dv026.
+- **O agendamento roda sozinho:** as 5 últimas execuções (45154548830 a 45878188588) vieram do `schedule`, uma por dia, com todos os passos verdes. A falha simulada (45091260105) parou o fluxo antes da promoção.
+- **Previsões conferidas com o que aconteceu:** cada ciclo previu o mês seguinte, ainda fora do pipeline. Comparando com o desfecho real, o F1 macro ficou entre 0,716 e 0,765 de fev a jun/2017 e caiu para 0,680 e 0,698 em jul e ago/2017, quando o retreino passou a ser promovido seguidamente.
+- **Onde o modelo erra:** com o vigente atual no teste do ciclo dv026 (24.018 reservas, análise de erros do Actions em [`evidencias/actions/promocao/`](evidencias/actions/promocao/)), o erro total é de 24%. O erro que mais aparece é deixar passar cancelamento: 38% das reservas canceladas não foram previstas, contra 14% de alarme falso entre as que vieram. Quase todos os erros são de reservas sem depósito, e 75% deles vêm de agências online (*Online TA*); a faixa de 30 a 89 dias de antecedência tem a maior taxa de erro (32%). Detalhes e matriz de confusão na seção 7 do relatório.
 - **Drift:** a taxa de cancelamento de 2017 sobe em relação ao mesmo mês de 2016 (jan/2017: +9,2 p.p.; abr/2017: +5,5 p.p.), e o alerta avisou. Em 23/11 o `agent` saiu do status geral do alerta, porque disparava em todo lote ([`docs/f10_drift.md`](docs/f10_drift.md)).
 
 Relatório completo: [`reports/relatorio_n3.pdf`](reports/relatorio_n3.pdf).
@@ -112,14 +117,14 @@ python -m src.prever --json exemplos/reservas_exemplo.json --manifesto models/mo
 Depois de rodar um ciclo local (seção anterior), o vigente local é usado sem `--manifesto`: `python -m src.prever --json exemplos/reservas_exemplo.json`.
 
 ```
-Reserva 1 (City Hotel, chegada 15/09/2017): chance de cancelamento 83,9% -> risco alto
+Reserva 1 (City Hotel, chegada 15/09/2017): chance de cancelamento 82,3% -> risco alto
 Reserva 2 (City Hotel, chegada 12/10/2017): chance de cancelamento 100,0% -> risco alto
-Reserva 3 (Resort Hotel, chegada 22/09/2017): chance de cancelamento 1,9% -> risco baixo
+Reserva 3 (Resort Hotel, chegada 22/09/2017): chance de cancelamento 1,6% -> risco baixo
 Limiar: 50% (a partir dele, risco alto; o mesmo corte da avaliação do modelo)
-Modelo vigente: B do ciclo 20261123T021937Z-gha45099413735-1
+Modelo vigente: B do ciclo 20261126T184446Z-gha45878188588-1
 ```
 
-A saída acima é do vigente do Actions (B do ciclo dv020). A reserva passa pelo mesmo ETL do treino, no modo inferência, e pelo vigente, carregado como no notebook 05 (`models/modelo_vigente.json` + o `Pipeline` completo em `models/registro/`). Em Python: `from src.prever import prever_reserva`.
+A saída acima é do vigente do Actions (B do ciclo dv026). A reserva passa pelo mesmo ETL do treino, no modo inferência, e pelo vigente, carregado como no notebook 05 (`models/modelo_vigente.json` + o `Pipeline` completo em `models/registro/`). Em Python: `from src.prever import prever_reserva`.
 
 Entradas inválidas são recusadas com uma mensagem, sem traceback: campo obrigatório vazio, texto num campo numérico (`"adr": "cento e dez"`; um número entre aspas, como `"110.5"`, é aceito), data que não existe (31 de setembro) e valor desconhecido em `hotel` ou `deposit_type` (`"hotel": "Hotel Central"`). Valor desconhecido nas outras categóricas (`meal`, `market_segment`, `customer_type` etc.) não interrompe, mas a reserva sai com um `AVISO`, porque o modelo não viu esse valor no treino. Os valores aceitos estão em `inferencia` no `config/config.yaml`.
 
@@ -140,8 +145,9 @@ O segundo comando baixa o vigente do Actions (a interface também tem um botão 
 | Página | O que mostra |
 |---|---|
 | Visão geral | Problema, fluxo de um ciclo, números do Actions e divisão por feature |
+| Exploração dos dados | Classes, cancelamento ao longo do tempo e por depósito, segmento, antecedência e pedidos especiais; colunas que vazariam a resposta; ausentes e duplicatas |
 | Simular uma reserva | Formulário com uma reserva nova, chance de cancelamento pelo vigente (`src.prever`) e gráfico "e se…" variando antecedência, diária, depósito ou pedidos especiais |
-| Prever um lote futuro | O vigente prevê um lote de `data/incoming` e compara com o desfecho real: F1, ROC-AUC, matriz de confusão, previsto × real por semana e onde o modelo erra |
+| Previsões × realidade | As previsões que cada ciclo do Actions fez para o mês seguinte, conferidas com o desfecho real: F1 mês a mês, matriz de confusão, previsto × real por semana e onde o modelo erra |
 | Ciclos e promoção | Decisões do manifesto, competição A × B na CV e vencedor × vigente no teste (cópia do MLflow do Actions) |
 | Seleção de features | Votos dos três métodos em cada ciclo e as features eleitas |
 | Monitoramento de drift | PSI por feature e variação da taxa de cancelamento de qualquer lote, calculados na hora (`src.drift`), e o histórico do Actions |
@@ -216,7 +222,7 @@ O notebook 05 carrega o vigente (Pipeline completo: pré-processamento, features
 
 O notebook 04 também grava a matriz de confusão e a análise de erros do modelo em uso no teste do ciclo (por hotel, segmento, tipo de depósito, tipo de cliente, canal e faixa de antecedência) em `evidencias/promocao/`.
 
-**Quando os lotes acabam.** Com o `schedule` diário, o último lote de 2017 entra em 27/11. Daí em diante o notebook 05 avisa, mostra as últimas previsões feitas e mantém a demonstração; o agendamento não foi alterado. Detalhes em [`docs/f7_workflow.md`](docs/f7_workflow.md).
+**Quando os lotes acabam.** Com o `schedule` diário, o último lote de 2017 entrou em 26/11. Daí em diante o notebook 05 avisa, mostra as últimas previsões feitas e mantém a demonstração; o agendamento não foi alterado. Detalhes em [`docs/f7_workflow.md`](docs/f7_workflow.md).
 
 Para prever com o modelo vigente localmente, rode o ciclo completo acima (ou abra o estado do Actions e baixe o vigente com `gh release download modelos --dir models/registro`) e depois `bash scripts/executar_notebook.sh 05_previsoes`.
 

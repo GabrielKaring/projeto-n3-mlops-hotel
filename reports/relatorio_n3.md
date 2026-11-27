@@ -46,6 +46,22 @@ Usamos o *Hotel Booking Demand* (Antonio, Almeida & Nunes, 2019, *Data in Brief*
 
 Todas essas decisões foram fixadas antes de treinar qualquer modelo e estão em `docs/etapa1_problema_dados_avaliacao.md` e `config/config.yaml`.
 
+### Exploração dos dados
+
+Antes de escolher tratamentos e modelos, olhamos como o cancelamento se distribui (os gráficos usam os 26 lotes depois do ETL, 119.209 reservas; a página "Exploração dos dados" da interface mostra os mesmos cortes de forma interativa).
+
+![Taxa de cancelamento por mês de chegada, por hotel. A linha tracejada é a média (37%).](img/eda_tempo.png)
+
+- **O cancelamento muda com o tempo e com o hotel.** O City Hotel cancela 42% das reservas, contra 28% do Resort, e a taxa sobe em 2017. Por isso a partição é cronológica (treina no passado, testa no período mais recente) e o monitoramento de drift compara cada lote com o mesmo mês do ano anterior (seção 9).
+- **Classes desbalanceadas** (63% contra 37%): daí o F1 macro como métrica e o `class_weight` balanceado nos dois algoritmos.
+
+![Taxa de cancelamento por tipo de depósito, antecedência e pedidos especiais. Vermelho = acima da média.](img/eda_atributos.png)
+
+- **Depósito:** as reservas *Non Refund* cancelam 99% das vezes, contra 28% das sem depósito. É contraintuitivo, e é o atributo que os três métodos de seleção elegem por unanimidade em todos os ciclos (seção 3).
+- **Antecedência:** a taxa cresce de 9% (até 6 dias) para 68% (um ano ou mais). Reservar muito cedo é sinal de plano ainda incerto.
+- **Pedidos especiais:** quem não faz nenhum cancela 48%; com um ou mais, cerca de 20%. O pedido indica compromisso com a viagem.
+- **Ausentes e duplicatas:** `company` (94%) e `agent` (14%) vazios querem dizer "sem empresa" e "sem agência", e viram `tem_empresa` e `tem_agente` em vez de ser descartados. As duplicatas são discutidas na seção 2.
+
 ## 2. ETL e chegada de dados novos
 
 Os dados foram quebrados em lotes mensais. O ciclo inicial tem 18 lotes (jul/2015 a dez/2016), e os 8 de 2017 ficam em `data/incoming/` para simular dados chegando. Cada execução libera um lote novo.
@@ -95,8 +111,13 @@ Os dois candidatos usam as mesmas features eleitas, os mesmos folds e a mesma m�
 | dv019 | jan/17 | 18 | 0,747 ± 0,026 | 0,790 ± 0,037 | B |
 | dv020 | fev/17 | 17 | 0,769 ± 0,045 | 0,787 ± 0,034 | B |
 | dv021 | mar/17 | 20 | 0,731 ± 0,064 | 0,767 ± 0,043 | B |
+| dv022 | abr/17 | 16 | 0,711 | 0,744 | B |
+| dv023 | mai/17 | 17 | 0,707 | 0,758 | B |
+| dv024 | jun/17 | 17 | 0,695 | 0,753 | B |
+| dv025 | jul/17 | 19 | 0,695 | 0,764 | B |
+| dv026 | ago/17 | 19 | 0,701 | 0,761 | B |
 
-O B ganhou nos três ciclos, também em ROC-AUC (0,85 contra 0,83). Como as features foram eleitas olhando o desenvolvimento inteiro, o CV podia sair otimista. Para medir isso, refizemos a eleição com o ranking de cada fold isolado: a diferença ficou entre -0,03 e +0,03, sem mudar o vencedor.
+Médias do CV dos oito ciclos executados no GitHub Actions (`evidencias/actions/mlflow/historico_runs.csv`); o desvio entre folds está nos runs do MLflow. O B ganhou nos oito ciclos, também em ROC-AUC (0,83 a 0,85 contra 0,81 a 0,84 do A). Como as features foram eleitas olhando o desenvolvimento inteiro, o CV podia sair otimista. Para medir isso, refizemos a eleição com o ranking de cada fold isolado: a diferença ficou entre -0,03 e +0,03, sem mudar o vencedor.
 
 ## 5. MLflow e rastreabilidade
 
@@ -146,8 +167,12 @@ Resultado nos ciclos executados no GitHub Actions (os valores são F1 macro no t
 | [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735) | dv020 (+ fev/2017) | 17.403 | B · 0,7433 | 0,7231 | **promovido** (+0,020) |
 | [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) | dv021 (+ mar/2017) | 18.392 | B · 0,7366 | 0,7415 | **mantido** (não supera o vigente) |
 | [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`) | dv022 (+ abr/2017) | 19.444 | B · 0,7488 | 0,7517 | **mantido** (não supera o vigente) |
+| [#7](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45262196574) (`schedule`) | dv023 (+ mai/2017) | 20.789 | B · 0,7546 | 0,7512 | **mantido** (+0,0034, abaixo de 0,005) |
+| [#8](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45474058813) (`schedule`) | dv024 (+ jun/2017) | 21.849 | B · 0,7553 | 0,7494 | **promovido** (+0,006) |
+| [#9](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45679932790) (`schedule`) | dv025 (+ jul/2017) | 22.907 | B · 0,7474 | 0,7354 | **promovido** (+0,012) |
+| [#10](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45878188588) (`schedule`) | dv026 (+ ago/2017) | 24.018 | B · 0,7416 | 0,7347 | **promovido** (+0,007) |
 
-O vigente de cada ciclo foi baixado da Release e reavaliado no teste novo, por isso o valor dele muda de um ciclo para o outro. No #5 e no #6 a regra funcionou como deveria: o candidato era bom, mas não melhor que o vigente, então o vigente ficou. A #6 foi disparada pelo `schedule`, sem ninguém mexer. Os `run_id` de cada decisão estão no `models/modelo_vigente.json` da `estado-pipeline` (por exemplo `af11ab357d164c78af5d99db1ef3ef5f` para a promoção do #4 e `8834b7a20af8415f9ee2aa434a8dd42a` para a manutenção do #5).
+O vigente de cada ciclo foi baixado da Release e reavaliado no teste novo, por isso o valor dele muda de um ciclo para o outro. No #5 e no #6 a regra funcionou como deveria: o candidato era bom, mas não melhor que o vigente, então o vigente ficou. No #7 o candidato até ganhou, mas por 0,0034, abaixo da melhoria mínima, e o vigente também ficou. Do #8 ao #10, com os meses de 2017 mudando o perfil das reservas, o vigente antigo perdeu desempenho no teste novo e o candidato retreinado passou a regra: três promoções seguidas. Da #6 à #10 todas as execuções vieram do `schedule`, uma por dia, sem ninguém mexer. O vigente atual é o B do ciclo dv026. Os `run_id` de cada decisão estão no `models/modelo_vigente.json` da `estado-pipeline` (por exemplo `af11ab357d164c78af5d99db1ef3ef5f` para a promoção do #4 e `8834b7a20af8415f9ee2aa434a8dd42a` para a manutenção do #5).
 
 Todo vencedor, promovido ou não, vai para a Release `modelos`. O `models/modelo_vigente.json` guarda o vigente e o histórico de decisões, com versão dos dados, features, métricas, `run_id` e motivo.
 
@@ -158,26 +183,26 @@ O notebook 05 carrega o vigente com o pré-processamento e prevê o **próximo l
 - **As decisões de modelagem não veem o teste.** A eleição das features (seção 3) e a escolha entre A e B (seção 4) usam só o desenvolvimento, com validação cruzada temporal. O teste não entra no treino nem na seleção.
 - **O teste é um holdout fora do tempo.** São as reservas mais recentes do ciclo, posteriores a tudo o que o candidato viu. O candidato chega ao teste já fechado, e a comparação com o vigente é a avaliação final dele.
 - **A regra foi fixada antes.** Piso de 0,60 e melhoria mínima de 0,005 estão no `config.yaml` desde antes do primeiro treino; o resultado no teste não ajusta nada, só aplica a regra. A análise de erros roda depois da decisão e não a influencia.
-- **A avaliação de produção é o lote futuro.** O que mede o modelo em uso de verdade é a conferência do notebook 05, com dados que não existiam no ciclo em que a previsão foi feita. Conferindo as previsões gravadas no Actions com o rótulo real dos lotes seguintes (o mesmo cálculo do notebook 05), o F1 macro foi de 0,716 em fev/2017, 0,765 em mar/2017, 0,756 em abr/2017 e 0,749 em mai/2017, na mesma faixa do teste.
+- **A avaliação de produção é o lote futuro.** O que mede o modelo em uso de verdade é a conferência do notebook 05, com dados que não existiam no ciclo em que a previsão foi feita. Conferindo as previsões gravadas no Actions com o rótulo real dos lotes seguintes (o mesmo cálculo do notebook 05), o F1 macro foi de 0,716 em fev/2017, 0,765 em mar/2017, 0,756 em abr/2017, 0,749 em mai/2017 e 0,735 em jun/2017, na mesma faixa do teste. Em jul/2017 (0,680) e ago/2017 (0,698) ele caiu. A taxa de cancelamento de 2017 ficou acima da de 2016 desde janeiro (seção 9), e foi nesse trecho que o retreino passou a ganhar do vigente e a regra promoveu três vezes seguidas: o pipeline reagiu à mudança, mas o modelo ainda erra mais nos meses finais. A página "Previsões × realidade" da interface (seção 8) mostra essa conferência mês a mês.
 
-**Quando os lotes acabam.** Com o `schedule` diário, o último lote de 2017 entra em 27/11. Daí em diante o notebook 05 avisa que não há lote novo, mostra as últimas previsões feitas e mantém a demonstração da seção 8; os ciclos rodam sobre os mesmos dados e a decisão esperada é manter o vigente. O agendamento não foi alterado, para não mudar a simulação de chegada de dados.
+**Quando os lotes acabam.** Com o `schedule` diário, o último lote de 2017 entrou em 26/11 (execução #10). Daí em diante o notebook 05 avisa que não há lote novo, mostra as últimas previsões feitas e mantém a demonstração da seção 8; os ciclos rodam sobre os mesmos dados e a decisão esperada é manter o vigente. O agendamento não foi alterado, para não mudar a simulação de chegada de dados.
 
 ### Matriz de confusão e análise de erros
 
 O notebook 04 avalia o modelo que segue em uso (o vencedor, se promovido; senão o vigente) no teste do ciclo, com o mesmo limiar de 0,5, e grava a matriz e a análise por grupo em `evidencias/promocao/` e no run `04_promocao`. Isso só descreve o modelo; não entra na decisão.
 
-Exemplo do ciclo dv022 (mesmos dados e mesmo modelo da execução agendada #6): o vencedor não superou o vigente, então a análise é do vigente (B do ciclo dv020), em 19.444 reservas do teste.
+Exemplo do último ciclo, dv026 (execução agendada [#10](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45878188588), cópia em `evidencias/actions/promocao/`): o vencedor foi promovido, então a análise é dele, o vigente atual, em 24.018 reservas do teste (22/04 a 31/08/2017).
 
 | | Previsto: não cancela | Previsto: cancela |
 |---|---|---|
-| **Real: não cancelou** | 11.349 | 957 (falso positivo) |
-| **Real: cancelou** | 3.175 (falso negativo) | 3.963 |
+| **Real: não cancelou** | 12.140 | 2.034 (falso positivo) |
+| **Real: cancelou** | 3.775 (falso negativo) | 6.069 |
 
-![Matriz de confusão do modelo em uso no teste do ciclo dv022.](img/matriz_confusao_dv022.png)
+![Matriz de confusão do modelo em uso no teste do ciclo dv026.](img/matriz_confusao_dv026.png)
 
-- **O erro dominante é o falso negativo:** 44,5% das reservas canceladas passaram como "vai vir", contra 7,8% de alarme falso entre as que vieram. Para o hotel, é quarto vazio sem aviso; o modelo é conservador ao apontar cancelamento.
-- **Onde se concentra:** 99,8% dos erros são de reservas sem depósito (*No Deposit*); as *Non Refund* são quase sempre acertadas. *Online TA* responde por 73% dos erros, com taxa de erro de 30% (a média é 21%). Por antecedência, a faixa de 180 a 364 dias erra 35%: lá a taxa real de cancelamento é 54%, e o modelo prevê só 24%.
-- **Nos 8 ciclos locais** o quadro se repete: *Online TA* e pelo menos uma faixa de antecedência entre 30 e 364 dias sempre aparecem entre os grupos com mais erro. Com mais dados de 2017, o falso negativo cai (de 53% no dv019 para 38% no dv026) e o falso positivo sobe (de 3% para 14%), acompanhando a taxa de cancelamento maior de 2017.
+- **O erro dominante é o falso negativo:** 38,3% das reservas canceladas passaram como "vai vir", contra 14,4% de alarme falso entre as que vieram (erro total de 24,2%). Para o hotel, é quarto vazio sem aviso; o modelo é conservador ao apontar cancelamento.
+- **Onde se concentra:** 99,9% dos erros são de reservas sem depósito (*No Deposit*); as *Non Refund* são todas acertadas. *Online TA* responde por 75% dos erros, com taxa de erro de 31%. Por antecedência, a faixa de 30 a 89 dias erra 32%: lá a taxa real de cancelamento é 40%, e o modelo prevê só 26%.
+- **Ao longo dos 8 ciclos** (execuções locais com o mesmo código, dados e seed) o quadro se repete: *Online TA* e pelo menos uma faixa de antecedência entre 30 e 364 dias sempre aparecem entre os grupos com mais erro. Com mais dados de 2017, o falso negativo cai (de 53% no dv019 para 38% no dv026) e o falso positivo sobe (de 3% para 14%), acompanhando a taxa de cancelamento maior de 2017.
 
 Isso aponta onde investir: um limiar ajustado ao custo de cada erro, ou atributos sobre o canal online, ajudariam mais que trocar de algoritmo.
 
@@ -190,16 +215,24 @@ python -m src.prever --json exemplos/reservas_exemplo.json
 ```
 
 ```
-Reserva 1 (City Hotel, chegada 15/09/2017): chance de cancelamento 83,9% -> risco alto
+Reserva 1 (City Hotel, chegada 15/09/2017): chance de cancelamento 82,3% -> risco alto
 Reserva 2 (City Hotel, chegada 12/10/2017): chance de cancelamento 100,0% -> risco alto
-Reserva 3 (Resort Hotel, chegada 22/09/2017): chance de cancelamento 1,9% -> risco baixo
+Reserva 3 (Resort Hotel, chegada 22/09/2017): chance de cancelamento 1,6% -> risco baixo
 Limiar: 50% (a partir dele, risco alto; o mesmo corte da avaliação do modelo)
-Modelo vigente: B do ciclo 20261123T021937Z-gha45099413735-1
+Modelo vigente: B do ciclo 20261126T184446Z-gha45878188588-1
 ```
 
-A saída é do vigente do Actions (B do ciclo dv020), baixado da Release. As três reservas de exemplo (`exemplos/reservas_exemplo.json`) têm perfis diferentes. A primeira é de agência online no City Hotel, com 120 dias de antecedência e sem pedidos especiais; no histórico, reservas com esse perfil cancelaram 62% das vezes, contra 37% no geral. A segunda é de grupo, com depósito não reembolsável e um cancelamento anterior (no histórico, 99% das reservas *Non Refund* foram canceladas, o padrão contraintuitivo citado na seção 3). A terceira é de um hóspede que já voltou outras vezes, reservou direto, com vaga de garagem e dois pedidos especiais. A probabilidade a partir de 50% vira "risco alto", o mesmo corte usado na avaliação. A mesma demonstração roda no fim do notebook 05 em todo ciclo e fica em `evidencias/previsoes/demonstracao_<cycle_id>.csv`. Um teste automático confirma que mudar o `is_canceled` da entrada não muda a probabilidade.
+A saída é do vigente do Actions (B do ciclo dv026), baixado da Release. As três reservas de exemplo (`exemplos/reservas_exemplo.json`) têm perfis diferentes. A primeira é de agência online no City Hotel, com 120 dias de antecedência e sem pedidos especiais; no histórico, reservas com esse perfil cancelaram 62% das vezes, contra 37% no geral. A segunda é de grupo, com depósito não reembolsável e um cancelamento anterior (no histórico, 99% das reservas *Non Refund* foram canceladas, o padrão contraintuitivo citado na seção 3). A terceira é de um hóspede que já voltou outras vezes, reservou direto, com vaga de garagem e dois pedidos especiais. A probabilidade a partir de 50% vira "risco alto", o mesmo corte usado na avaliação. A mesma demonstração roda no fim do notebook 05 em todo ciclo e fica em `evidencias/previsoes/demonstracao_<cycle_id>.csv`. Um teste automático confirma que mudar o `is_canceled` da entrada não muda a probabilidade.
 
 Entradas inválidas são recusadas com uma mensagem clara: campo obrigatório vazio, texto num campo numérico, data que não existe (31 de setembro) e valor desconhecido em `hotel` ou `deposit_type`, os campos em que um erro de digitação mais distorceria a resposta. Nas outras categóricas, um valor que o modelo não viu no treino gera um aviso junto da previsão, porque o one-hot o trataria como categoria rara sem avisar ninguém. Os valores aceitos ficam no `config.yaml` (`inferencia`) e só valem para a demonstração; o treino não muda.
+
+### Interface de demonstração
+
+Para a apresentação e para quem não usa terminal, há uma interface em Streamlit (`streamlit run app/streamlit_app.py`, instruções no README). Ela usa as mesmas funções do pipeline e só lê: não move lotes, não treina e não grava nada versionado.
+
+- **Simular uma reserva:** um formulário com os campos conhecidos no ato da reserva devolve a chance de cancelamento pelo vigente, o risco e a ação sugerida (pedir depósito ou confirmar). Um gráfico "e se…" varia um atributo de cada vez (antecedência, diária, depósito, pedidos especiais) e mostra como a probabilidade muda, o que ajuda a explicar o que o modelo aprendeu.
+- **Previsões × realidade:** a conferência da seção 7, mês a mês, com matriz de confusão, previsto × real por semana e erros por grupo.
+- **Exploração dos dados, ciclos e promoção, seleção de features e drift:** as mesmas evidências deste relatório, lidas de `evidencias/actions/` e calculadas na hora a partir dos lotes.
 
 ## 9. Recurso adicional: monitoramento de drift com alerta
 
@@ -237,27 +270,31 @@ O `agent` continua com PSI acima de 0,25 nos oito lotes, agora marcado como info
 
 - **Drift de preço.** Sem o `agent`, o alerta ainda aparece em boa parte dos lotes por causa de `adr` e `valor_estimado_estadia`: as diárias sobem de um ano para o outro. É uma mudança que o modelo vê diretamente, por isso ficou no status. Um próximo passo seria comparar a diária corrigida pela inflação.
 - **Momento da previsão.** O dataset não diz quando cada campo foi preenchido. Mantivemos `adults`, `children`, `stays_in_*` e `meal` supondo que refletem a reserva, mas o artigo avisa que esses campos costumam mudar até o check-in e se comportam diferente entre canceladas e não canceladas. Se forem atualizados depois, carregam parte do mesmo problema do `country` e o desempenho real seria menor.
-- **Recall do cancelamento.** No teste, o B acerta 80% a 90% quando diz "vai cancelar", mas só pega de 46% a 55% dos cancelamentos, com o corte em 0,5 (seção 7). Ajustar o limiar ao custo de cada erro do hotel ficou fora do escopo.
+- **Recall do cancelamento.** No teste, o B acerta 75% a 90% quando diz "vai cancelar", mas só pega de 46% a 62% dos cancelamentos, com o corte em 0,5 (seção 7). Ajustar o limiar ao custo de cada erro do hotel ficou fora do escopo.
 - **Teste fixo por ciclo.** A promoção usa o teste do ciclo atual. Com teste de poucos meses, diferenças de 0,005 podem ser ruído; por isso existe a melhoria mínima, mas ela não substitui um teste estatístico.
 - **Generalização.** São só dois hotéis, em um país, antes de 2018.
-- **Agendamento.** O `schedule` roda todo dia às 06:00 de Brasília, mas o GitHub não garante o horário: no dia da preparação da entrega os disparos atrasaram várias horas. Por isso os ciclos #2 a #5 foram disparados à mão (`workflow_dispatch`, mesmo workflow), e a #6 já veio do `schedule`.
-- **Fim dos lotes simulados.** São só 8 lotes de 2017. Depois do último (27/11), os ciclos agendados rodam sem dado novo e sem lote futuro para prever (seção 7).
+- **Agendamento.** O `schedule` roda todo dia às 06:00 de Brasília, mas o GitHub não garante o horário: no dia da preparação da entrega os disparos atrasaram várias horas. Por isso os ciclos #2 a #5 foram disparados à mão (`workflow_dispatch`, mesmo workflow); da #6 à #10 todos vieram do `schedule`.
+- **Queda nos últimos meses.** Nas previsões conferidas com o desfecho real, o F1 macro caiu para 0,680 e 0,698 em jul e ago/2017 (seção 7). O retreino diário e a promoção reagiram, mas a regra só olha o teste do ciclo; não há um gatilho que retreine ou recalibre quando o drift alerta.
+- **Fim dos lotes simulados.** São só 8 lotes de 2017. Depois do último (26/11), os ciclos agendados rodam sem dado novo e sem lote futuro para prever (seção 7).
 
 ## 11. Conclusão e considerações finais
 
-O pipeline cumpre o ciclo completo sem ninguém mexer: chega um lote novo, o ETL é refeito, as features são eleitas de novo, os dois modelos competem, tudo é registrado no MLflow e um modelo novo só entra se ganhar do atual pelas regras definidas antes. Nos ciclos executados, a regra promoveu quando houve ganho e manteve quando não houve. A Random Forest venceu sempre, com F1 macro de 0,73 a 0,75 no teste. O monitoramento de drift confirmou a mudança de comportamento em 2017; depois de tirar o `agent` do status geral, o alerta deixou de disparar só por causa da troca de agências. Por fim, o modelo vigente pode ser usado com uma reserva nova, sem rótulo, pela linha de comando ou pelo notebook 05.
+O pipeline cumpre o ciclo completo sem ninguém mexer: chega um lote novo, o ETL é refeito, as features são eleitas de novo, os dois modelos competem, tudo é registrado no MLflow e um modelo novo só entra se ganhar do atual pelas regras definidas antes. Nos oito ciclos executados no GitHub Actions, cinco deles disparados só pelo `schedule`, a regra promoveu quando houve ganho (cinco vezes, contando o primeiro ciclo) e manteve quando não houve (três vezes, uma delas com ganho abaixo do mínimo). A Random Forest venceu sempre, com F1 macro de 0,73 a 0,76 no teste, e as previsões feitas para o mês seguinte ficaram entre 0,68 e 0,77 quando conferidas com o desfecho real. O monitoramento de drift confirmou a mudança de comportamento em 2017; depois de tirar o `agent` do status geral, o alerta deixou de disparar só por causa da troca de agências. Por fim, o modelo vigente pode ser usado com uma reserva nova, sem rótulo, pela linha de comando, pelo notebook 05 ou pela interface em Streamlit.
+
+O principal aprendizado é que o modelo, sozinho, não resolve: o que dá confiança é o processo em volta dele (dados versionados, regra de promoção fixada antes, registro de tudo e conferência com o que aconteceu depois). Os próximos passos mais úteis para o hotel são ajustar o limiar ao custo de cada tipo de erro, já que o modelo perde muitos cancelamentos, e criar atributos sobre o canal online, que concentra três quartos dos erros.
 
 ## Evidências
 
 | O quê | Onde |
 |---|---|
-| Execuções no Actions | [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506), [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) (falha simulada), [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735), [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641), [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (agendada) e as agendadas seguintes |
+| Execuções no Actions | [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506), [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) (falha simulada), [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735), [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641), [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) a [#10](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45878188588) (agendadas) |
 | Estado entre ciclos | branch `estado-pipeline` |
 | Modelos de cada ciclo | Release `modelos` |
 | Evidências de cada execução | artefato `evidencias-<run_id>` de cada execução |
 | Tabelas de votação, competição, drift e decisões | `evidencias/` |
 | Decisões e vigente | `models/modelo_vigente.json` na `estado-pipeline`; cópia em `models/modelo_vigente_actions.json` |
 | Cópia das evidências do Actions | `evidencias/actions/` (votos, drift, diagnóstico, previsões e histórico do MLflow) |
+| Interface de demonstração | `streamlit run app/streamlit_app.py` (README, "Interface de demonstração") |
 | Demonstração de uso | `python -m src.prever --json exemplos/reserva_exemplo.json --manifesto models/modelo_vigente_actions.json`, com o vigente baixado da Release (`models/LEIAME.md`) |
 | Histórico de desenvolvimento | `HISTORICO_DESENVOLVIMENTO.md` |
 | Testes | `python -m pytest -q` (219 testes) |

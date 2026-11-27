@@ -1,7 +1,7 @@
 {
-  "cycle_id": "20261123T101743Z-gha45154548830-1",
-  "data_version": "dv022-b2d8eb3a",
-  "gerado_em": "2026-11-23T10:17:46Z",
+  "cycle_id": "20261126T184446Z-gha45878188588-1",
+  "data_version": "dv026-707ae968",
+  "gerado_em": "2026-11-26T18:44:48Z",
   "lotes": [
     "lote_2015-07",
     "lote_2015-08",
@@ -24,31 +24,35 @@
     "lote_2017-01",
     "lote_2017-02",
     "lote_2017-03",
-    "lote_2017-04"
+    "lote_2017-04",
+    "lote_2017-05",
+    "lote_2017-06",
+    "lote_2017-07",
+    "lote_2017-08"
   ],
   "lotes_novos_vs_ciclo_anterior": [
-    "lote_2017-04"
+    "lote_2017-08"
   ],
   "antes": {
-    "n_linhas": 97192,
+    "n_linhas": 119390,
     "n_colunas": 32,
     "nulos_por_coluna": {
       "children": 4,
       "country": 488,
-      "agent": 13974,
-      "company": 91197
+      "agent": 16340,
+      "company": 112593
     },
-    "duplicatas_exatas": 27532,
-    "taxa_cancelamento": 0.3624,
+    "duplicatas_exatas": 31994,
+    "taxa_cancelamento": 0.3704,
     "extremos": {
       "lead_time": {
         "min": 0.0,
-        "p99": 426.0,
+        "p99": 444.0,
         "max": 737.0
       },
       "adr": {
         "min": -6.38,
-        "p99": 231.0,
+        "p99": 252.0,
         "max": 5400.0
       },
       "adults": {
@@ -63,26 +67,26 @@
       },
       "days_in_waiting_list": {
         "min": 0.0,
-        "p99": 87.0,
+        "p99": 75.0,
         "max": 391.0
       }
     }
   },
   "depois": {
-    "n_linhas": 97032,
+    "n_linhas": 119209,
     "n_colunas": 33,
     "nulos_por_coluna": {},
-    "duplicatas_exatas": 31072,
-    "taxa_cancelamento": 0.3628,
+    "duplicatas_exatas": 35994,
+    "taxa_cancelamento": 0.3708,
     "extremos": {
       "lead_time": {
         "min": 0.0,
-        "p99": 426.0,
+        "p99": 444.0,
         "max": 737.0
       },
       "adr": {
         "min": 0.0,
-        "p99": 231.0,
+        "p99": 252.0,
         "max": 5400.0
       },
       "adults": {
@@ -97,26 +101,26 @@
       },
       "days_in_waiting_list": {
         "min": 0.0,
-        "p99": 87.0,
+        "p99": 75.0,
         "max": 391.0
       }
     }
   },
   "relatorio_etl": {
-    "n_entrada": 97192,
-    "duplicatas_identicas_no_dado": 27532,
+    "n_entrada": 119390,
+    "duplicatas_identicas_no_dado": 31994,
     "duplicatas_removidas": 0,
     "duplicatas_estrategia": "entre_lotes",
     "regras_dominio": {
-      "sem_hospedes": 159,
+      "sem_hospedes": 180,
       "adr_negativo": 1
     },
-    "regras_dominio_removidas": 160,
+    "regras_dominio_removidas": 181,
     "imputados": {
       "children": 4,
       "country": 478,
-      "agent": 13924,
-      "company": 91063
+      "agent": 16280,
+      "company": 112441
     },
     "colunas_removidas": [
       "reservation_status",
@@ -129,7 +133,7 @@
       "arrival_date_day_of_month",
       "company"
     ],
-    "n_saida": 97032,
-    "removidas_total": 160
+    "n_saida": 119209,
+    "removidas_total": 181
   }
 }
