@@ -144,13 +144,14 @@ O segundo comando baixa o vigente do Actions (a interface também tem um botão 
 
 | Página | O que mostra |
 |---|---|
-| Visão geral | Problema, fluxo de um ciclo, números do Actions e divisão por feature |
-| Exploração dos dados | Classes, cancelamento ao longo do tempo e por depósito, segmento, antecedência e pedidos especiais; colunas que vazariam a resposta; ausentes e duplicatas |
-| Simular uma reserva | Formulário com uma reserva nova, chance de cancelamento pelo vigente (`src.prever`) e gráfico "e se…" variando antecedência, diária, depósito ou pedidos especiais |
-| Previsões × realidade | As previsões que cada ciclo do Actions fez para o mês seguinte, conferidas com o desfecho real: F1 mês a mês, simulação de outro corte de decisão, matriz de confusão, previsto × real por semana e onde o modelo erra |
-| Ciclos e promoção | Decisões do manifesto, competição A × B na CV e vencedor × vigente no teste (cópia do MLflow do Actions) |
-| Seleção de features | Votos dos três métodos em cada ciclo e as features eleitas |
-| Monitoramento de drift | PSI por feature e variação da taxa de cancelamento de qualquer lote, calculados na hora (`src.drift`), e o histórico do Actions |
+| O projeto | O problema, os números principais, como funciona o ciclo e quem usa |
+| Os dados | Cancelamento por depósito, antecedência e pedidos especiais, e ao longo do tempo |
+| Testar uma reserva | Três exemplos prontos e campos editáveis: a chance de cancelamento pelo vigente (`src.prever`) é recalculada na hora, com o gráfico "e se mudasse a antecedência?" |
+| O modelo acertou? | As previsões que cada ciclo do Actions fez para o mês seguinte, conferidas com o que aconteceu, e a simulação de outro corte de decisão |
+| Como o modelo é escolhido | Novo modelo × modelo em uso em cada mês e a decisão; a competição A × B e a votação das variáveis ficam em "Detalhes técnicos" |
+| Alerta de mudança | Cancelamento de cada mês contra o mesmo mês do ano anterior, com os alertas; o PSI por variável fica em "Detalhes técnicos" |
+
+Cada página mostra poucos números, um gráfico e uma frase de conclusão; o que é técnico fica recolhido em "Detalhes técnicos". O tema claro e o modo headless vêm de `.streamlit/config.toml`.
 
 A interface só lê: não move lotes, não treina e não grava nada versionado. Para a apresentação, o [`docs/roteiro_apresentacao.md`](docs/roteiro_apresentacao.md) tem quem fala em cada slide, o checklist do dia com o plano B e as perguntas prováveis.
 

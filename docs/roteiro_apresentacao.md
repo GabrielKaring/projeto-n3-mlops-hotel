@@ -8,16 +8,16 @@ A nota da socialização é individual: cada um apresenta e responde pela parte 
 
 | Slide | Assunto | Quem | Na interface |
 |---|---|---|---|
-| 1 e 2 | Título e divisão do trabalho | Vinicius | Visão geral |
-| 3 a 5 | Problema, dados e exploração | Gabriel Karing | Exploração dos dados |
-| 6 | Fluxo automático | Diego | Visão geral (os 7 passos) |
-| 7 | Votação das variáveis | Gabriel Karing | Seleção de features |
-| 8 | Competição A × B | Gabriel Wendorff | Ciclos e promoção (gráfico da CV) |
-| 9 | Promoção | Diego | Ciclos e promoção (tabela de decisões) |
-| 10 | Automação e MLflow | Diego e José | Ciclos e promoção ("Runs do MLflow"); José pode abrir `mlflow ui` |
-| 11 e 12 | Resultados e erros | Gabriel Wendorff | Previsões × realidade (com o corte de decisão) |
-| 13 | Drift | Guilherme e Lucas | Monitoramento de drift |
-| 14 e 15 | Demonstração e interface | Diego | Simular uma reserva |
+| 1 e 2 | Título e divisão do trabalho | Vinicius | O projeto ("Quem fez o quê") |
+| 3 a 5 | Problema, dados e exploração | Gabriel Karing | O projeto; Os dados |
+| 6 | Fluxo automático | Diego | O projeto ("Como funciona") |
+| 7 | Votação das variáveis | Gabriel Karing | Como o modelo é escolhido ("Detalhes técnicos") |
+| 8 | Competição A × B | Gabriel Wendorff | Como o modelo é escolhido ("Detalhes técnicos") |
+| 9 | Promoção | Diego | Como o modelo é escolhido |
+| 10 | Automação e MLflow | Diego e José | José pode abrir `mlflow ui` ou rodar `python -m src.rastreio` |
+| 11 e 12 | Resultados e erros | Gabriel Wendorff | O modelo acertou? (com "E se o corte fosse outro?") |
+| 13 | Drift | Guilherme e Lucas | Alerta de mudança |
+| 14 e 15 | Demonstração e interface | Diego | Testar uma reserva |
 | 16 | Considerações finais | Vinicius | — |
 
 Cada um deve conseguir explicar, sem o slide: o que a sua parte faz, por que foi feita assim e onde está a evidência no repositório (a feature e os arquivos estão em `config/equipe.yaml`).
@@ -38,7 +38,7 @@ streamlit run app/streamlit_app.py
 ```
 
 - O `src.prever` deve mostrar 82,3%, 100,0% e 1,6%. Se mostrar, o modelo está no lugar e a interface vai funcionar.
-- Abra uma vez cada página da interface antes de apresentar: "Exploração dos dados", "Previsões × realidade" e "Monitoramento de drift" leem todos os lotes na primeira vez (alguns segundos) e depois ficam em cache.
+- Abra uma vez cada página da interface antes de apresentar: "Os dados", "O modelo acertou?" e "Alerta de mudança" leem todos os lotes na primeira vez (alguns segundos) e depois ficam em cache.
 - Com o modelo baixado, a interface não precisa de internet.
 
 **Plano B**, se a interface não abrir: rodar o `python -m src.prever` acima no terminal (é a mesma previsão) e usar o print do slide 15. Se nem o Python funcionar, o slide 14 tem o resultado da demonstração.
@@ -53,7 +53,7 @@ streamlit run app/streamlit_app.py
 
 **Por que o modelo piorou em jul e ago/2017 (F1 0,68 e 0,70)?** O perfil das reservas mudou em 2017: a taxa de cancelamento ficou acima da de 2016 desde janeiro. O pipeline reagiu, porque o retreino passou a ganhar do modelo em uso e foi promovido três vezes seguidas (jun, jul e ago), mas não há um gatilho que retreine assim que o drift alerta. Está nas limitações.
 
-**Por que o modelo perde tantos cancelamentos?** Com o corte em 50%, ele é conservador: no teste do dv026 deixou passar 38% dos cancelamentos, com 14% de alarme falso. O corte pode ser ajustado ao custo de cada erro para o hotel. Na interface, "Previsões × realidade" tem o controle: no lote de ago/2017, baixar o corte de 50% para 40% reduz os cancelamentos perdidos de 51% para 26%, e os alarmes falsos sobem de 11% para 28%. Não mudamos o corte no pipeline porque ele foi fixado antes do treino.
+**Por que o modelo perde tantos cancelamentos?** Com o corte em 50%, ele é conservador: no teste do dv026 deixou passar 38% dos cancelamentos, com 14% de alarme falso. O corte pode ser ajustado ao custo de cada erro para o hotel. Na interface, "O modelo acertou?" tem o controle ("E se o corte fosse outro?"): em ago/2017, baixar o corte de 50% para 40% reduz os cancelamentos perdidos de 51% para 26%, e os alarmes falsos sobem de 11% para 28%. Não mudamos o corte no pipeline porque ele foi fixado antes do treino.
 
 **Por que "não reembolsável" cancela 99% das vezes?** É o que os dados mostram: das 14.587 reservas *Non Refund*, 99% constam como canceladas. O dataset não traz informação para explicar o motivo, então o modelo usa o padrão como ele está, e nós não inventamos uma causa. É também o atributo que os três métodos elegem por unanimidade em todos os ciclos.
 
