@@ -43,7 +43,7 @@ Execuções do pipeline no GitHub Actions até 26/11/2026 (F1 macro no **teste d
 - **Onde o modelo erra:** com o vigente atual no teste do ciclo dv026 (24.018 reservas, análise de erros do Actions em [`evidencias/actions/promocao/`](evidencias/actions/promocao/)), o erro total é de 24%. O erro que mais aparece é deixar passar cancelamento: 38% das reservas canceladas não foram previstas, contra 14% de alarme falso entre as que vieram. Quase todos os erros são de reservas sem depósito, e 75% deles vêm de agências online (*Online TA*); a faixa de 30 a 89 dias de antecedência tem a maior taxa de erro (32%). Detalhes e matriz de confusão na seção 7 do relatório.
 - **Drift:** a taxa de cancelamento de 2017 sobe em relação ao mesmo mês de 2016 (jan/2017: +9,2 p.p.; abr/2017: +5,5 p.p.), e o alerta avisou. Em 23/11 o `agent` saiu do status geral do alerta, porque disparava em todo lote ([`docs/f10_drift.md`](docs/f10_drift.md)).
 
-Relatório completo: [`reports/relatorio_n3.pdf`](reports/relatorio_n3.pdf).
+Relatório completo: [`reports/relatorio_n3.pdf`](reports/relatorio_n3.pdf). Interface on-line, sem instalar nada: **[n3-cancelamento-hotel.streamlit.app](https://n3-cancelamento-hotel.streamlit.app)**.
 
 ## Status por feature
 
@@ -132,7 +132,7 @@ Mais detalhes sobre os manifestos em [`models/LEIAME.md`](models/LEIAME.md). O n
 
 ## Interface de demonstração (Streamlit)
 
-Uma interface para apresentar o projeto funcionando, sem abrir notebooks:
+Uma interface para apresentar o projeto funcionando, sem abrir notebooks. Está publicada em **[n3-cancelamento-hotel.streamlit.app](https://n3-cancelamento-hotel.streamlit.app)** (Streamlit Community Cloud, atualizada a cada push na `main`). Para rodar localmente:
 
 ```bash
 pip install -r requirements-app.txt -c constraints.txt
@@ -153,7 +153,7 @@ O segundo comando baixa o vigente do Actions. Ele é opcional: se o arquivo não
 
 Cada página mostra poucos números, um gráfico e uma frase de conclusão; o que é técnico fica recolhido em "Detalhes técnicos". O tema claro e o modo headless vêm de `.streamlit/config.toml`.
 
-**Publicar no Streamlit Community Cloud** (gratuito, o app fica num link público): em [share.streamlit.io](https://share.streamlit.io), entre com a conta do GitHub, clique em *Create app* → *Deploy a public app from GitHub* e preencha repositório `GabrielKaring/projeto-n3-mlops-hotel`, branch `main` e arquivo `app/streamlit_app.py`. Em *Advanced settings*, escolha **Python 3.12**. O Cloud instala só o `app/requirements.txt` (sem mlflow nem o executor de notebooks), e o app baixa o modelo da Release na primeira visita.
+**Como foi publicada** no Streamlit Community Cloud (para publicar de novo, por exemplo num fork): em [share.streamlit.io](https://share.streamlit.io), entre com a conta do GitHub, clique em *Create app* → *Deploy a public app from GitHub* e preencha repositório `GabrielKaring/projeto-n3-mlops-hotel`, branch `main` e arquivo `app/streamlit_app.py`. Em *Advanced settings*, escolha **Python 3.12**. O Cloud instala só o `app/requirements.txt` (sem mlflow nem o executor de notebooks), e o app baixa o modelo da Release na primeira visita.
 
 A interface só lê: não move lotes, não treina e não grava nada versionado. Para a apresentação, o [`docs/roteiro_apresentacao.md`](docs/roteiro_apresentacao.md) tem quem fala em cada slide, o checklist do dia com o plano B e as perguntas prováveis.
 

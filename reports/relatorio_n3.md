@@ -228,7 +228,7 @@ Entradas inválidas são recusadas com uma mensagem clara: campo obrigatório va
 
 ### Interface de demonstração
 
-Para a apresentação e para quem não usa terminal, há uma interface em Streamlit (`streamlit run app/streamlit_app.py`, instruções no README). Ela usa as mesmas funções do pipeline e só lê: não move lotes, não treina e não grava nada versionado.
+Para a apresentação e para quem não usa terminal, há uma interface em Streamlit, publicada em [n3-cancelamento-hotel.streamlit.app](https://n3-cancelamento-hotel.streamlit.app) (ou localmente com `streamlit run app/streamlit_app.py`, instruções no README). Ela usa as mesmas funções do pipeline e só lê: não move lotes, não treina e não grava nada versionado.
 
 - **Testar uma reserva:** três exemplos prontos e os campos conhecidos no ato da reserva; a chance de cancelamento pelo vigente, o risco e a ação sugerida (pedir depósito ou confirmar) são recalculados a cada mudança. Um gráfico "e se mudasse a antecedência?" mostra como a probabilidade muda, o que ajuda a explicar o que o modelo aprendeu.
 - **O modelo acertou?:** a conferência da seção 7, mês a mês, com matriz de confusão, previsto × real por semana e a simulação de outro corte de decisão.
@@ -294,7 +294,7 @@ O principal aprendizado é que o modelo, sozinho, não resolve: o que dá confia
 | Tabelas de votação, competição, drift e decisões | `evidencias/` |
 | Decisões e vigente | `models/modelo_vigente.json` na `estado-pipeline`; cópia em `models/modelo_vigente_actions.json` |
 | Cópia das evidências do Actions | `evidencias/actions/` (votos, drift, diagnóstico, previsões e histórico do MLflow) |
-| Interface de demonstração | `streamlit run app/streamlit_app.py` (README, "Interface de demonstração") |
+| Interface de demonstração | [n3-cancelamento-hotel.streamlit.app](https://n3-cancelamento-hotel.streamlit.app), ou `streamlit run app/streamlit_app.py` (README, "Interface de demonstração") |
 | Demonstração de uso | `python -m src.prever --json exemplos/reserva_exemplo.json --manifesto models/modelo_vigente_actions.json`, com o vigente baixado da Release (`models/LEIAME.md`) |
 | Histórico de desenvolvimento | `HISTORICO_DESENVOLVIMENTO.md` |
 | Testes | `python -m pytest -q` (219 testes) |
