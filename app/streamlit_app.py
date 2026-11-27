@@ -430,8 +430,31 @@ def pagina_lote() -> None:
     escolhido = st.selectbox("Detalhar o mês", lotes, index=len(lotes) - 1,
                              format_func=lambda l: f"{l.removeprefix('lote_')}  ·  previsto pelo {resumo.loc[lotes.index(l), 'modelo']}")
     prev = conferir_previsoes(str(arquivos[escolhido]))
-    y, p = prev["is_canceled"].to_numpy(), prev["previsao"].to_numpy()
-    m = metricas_classificacao(y, p, prev["prob_cancelamento"].to_numpy())
+    y, prob = prev["is_canceled"].to_numpy(), prev["prob_cancelamento"].to_numpy()
+
+    with st.container(border=True):
+        st.markdown("**E se o corte fosse outro?** O pipeline usa 50%: a partir dele a reserva é \"risco alto\". "
+                    "Baixar o corte pega mais cancelamentos, ao preço de mais alarmes falsos. É só uma simulação: "
+                    "o modelo e a regra de promoção não mudam.")
+        limiar = st.slider("Corte de decisão", 0.20, 0.80, float(promocao.LIMIAR_CLASSE), 0.05, format="%.2f")
+        cortes = [round(0.20 + 0.05 * i, 2) for i in range(13)]
+        curva = []
+        for c_ in cortes:
+            rc = resumo_confusao(y, (prob >= c_).astype(int))
+            curva += [{"corte": c_, "taxa": rc["taxa_falso_negativo"], "erro": "cancelamentos perdidos"},
+                      {"corte": c_, "taxa": rc["taxa_falso_positivo"], "erro": "alarmes falsos"}]
+        linhas = alt.Chart(pd.DataFrame(curva)).mark_line(point=True).encode(
+            x=alt.X("corte:Q", title="Corte de decisão", axis=alt.Axis(format="%")),
+            y=alt.Y("taxa:Q", axis=alt.Axis(format="%"), title="Taxa de erro"),
+            color=alt.Color("erro:N", scale=alt.Scale(range=["#fb8c00", "#e53935"]), legend=alt.Legend(orient="top", title=None)),
+            tooltip=[alt.Tooltip("corte:Q", format=".0%"), "erro", alt.Tooltip("taxa:Q", format=".1%")])
+        marca = alt.Chart(pd.DataFrame({"x": [limiar]})).mark_rule(strokeDash=[4, 4]).encode(x="x:Q")
+        st.altair_chart((linhas + marca).properties(height=220), width="stretch")
+        st.caption("Cancelamentos perdidos: % das reservas canceladas que o modelo deixou passar. "
+                   "Alarmes falsos: % das reservas que vieram e foram marcadas como risco alto.")
+
+    p = (prob >= limiar).astype(int)
+    m = metricas_classificacao(y, p, prob)
     r = resumo_confusao(y, p)
 
     k = st.columns(5)
