@@ -48,7 +48,7 @@ Todas essas decisões foram fixadas antes de treinar qualquer modelo e estão em
 
 ### Exploração dos dados
 
-Antes de escolher tratamentos e modelos, olhamos como o cancelamento se distribui (os gráficos usam os 26 lotes depois do ETL, 119.209 reservas; a página "Exploração dos dados" da interface mostra os mesmos cortes de forma interativa).
+Antes de escolher tratamentos e modelos, olhamos como o cancelamento se distribui (os gráficos usam os 26 lotes depois do ETL, 119.209 reservas; a página "Os dados" da interface mostra os mesmos cortes de forma interativa).
 
 ![Taxa de cancelamento por mês de chegada, por hotel. A linha tracejada é a média (37%).](img/eda_tempo.png)
 
@@ -183,7 +183,7 @@ O notebook 05 carrega o vigente com o pré-processamento e prevê o **próximo l
 - **As decisões de modelagem não veem o teste.** A eleição das features (seção 3) e a escolha entre A e B (seção 4) usam só o desenvolvimento, com validação cruzada temporal. O teste não entra no treino nem na seleção.
 - **O teste é um holdout fora do tempo.** São as reservas mais recentes do ciclo, posteriores a tudo o que o candidato viu. O candidato chega ao teste já fechado, e a comparação com o vigente é a avaliação final dele.
 - **A regra foi fixada antes.** Piso de 0,60 e melhoria mínima de 0,005 estão no `config.yaml` desde antes do primeiro treino; o resultado no teste não ajusta nada, só aplica a regra. A análise de erros roda depois da decisão e não a influencia.
-- **A avaliação de produção é o lote futuro.** O que mede o modelo em uso de verdade é a conferência do notebook 05, com dados que não existiam no ciclo em que a previsão foi feita. Conferindo as previsões gravadas no Actions com o rótulo real dos lotes seguintes (o mesmo cálculo do notebook 05), o F1 macro foi de 0,716 em fev/2017, 0,765 em mar/2017, 0,756 em abr/2017, 0,749 em mai/2017 e 0,735 em jun/2017, na mesma faixa do teste. Em jul/2017 (0,680) e ago/2017 (0,698) ele caiu. A taxa de cancelamento de 2017 ficou acima da de 2016 desde janeiro (seção 9), e foi nesse trecho que o retreino passou a ganhar do vigente e a regra promoveu três vezes seguidas: o pipeline reagiu à mudança, mas o modelo ainda erra mais nos meses finais. A página "Previsões × realidade" da interface (seção 8) mostra essa conferência mês a mês.
+- **A avaliação de produção é o lote futuro.** O que mede o modelo em uso de verdade é a conferência do notebook 05, com dados que não existiam no ciclo em que a previsão foi feita. Conferindo as previsões gravadas no Actions com o rótulo real dos lotes seguintes (o mesmo cálculo do notebook 05), o F1 macro foi de 0,716 em fev/2017, 0,765 em mar/2017, 0,756 em abr/2017, 0,749 em mai/2017 e 0,735 em jun/2017, na mesma faixa do teste. Em jul/2017 (0,680) e ago/2017 (0,698) ele caiu. A taxa de cancelamento de 2017 ficou acima da de 2016 desde janeiro (seção 9), e foi nesse trecho que o retreino passou a ganhar do vigente e a regra promoveu três vezes seguidas: o pipeline reagiu à mudança, mas o modelo ainda erra mais nos meses finais. A página "O modelo acertou?" da interface (seção 8) mostra essa conferência mês a mês.
 
 **Quando os lotes acabam.** Com o `schedule` diário, o último lote de 2017 entrou em 26/11 (execução #10). Daí em diante o notebook 05 avisa que não há lote novo, mostra as últimas previsões feitas e mantém a demonstração da seção 8; os ciclos rodam sobre os mesmos dados e a decisão esperada é manter o vigente. O agendamento não foi alterado, para não mudar a simulação de chegada de dados.
 
@@ -230,9 +230,9 @@ Entradas inválidas são recusadas com uma mensagem clara: campo obrigatório va
 
 Para a apresentação e para quem não usa terminal, há uma interface em Streamlit (`streamlit run app/streamlit_app.py`, instruções no README). Ela usa as mesmas funções do pipeline e só lê: não move lotes, não treina e não grava nada versionado.
 
-- **Simular uma reserva:** um formulário com os campos conhecidos no ato da reserva devolve a chance de cancelamento pelo vigente, o risco e a ação sugerida (pedir depósito ou confirmar). Um gráfico "e se…" varia um atributo de cada vez (antecedência, diária, depósito, pedidos especiais) e mostra como a probabilidade muda, o que ajuda a explicar o que o modelo aprendeu.
-- **Previsões × realidade:** a conferência da seção 7, mês a mês, com matriz de confusão, previsto × real por semana e erros por grupo.
-- **Exploração dos dados, ciclos e promoção, seleção de features e drift:** as mesmas evidências deste relatório, lidas de `evidencias/actions/` e calculadas na hora a partir dos lotes.
+- **Testar uma reserva:** três exemplos prontos e os campos conhecidos no ato da reserva; a chance de cancelamento pelo vigente, o risco e a ação sugerida (pedir depósito ou confirmar) são recalculados a cada mudança. Um gráfico "e se mudasse a antecedência?" mostra como a probabilidade muda, o que ajuda a explicar o que o modelo aprendeu.
+- **O modelo acertou?:** a conferência da seção 7, mês a mês, com matriz de confusão, previsto × real por semana e a simulação de outro corte de decisão.
+- **O projeto, Os dados, Como o modelo é escolhido e Alerta de mudança:** as mesmas evidências deste relatório, lidas de `evidencias/actions/` e calculadas na hora a partir dos lotes. Cada página mostra poucos números e uma conclusão; o detalhe técnico fica recolhido.
 
 ## 9. Recurso adicional: monitoramento de drift com alerta
 

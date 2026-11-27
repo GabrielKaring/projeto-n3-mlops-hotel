@@ -1,0 +1,13 @@
+# Interface de demonstração (app/streamlit_app.py): tema claro, que fica legível em projetor, nas cores da apresentação.
+[theme]
+base = "light"
+primaryColor = "#8A1F3A"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F4EFE8"
+textColor = "#1E2430"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false
