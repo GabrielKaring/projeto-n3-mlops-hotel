@@ -1,20 +1,20 @@
 # Histórico de desenvolvimento
 
-_Gerado em 23/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. Não edite à mão: rode o script de novo._
+_Gerado em 27/11/2026 por `scripts/gerar_historico.py` a partir do `git log`. Não edite à mão: rode o script de novo._
 
 ## Resumo por integrante
 
 | Integrante | Commits | Primeiro | Último | Linhas + | Linhas − |
 |---|---:|---|---|---:|---:|
-| Gabriel Karing | 24 | 2026-11-04 | 2026-11-23 | 16,484 | 11,587 |
+| Gabriel Karing | 27 | 2026-11-04 | 2026-11-27 | 18,965 | 12,203 |
 | Vinicius | 15 | 2026-11-23 | 2026-11-23 | 1,440 | 198 |
-| Lucas | 6 | 2026-11-23 | 2026-11-23 | 2,338 | 11 |
+| Lucas | 7 | 2026-11-23 | 2026-11-23 | 2,353 | 18 |
 | Gabriel Wendorff | 3 | 2026-11-19 | 2026-11-19 | 1,497 | 39 |
 | Diego | 2 | 2026-11-19 | 2026-11-19 | 11,338 | 99 |
 | Guilherme | 2 | 2026-11-21 | 2026-11-21 | 840 | 5 |
 | José | 1 | 2026-11-19 | 2026-11-19 | 6,022 | 35 |
 
-Total: 53 commits de 7 integrante(s).
+Total: 57 commits de 7 integrante(s).
 
 ## Visão por feature
 
@@ -30,7 +30,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | F6 | MLflow e rastreabilidade | José | 1 | 2 | ✅ com commits do dono |
 | F7 | Workflow único e agendamento | Diego | 1 | 4 | ✅ com commits do dono |
 | F8 | Eleição, promoção e previsões | Diego | 1 | 1 | ✅ com commits do dono |
-| F9 | Repositório, relatório e evidências | Vinicius | 7 | 4 | ✅ com commits do dono |
+| F9 | Repositório, relatório e evidências | Vinicius | 7 | 6 | ✅ com commits do dono |
 | F10 | Recurso adicional justificado (sugestão: monitoramento de drift com alerta) | Lucas, Guilherme | 6 | 2 | ✅ com commits do dono |
 
 ### Por integrante
@@ -45,7 +45,7 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | Lucas | F10 | 4 |
 | Vinicius | F9 | 7 |
 
-14 commit(s) sem tag de feature (docs, equipe, correções).
+16 commit(s) sem tag de feature (docs, equipe, correções).
 
 #### F1 · Problema, dados e avaliação
 
@@ -108,6 +108,8 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `201b7c5` 2026-11-23 · Gabriel Karing · [F9] regenera o histórico de desenvolvimento
 - `75b71fb` 2026-11-23 · Gabriel Karing · [F9] introdução, título com as duas disciplinas e G0 resolvido
 - `39aa17e` 2026-11-23 · Lucas · [F9] gerar_historico lê o git log em UTF-8 (acentos no Windows)
+- `2047fdf` 2026-11-27 · Gabriel Karing · [F9] atualiza para os 8 ciclos do Actions e adiciona a exploração dos dados
+- `4de69d0` 2026-11-27 · Gabriel Karing · [F9] LEIAME das evidências do Actions e legenda do drift na interface com os 8 ciclos
 
 #### F10 · Recurso adicional justificado (sugestão: monitoramento de drift com alerta)
 
@@ -177,6 +179,10 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 | 2026-11-23 | `40a867e` | Gabriel Karing | [docs] regenera o histórico de desenvolvimento | 1 |
 | 2026-11-23 | `39aa17e` | Lucas | [F9] gerar_historico lê o git log em UTF-8 (acentos no Windows) | 1 |
 | 2026-11-23 | `ec01007` | Lucas | [F10] cita o passo do drift na tabela do f7_workflow.md | 1 |
+| 2026-11-23 | `8dcab0b` | Lucas | [docs] regenera o histórico de desenvolvimento | 1 |
+| 2026-11-27 | `447b1d9` | Gabriel Karing | [docs] interface Streamlit para demonstrar o pipeline | 3 |
+| 2026-11-27 | `2047fdf` | Gabriel Karing | [F9] atualiza para os 8 ciclos do Actions e adiciona a exploração dos dados | 33 |
+| 2026-11-27 | `4de69d0` | Gabriel Karing | [F9] LEIAME das evidências do Actions e legenda do drift na interface com os 8 ciclos | 2 |
 
 ## Contribuições de Gabriel Karing
 
@@ -204,6 +210,9 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `75b71fb` 2026-11-23 · [F9] introdução, título com as duas disciplinas e G0 resolvido
 - `4be6246` 2026-11-23 · [docs][F8][F10] ajustes do code review: uso do teste, validação da demonstração, drift sem travar no MLflow e versões fixas
 - `40a867e` 2026-11-23 · [docs] regenera o histórico de desenvolvimento
+- `447b1d9` 2026-11-27 · [docs] interface Streamlit para demonstrar o pipeline
+- `2047fdf` 2026-11-27 · [F9] atualiza para os 8 ciclos do Actions e adiciona a exploração dos dados
+- `4de69d0` 2026-11-27 · [F9] LEIAME das evidências do Actions e legenda do drift na interface com os 8 ciclos
 
 ## Contribuições de Gabriel Wendorff
 
@@ -251,3 +260,4 @@ Commits com a tag `[Fn]` no início da mensagem. "Do dono" conta commits cujo au
 - `0b89602` 2026-11-23 · [docs] regenera o histórico de desenvolvimento
 - `39aa17e` 2026-11-23 · [F9] gerar_historico lê o git log em UTF-8 (acentos no Windows)
 - `ec01007` 2026-11-23 · [F10] cita o passo do drift na tabela do f7_workflow.md
+- `8dcab0b` 2026-11-23 · [docs] regenera o histórico de desenvolvimento
