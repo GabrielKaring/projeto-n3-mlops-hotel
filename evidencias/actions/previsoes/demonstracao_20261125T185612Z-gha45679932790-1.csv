@@ -1,0 +1,4 @@
+reserva,hotel,arrival_date,prob_cancelamento,previsao,limiar,risco,vigente_cycle_id,vigente_modelo,aviso,cycle_id,data_version
+1,City Hotel,2017-09-15,0.8403102359922007,1,0.5,risco alto,20261125T185612Z-gha45679932790-1,B,,20261125T185612Z-gha45679932790-1,dv025-ac9d46fc
+2,City Hotel,2017-10-12,1.0,1,0.5,risco alto,20261125T185612Z-gha45679932790-1,B,,20261125T185612Z-gha45679932790-1,dv025-ac9d46fc
+3,Resort Hotel,2017-09-22,0.021199497547357313,0,0.5,risco baixo,20261125T185612Z-gha45679932790-1,B,,20261125T185612Z-gha45679932790-1,dv025-ac9d46fc

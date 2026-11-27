@@ -1,0 +1,3 @@
+# Interface de demonstração (app/streamlit_app.py). Fora do requirements.txt para não mudar o ambiente do pipeline.
+-r requirements.txt
+streamlit>=1.40
