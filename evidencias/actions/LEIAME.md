@@ -6,13 +6,13 @@ Ela fica numa pasta própria para não se misturar com os ciclos locais: o noteb
 
 ## Execuções copiadas
 
-As 4 execuções que decidiram um ciclo, com vencedor, vigente e decisão de cada uma, estão na tabela de "Principais resultados" do [README](../../README.md#principais-resultados). A execução [45091260105](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) foi a falha simulada (`falhar_em = 03_treino_competicao`): o fluxo parou no notebook 03 e nada foi decidido, por isso ela não tem arquivos aqui.
+As 8 execuções que decidiram um ciclo (dv019 a dv026; as 5 últimas disparadas pelo `schedule`), com vencedor, vigente e decisão de cada uma, estão na tabela de "Principais resultados" do [README](../../README.md#principais-resultados). A execução [45091260105](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) foi a falha simulada (`falhar_em = 03_treino_competicao`): o fluxo parou no notebook 03 e nada foi decidido, por isso ela não tem arquivos aqui.
 
 ## Arquivos
 
 | Pasta | Conteúdo | Origem |
 |---|---|---|
-| `../../models/modelo_vigente_actions.json` | Manifesto do vigente e histórico das 4 decisões, com `run_id`, features, métricas e motivo | `models/modelo_vigente.json` da `estado-pipeline` |
+| `../../models/modelo_vigente_actions.json` | Manifesto do vigente e histórico das 8 decisões, com `run_id`, features, métricas e motivo | `models/modelo_vigente.json` da `estado-pipeline` |
 | `votacao/` | Tabela de votos de cada ciclo | artefato de cada execução |
 | `mlflow/historico_runs.csv` | Todos os runs do MLflow, com `cycle_id`, `data_version`, etapa e métricas (inclusive o CV de A e B de cada ciclo) | artefato da última execução |
 | `drift/` | Drift do lote da última execução (JSON e gráfico) e o histórico de todos os lotes | artefato da última execução |
@@ -23,5 +23,5 @@ Os modelos de cada ciclo estão na Release `modelos`. Para não inchar a `main`,
 
 ## Observações
 
-- O drift destas execuções foi calculado **antes** do ajuste de 23/11/2026, que tirou o `agent` do status geral (`docs/f10_drift.md`). Por isso todos os lotes aparecem com status `alerta`. A partir do próximo ciclo agendado com esse ajuste na `main`, o status passa a ignorar o `agent`, e o drift também vai para o MLflow (run `01_drift`).
-- A matriz de confusão e a análise de erros do notebook 04, e a demonstração com reservas novas do notebook 05, também entraram em 23/11/2026. Elas aparecem nos artefatos das próximas execuções.
+- O drift copiado é o da última execução (dv026), já com o ajuste de 23/11/2026 que tirou o `agent` do status geral (`docs/f10_drift.md`): o PSI dele aparece na coluna `informativas_alerta` do histórico. As execuções até a 45154548830 rodaram antes do ajuste e marcavam todo lote como `alerta`.
+- A matriz de confusão e a análise de erros do notebook 04, e a demonstração com reservas novas do notebook 05, entraram em 23/11/2026. A análise de erros da última execução está em `promocao/`, e as demonstrações das execuções 45262196574 em diante estão em `previsoes/`.

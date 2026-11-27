@@ -746,8 +746,8 @@ def pagina_drift() -> None:
         color=alt.Color("série:N", legend=alt.Legend(orient="top", title=None)),
         tooltip=["lote", "série", alt.Tooltip("taxa:Q", format=".1%"), "status_alvo"],
     ).properties(height=320), width="stretch")
-    st.caption("Calculado no Actions antes do ajuste que tirou `agent` do status geral (docs/f10_drift.md); "
-               "o gráfico de PSI acima é calculado ao vivo, já com a regra atual.")
+    st.caption("Histórico gravado pela última execução do Actions, já com a regra atual (`agent` só informativo). "
+               "O gráfico de PSI acima é calculado na hora, a partir dos lotes.")
 
 
 {
