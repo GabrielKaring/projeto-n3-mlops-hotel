@@ -30,7 +30,7 @@ Situação em 23/11/2026, na `main`.
 
 Ordem do trabalho: `G1 → G2 → G3 → G4 → G5 → G8 → G9 → GF`. G6 e G7 correm em paralelo desde o início, e G10 entra no fluxo pelo G7.
 
-**Evidências usadas abaixo.** Execuções do Actions: [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506), [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) (falha simulada), [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735), [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) e [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`). A cópia do que elas produziram está em [`evidencias/actions/`](../evidencias/actions/), uma pasta por feature, e o manifesto em `models/modelo_vigente_actions.json`.
+**Evidências usadas abaixo.** Execuções do Actions: [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506), [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) (falha simulada), [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735), [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) e [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) a [#10](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45878188588), as cinco disparadas pelo `schedule` (23 a 26/11). A cópia do que elas produziram está em [`evidencias/actions/`](../evidencias/actions/), uma pasta por feature, e o manifesto em `models/modelo_vigente_actions.json`.
 
 ## G0 · Regras do grupo e do repositório
 
@@ -57,7 +57,7 @@ Evidência: `docs/etapa1_problema_dados_avaliacao.md`.
 - [x] Tratamentos justificados e diagnóstico de antes e depois.
 - [x] Transformações ajustadas só no treino, via `Pipeline`/`ColumnTransformer`.
 - [x] Novos lotes identificados e incorporados sem duplicação, com `data_version`.
-- [x] Ciclos refeitos no pipeline final, sem `country`: #2, #4, #5 e #6 (`dv019` a `dv022`).
+- [x] Ciclos refeitos no pipeline final, sem `country`: #2, #4, #5 e #6 (`dv019` a `dv022`); o agendamento seguiu com #7 a #10 (`dv023` a `dv026`), até o último lote de 2017.
 
 ## G3 · Três métodos de seleção
 
@@ -102,7 +102,7 @@ Como funciona: [`f7_workflow.md`](f7_workflow.md).
 - [x] Executa 01→02→03→04→05, um notebook por passo, sem `--allow-errors`.
 - [x] Falha interrompe o fluxo e impede promoção: #3 parou no 03, e o 04 e a Release não rodaram.
 - [x] Publica as evidências como artefato `evidencias-<run_id>`.
-- [x] **Execução real pelo `schedule`:** #6, com todos os passos verdes.
+- [x] **Execução real pelo `schedule`:** #6 a #10, uma por dia de 23 a 26/11, com todos os passos verdes.
 
 > O `schedule` só dispara a partir da branch padrão, pode atrasar e exige *Workflow permissions* = "Read and write".
 
@@ -111,7 +111,8 @@ Como funciona: [`f7_workflow.md`](f7_workflow.md).
 - [x] Vencedor eleito no notebook 04 pela maior média de `f1_macro` no CV; empate vai para o menor desvio.
 - [x] Vencedor e vigente avaliados no mesmo teste do ciclo atual.
 - [x] Melhoria mínima (0,005) e piso (0,60) definidos antes, em `config.yaml`.
-- [x] Mantém o vigente quando a regra não é atendida: #5 e #6.
+- [x] Mantém o vigente quando a regra não é atendida: #5, #6 e #7 (no #7 o vencedor ganhou por 0,0034, abaixo da melhoria mínima de 0,005).
+- [x] Promove sem intervenção quando a regra é atendida: #8, #9 e #10, disparadas pelo `schedule`.
 - [x] Manifesto com identificação, versão dos dados, features, métrica, `run_id`, decisão e histórico.
 - [x] Modelos anteriores preservados na Release `modelos`, sem sobrescrita.
 - [x] Notebook 05 carrega o vigente completo e prevê o próximo lote de `data/incoming/`, conferido quando ele chega.
@@ -142,7 +143,7 @@ Teste de 23/11/2026 numa cópia limpa da `main` (`git archive` de `73d525c`), se
 - [x] Votação refeita em cada ciclo, com o mesmo `cycle_id` e `data_version` do início ao fim.
 - [x] Dois modelos treinados e decisão automática registrada em cada ciclo.
 - [x] Previsões com o vigente, sem erro nos logs.
-- [x] Execução por `schedule` comprovada (#6).
+- [x] Execução por `schedule` comprovada (#6 a #10).
 - [x] MLflow recupera os ciclos e as decisões.
 - [x] Recurso adicional demonstrado.
 - [x] Teste só na avaliação final, e `python -m pytest -q` passando.

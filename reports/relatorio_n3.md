@@ -158,16 +158,16 @@ A regra foi fixada antes no `config.yaml`:
 - o vencedor e o vigente são avaliados **no teste do ciclo atual, nos mesmos registros**, e não contra um número guardado de um ciclo antigo;
 - o vencedor só é promovido se passar do piso de **0,60** e superar o vigente em pelo menos **0,005**; senão o vigente fica.
 
-Resultado nos ciclos executados no GitHub Actions (os valores são F1 macro no teste do ciclo; vencedor e vigente avaliados nos mesmos registros):
+Resultado nos ciclos executados no GitHub Actions (os valores são F1 macro no teste do ciclo; vencedor e vigente avaliados nos mesmos registros; "Teste" é o número de reservas do teste; entre parênteses, a diferença vencedor − vigente):
 
-| Execução | Dados | Teste (registros) | Vencedor | Vigente | Decisão |
+| Execução | Dados | Teste | Vencedor | Vigente | Decisão |
 |---|---|---|---|---|---|
-| [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506) | dv019 (+ jan/2017) | 16.456 | B · 0,7310 | nenhum | **promovido** (1º ciclo, passa no piso) |
-| [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) | falha simulada | n/a | n/a | B do #2 | nada promovido; fluxo parou no 03 |
+| [#2](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45090760506) | dv019 (+ jan/2017) | 16.456 | B · 0,7310 | nenhum | **promovido** (1º ciclo) |
+| [#3](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45091260105) | falha simulada | n/a | n/a | B do #2 | parou no 03 |
 | [#4](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099413735) | dv020 (+ fev/2017) | 17.403 | B · 0,7433 | 0,7231 | **promovido** (+0,020) |
-| [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) | dv021 (+ mar/2017) | 18.392 | B · 0,7366 | 0,7415 | **mantido** (não supera o vigente) |
-| [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`) | dv022 (+ abr/2017) | 19.444 | B · 0,7488 | 0,7517 | **mantido** (não supera o vigente) |
-| [#7](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45262196574) (`schedule`) | dv023 (+ mai/2017) | 20.789 | B · 0,7546 | 0,7512 | **mantido** (+0,0034, abaixo de 0,005) |
+| [#5](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45099857641) | dv021 (+ mar/2017) | 18.392 | B · 0,7366 | 0,7415 | **mantido** (−0,005) |
+| [#6](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45154548830) (`schedule`) | dv022 (+ abr/2017) | 19.444 | B · 0,7488 | 0,7517 | **mantido** (−0,003) |
+| [#7](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45262196574) (`schedule`) | dv023 (+ mai/2017) | 20.789 | B · 0,7546 | 0,7512 | **mantido** (+0,003) |
 | [#8](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45474058813) (`schedule`) | dv024 (+ jun/2017) | 21.849 | B · 0,7553 | 0,7494 | **promovido** (+0,006) |
 | [#9](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45679932790) (`schedule`) | dv025 (+ jul/2017) | 22.907 | B · 0,7474 | 0,7354 | **promovido** (+0,012) |
 | [#10](https://github.com/GabrielKaring/projeto-n3-mlops-hotel/actions/runs/45878188588) (`schedule`) | dv026 (+ ago/2017) | 24.018 | B · 0,7416 | 0,7347 | **promovido** (+0,007) |
